@@ -6,6 +6,7 @@ import "strconv"
 import "os"
 import "time"
 import "fmt"
+import "math/rand"
 
 func port(tst string, host int) string {
   s := "/var/tmp/px-"
@@ -82,7 +83,7 @@ func TestBasic(t *testing.T) {
     pxh[i] = port("basic", i)
   }
   for i := 0; i < npaxos; i++ {
-    pxa[i] = Make(pxh, i)
+    pxa[i] = Make(pxh, i, nil)
     pxa[i].Start(0, v0)
   }
 
@@ -120,7 +121,7 @@ func TestMany(t *testing.T) {
     pxh[i] = port("many", i)
   }
   for i := 0; i < npaxos; i++ {
-    pxa[i] = Make(pxh, i)
+    pxa[i] = Make(pxh, i, nil)
     pxa[i].Start(0, v0)
   }
 
@@ -162,7 +163,7 @@ func TestBasicCrash(t *testing.T) {
     pxh[i] = port("basiccrash", i)
   }
   for i := 0; i < npaxos; i++ {
-    pxa[i] = Make(pxh, i)
+    pxa[i] = Make(pxh, i, nil)
     pxa[i].Start(0, v0)
   }
 
@@ -178,8 +179,8 @@ func TestBasicCrash(t *testing.T) {
   checkmax(t, pxa, 2, 0)
 
   // restart two crashed peers
-  pxa[1] = Make(pxh, 1)
-  pxa[2] = Make(pxh, 2)
+  pxa[1] = Make(pxh, 1, nil)
+  pxa[2] = Make(pxh, 2, nil)
   pxa[3].Start(3, 103)
 
   // do agreements now complete?
@@ -226,20 +227,20 @@ func TestOld(t *testing.T) {
     pxh[i] = port("old", i)
   }
 
-  pxa[1] = Make(pxh, 1)
-  pxa[2] = Make(pxh, 2)
-  pxa[3] = Make(pxh, 3)
+  pxa[1] = Make(pxh, 1, nil)
+  pxa[2] = Make(pxh, 2, nil)
+  pxa[3] = Make(pxh, 3, nil)
   pxa[1].Start(1, 111)
 
   waitmajority(t, pxa, 1)
 
-  pxa[0] = Make(pxh, 0)
+  pxa[0] = Make(pxh, 0, nil)
   pxa[0].Start(1, 222)
 
   waitn(t, pxa, 1, 4)
 
   if false {
-    pxa[4] = Make(pxh, 4)
+    pxa[4] = Make(pxh, 4, nil)
     waitn(t, pxa, 1, npaxos)
   }
 }
@@ -261,7 +262,7 @@ func TestManyUnreliable(t *testing.T) {
     pxh[i] = port("many", i)
   }
   for i := 0; i < npaxos; i++ {
-    pxa[i] = Make(pxh, i)
+    pxa[i] = Make(pxh, i, nil)
     pxa[i].unreliable = true
     pxa[i].Start(0, v0)
   }
@@ -336,7 +337,7 @@ func TestPartition(t *testing.T) {
         pxh[j] = pp(i, j)
       }
     }
-    pxa[i] = Make(pxh, i)
+    pxa[i] = Make(pxh, i, nil)
   }
   defer part(t, npaxos, []int{}, []int{}, []int{})
 
@@ -408,4 +409,98 @@ func TestPartition(t *testing.T) {
   }
 
   fmt.Printf("OK\n")
+}
+
+func TestLots(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  const npaxos = 5
+  var pxa []*Paxos = make([]*Paxos, npaxos)
+  defer cleanup(pxa)
+
+  for i := 0; i < npaxos; i++ {
+    var pxh []string = make([]string, npaxos)
+    for j := 0; j < npaxos; j++ {
+      if j == i {
+        pxh[j] = port("partition", i)
+      } else {
+        pxh[j] = pp(i, j)
+      }
+    }
+    pxa[i] = Make(pxh, i, nil)
+    pxa[i].unreliable = true
+  }
+  defer part(t, npaxos, []int{}, []int{}, []int{})
+
+  done := false
+
+  // re-partition periodically
+  go func() {
+    for done == false {
+      var a [npaxos]int
+      for i := 0; i < npaxos; i++ {
+        a[i] = (rand.Int() % 3)
+      }
+      pa := make([][]int, 3)
+      for i := 0; i < 3; i++ {
+        pa[i] = make([]int, 0)
+        for j := 0; j < npaxos; j++ {
+          if a[j] == i {
+            pa[i] = append(pa[i], j)
+          }
+        }
+      }
+      part(t, npaxos, pa[0], pa[1], pa[2])
+      time.Sleep(time.Duration(rand.Int63() % 200) * time.Millisecond)
+    }
+  }()
+
+  seq := 0
+
+  // periodically start a new instance
+  go func () {
+    for done == false {
+      n := 0
+      for i := 0; i < npaxos; i++ {
+        if (rand.Int() % 100) < 30 {
+          n++
+          pxa[i].Start(seq, rand.Int() % 10)
+        }
+      }
+      if n == 0 {
+          pxa[0].Start(seq, rand.Int() % 10)
+      }
+      seq++
+      time.Sleep(time.Duration(rand.Int63() % 300) * time.Millisecond)
+    }
+  }()
+
+  // periodically check that decisions are consistent
+  go func() {
+    for done == false {
+      for i := 0; i < seq; i++ {
+        ndecided(t, pxa, i)
+      }
+      time.Sleep(time.Duration(rand.Int63() % 300) * time.Millisecond)
+    }
+  }()
+
+  time.Sleep(20 * time.Second)
+  done = true
+  time.Sleep(2 * time.Second)
+
+
+  // repair, then check that all instances decided.
+  for i := 0; i < npaxos; i++ {
+    pxa[i].unreliable = false
+  }
+  part(t, npaxos, []int{0,1,2,3,4}, []int{}, []int{})
+  time.Sleep(2 * time.Second)
+  fmt.Printf("done; started %v instances\n", seq)
+  time.Sleep(4 * time.Second)
+
+
+  for i := 0; i < seq; i++ {
+    waitmajority(t, pxa, i)
+  }
 }
