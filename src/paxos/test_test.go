@@ -256,81 +256,6 @@ func TestMany(t *testing.T) {
 }
 
 //
-// basic failure / restart cases
-//
-func TestBasicCrash(t *testing.T) {
-  runtime.GOMAXPROCS(4)
-
-  const npaxos = 5
-  var pxa []*Paxos = make([]*Paxos, npaxos)
-  var pxh []string = make([]string, npaxos)
-  defer cleanup(pxa)
-
-  for i := 0; i < npaxos; i++ {
-    pxh[i] = port("basiccrash", i)
-  }
-  for i := 0; i < npaxos; i++ {
-    pxa[i] = Make(pxh, i, nil)
-    pxa[i].Start(0, 0)
-  }
-
-  fmt.Printf("Minority crash: ")
-
-  pxa[0].Kill()
-  pxa[1].Kill()
-  pxa[2].Start(1, 101)
-  waitmajority(t, pxa, 1)
-
-  fmt.Printf("OK\n")
-
-  fmt.Printf("Majority crash: ")
-
-  pxa[2].Kill()
-  pxa[3].Start(2, 102)
-  checkmax(t, pxa, 2, 0)
-
-  fmt.Printf("OK\n")
-
-  fmt.Printf("After reboot: ")
-
-  pxa[1] = Make(pxh, 1, nil)
-  pxa[2] = Make(pxh, 2, nil)
-  pxa[3].Start(3, 103)
-
-  // do agreements now complete?
-  // XXX requiring completion is a little dubious, since peers that
-  // have lost on-disk Paxos state really should not
-  // let themselves restart.
-  // on the other hand, in this test no crashed peer had
-  // made any prepare_ok promise.
-  waitmajority(t, pxa, 2)
-  waitmajority(t, pxa, 3)
-
-  fmt.Printf("OK\n")
-
-  fmt.Printf("Rebooted servers see past instances: ")
-
-  ok := false
-  for iters := 0; iters < 50; iters++ {
-    ok = true
-    for seq := 0; seq <= 3; seq++ {
-      if ndecided(t, pxa, seq) != 4 {
-        ok = false
-      }
-    }
-    if ok {
-      break
-    }
-    time.Sleep(100 * time.Millisecond)
-  }
-  if ok == false {
-    t.Fatalf("restarted peer doesn't see old agreements")
-  }
-  
-  fmt.Printf("OK\n")
-}
-
-//
 // a peer starts up, with proposal, after others decide.
 // then another peer starts, without a proposal.
 // 
@@ -540,6 +465,8 @@ func TestPartition(t *testing.T) {
 func TestLots(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
+  fmt.Printf("Many requests, changing partitions: ")
+
   tag := "lots"
   const npaxos = 5
   var pxa []*Paxos = make([]*Paxos, npaxos)
@@ -616,18 +543,16 @@ func TestLots(t *testing.T) {
   done = true
   time.Sleep(2 * time.Second)
 
-
   // repair, then check that all instances decided.
   for i := 0; i < npaxos; i++ {
     pxa[i].unreliable = false
   }
   part(t, tag, npaxos, []int{0,1,2,3,4}, []int{}, []int{})
-  time.Sleep(2 * time.Second)
-  fmt.Printf("done; started %v instances\n", seq)
-  time.Sleep(4 * time.Second)
-
+  time.Sleep(5 * time.Second)
 
   for i := 0; i < seq; i++ {
     waitmajority(t, pxa, i)
   }
+
+  fmt.Printf("OK\n")
 }
