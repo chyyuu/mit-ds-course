@@ -8,6 +8,8 @@ import "time"
 import "viewservice"
 import "sync"
 import "os"
+import "syscall"
+import "math/rand"
 
 
 type PBServer struct {
@@ -15,6 +17,7 @@ type PBServer struct {
   l net.Listener
   dead bool // for testing
   partitioned bool // for testing
+  unreliable bool // for testing
   me string
   vs *viewservice.Clerk
   // Your declarations here.
@@ -78,7 +81,21 @@ func StartServer(vshost string, me string) *PBServer {
     for pb.dead == false {
       conn, err := pb.l.Accept()
       if err == nil && pb.dead == false {
+        if pb.unreliable && (rand.Int63() % 1000) < 100 {
+          // discard the request.
+          conn.Close()
+        } else if pb.unreliable && (rand.Int63() % 1000) < 200 {
+          // process the request but force discard of reply.
+          c1 := conn.(*net.UnixConn)
+          f, _ := c1.File()
+          err := syscall.Shutdown(int(f.Fd()), syscall.SHUT_WR)
+          if err != nil {
+            fmt.Printf("shutdown: %v\n", err)
+          }
+          go rpcs.ServeConn(conn)
+        } else {
         go rpcs.ServeConn(conn)
+        }
       } else if err == nil {
         conn.Close()
       }

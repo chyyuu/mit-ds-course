@@ -9,9 +9,9 @@ import "fmt"
 import "math/rand"
 
 func check(t *testing.T, ck *Clerk, key string, value string) {
-  v, err := ck.Get(key)
+  v := ck.Get(key)
   if v != value {
-    t.Fatalf("Get(%v) -> %v, expected %v, err %v", key, v, value, err)
+    t.Fatalf("Get(%v) -> %v, expected %v", key, v, value)
   }
 }
 
@@ -76,10 +76,11 @@ func TestBasic(t *testing.T) {
       go func(me int) {
         defer func() { ca[me] <- true }()
         ci := (rand.Int() % nservers)
+        myck := MakeClerk([]string{kvh[ci]})
         if (rand.Int() % 1000) < 500 {
-          cka[ci].Put("b", strconv.Itoa(rand.Int()))
+          myck.Put("b", strconv.Itoa(rand.Int()))
         } else {
-          cka[ci].Get("b")
+          myck.Get("b")
         }
       }(nth)
     }
@@ -88,7 +89,7 @@ func TestBasic(t *testing.T) {
     }
     var va [nservers]string
     for i := 0; i < nservers; i++ {
-      va[i], _ = cka[i].Get("b")
+      va[i] = cka[i].Get("b")
       if va[i] != va[0] {
         t.Fatalf("mismatch")
       }
@@ -234,6 +235,121 @@ func TestPartition(t *testing.T) {
   fmt.Printf("OK\n")
 }
 
+func TestUnreliable(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  const nservers = 3
+  var kva []*KVPaxos = make([]*KVPaxos, nservers)
+  var kvh []string = make([]string, nservers)
+  defer cleanup(kva)
+
+  for i := 0; i < nservers; i++ {
+    kvh[i] = port("un", i)
+  }
+  for i := 0; i < nservers; i++ {
+    kva[i] = StartServer(kvh, i)
+    kva[i].unreliable = true
+  }
+
+  ck := MakeClerk(kvh)
+  var cka [nservers]*Clerk
+  for i := 0; i < nservers; i++ {
+    cka[i] = MakeClerk([]string{kvh[i]})
+  }
+
+  fmt.Printf("Basic put/get, unreliable: ")
+
+  ck.Put("a", "aa")
+  check(t, ck, "a", "aa")
+
+  cka[1].Put("a", "aaa")
+
+  check(t, cka[2], "a", "aaa")
+  check(t, cka[1], "a", "aaa")
+  check(t, ck, "a", "aaa")
+
+  fmt.Printf("OK\n")
+
+  fmt.Printf("Sequence of puts, unreliable: ")
+
+  const ncli = 30
+  var ca [ncli]chan bool
+  for cli := 0; cli < ncli; cli++ {
+    ca[cli] = make(chan bool)
+    go func(me int) {
+      ok := false
+      defer func() { ca[me] <- ok }()
+      sa := make([]string, len(kvh))
+      copy(sa, kvh)
+      for i := range sa {
+        j := rand.Intn(i+1)
+        sa[i], sa[j] = sa[j], sa[i]
+      }
+      myck := MakeClerk(sa)
+      key := strconv.Itoa(me)
+      myck.Put(key, "0")
+      myck.Put(key, "1")
+      myck.Put(key, "2")
+      time.Sleep(100 * time.Millisecond)
+      if myck.Get(key) != "2" {
+        t.Fatalf("wrong value")
+      }
+      if myck.Get(key) != "2" {
+        t.Fatalf("wrong value")
+      }
+      ok = true
+    }(cli)
+  }
+  for cli := 0; cli < ncli; cli++ {
+    x := <- ca[cli]
+    if x == false {
+      t.Fatalf("failure")
+    }
+  }
+
+  fmt.Printf("OK\n")
+
+  fmt.Printf("Concurrent clients, unreliable: ")
+
+  for iters := 0; iters < 20; iters++ {
+    const ncli = 30
+    var ca [ncli]chan bool
+    for cli := 0; cli < ncli; cli++ {
+      ca[cli] = make(chan bool)
+      go func(me int) {
+        defer func() { ca[me] <- true }()
+        sa := make([]string, len(kvh))
+        copy(sa, kvh)
+        for i := range sa {
+          j := rand.Intn(i+1)
+          sa[i], sa[j] = sa[j], sa[i]
+        }
+        myck := MakeClerk(sa)
+        if (rand.Int() % 1000) < 500 {
+          myck.Put("b", strconv.Itoa(rand.Int()))
+        } else {
+          myck.Get("b")
+        }
+      }(cli)
+    }
+    for cli := 0; cli < ncli; cli++ {
+      <- ca[cli]
+    }
+
+    var va [nservers]string
+    for i := 0; i < nservers; i++ {
+      va[i] = cka[i].Get("b")
+      if va[i] != va[0] {
+        t.Fatalf("mismatch; 0 got %v, %v got %v", va[0], i, va[i])
+      }
+    }
+  }
+
+  fmt.Printf("OK\n")
+
+  time.Sleep(1 * time.Second)
+}
+
 func TestHole(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
@@ -282,13 +398,11 @@ func TestHole(t *testing.T) {
           ci := (rand.Int() % 2)
           if (rand.Int() % 1000) < 500 {
             nv := strconv.Itoa(rand.Int())
-            err := cka[ci].Put(key, nv)
-            if err == nil {
-              last = nv
-            }
+            cka[ci].Put(key, nv)
+            last = nv
           } else {
-            v, err := cka[ci].Get(key)
-            if err == nil && v != last {
+            v := cka[ci].Get(key)
+            if v != last {
               t.Fatalf("%v: wrong value, key %v, wanted %v, got %v",
                 cli, key, last, v)
             }
@@ -381,24 +495,26 @@ func TestManyPartition(t *testing.T) {
     go func(cli int) {
       ok := false
       defer func() { ca[cli] <- ok }()
-      var cka [nservers]*Clerk
+      sa := make([]string, nservers)
       for i := 0; i < nservers; i++ {
-        cka[i] = MakeClerk([]string{port(tag, i)})
+        sa[i] = port(tag, i)
       }
+      for i := range sa {
+        j := rand.Intn(i+1)
+        sa[i], sa[j] = sa[j], sa[i]
+      }
+      myck := MakeClerk(sa)
       key := strconv.Itoa(cli)
       last := ""
-      cka[0].Put(key, last)
+      myck.Put(key, last)
       for done == false {
-        ci := (rand.Int() % nservers)
         if (rand.Int() % 1000) < 500 {
           nv := strconv.Itoa(rand.Int())
-          err := cka[ci].Put(key, nv)
-          if err == nil {
-            last = nv
-          }
+          myck.Put(key, nv)
+          last = nv
         } else {
-          v, err := cka[ci].Get(key)
-          if err == nil && v != last {
+          v := myck.Get(key)
+          if v != last {
             t.Fatalf("%v: wrong value, key %v, wanted %v, got %v",
               cli, key, last, v)
           }

@@ -11,6 +11,8 @@ const (
 type Err string
 
 type PutArgs struct {
+  CID int64  // client ID
+  Cseq uint64 // client seq #
   Key string
   Value string
 }
@@ -20,6 +22,8 @@ type PutReply struct {
 }
 
 type GetArgs struct {
+  CID int64  // client ID
+  Cseq uint64 // client seq #
   Key string
 }
 
