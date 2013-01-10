@@ -9,8 +9,10 @@ import "fmt"
 import "math/rand"
 
 func port(tag string, host int) string {
-  s := "/var/tmp/px-"
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  os.Mkdir(s, 0777)
+  s += "px-"
   s += strconv.Itoa(os.Getpid()) + "-"
   s += tag + "-"
   s += strconv.Itoa(host)
@@ -465,8 +467,9 @@ func TestManyUnreliable(t *testing.T) {
 }
 
 func pp(tag string, src int, dst int) string {
-  s := "/var/tmp/px-" + tag + "-"
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  s += "px-" + tag + "-"
   s += strconv.Itoa(os.Getpid()) + "-"
   s += strconv.Itoa(src) + "-"
   s += strconv.Itoa(dst)

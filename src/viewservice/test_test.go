@@ -24,8 +24,10 @@ func check(t *testing.T, ck *Clerk, p string, b string, n uint) {
 }
 
 func port(suffix string) string {
-  s := "/var/tmp/viewserver-" 
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  os.Mkdir(s, 0777)
+  s += "viewserver-" 
   s += strconv.Itoa(os.Getpid()) + "-"
   s += suffix
   return s

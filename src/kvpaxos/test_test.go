@@ -16,8 +16,10 @@ func check(t *testing.T, ck *Clerk, key string, value string) {
 }
 
 func port(tag string, host int) string {
-  s := "/var/tmp/kv-"
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  os.Mkdir(s, 0777)
+  s += "kv-"
   s += strconv.Itoa(os.Getpid()) + "-"
   s += tag + "-"
   s += strconv.Itoa(host)
@@ -102,8 +104,9 @@ func TestBasic(t *testing.T) {
 }
 
 func pp(tag string, src int, dst int) string {
-  s := "/var/tmp/kv-" + tag + "-"
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  s += "kv-" + tag + "-"
   s += strconv.Itoa(os.Getpid()) + "-"
   s += strconv.Itoa(src) + "-"
   s += strconv.Itoa(dst)

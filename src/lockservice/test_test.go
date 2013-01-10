@@ -28,8 +28,9 @@ func tu(t *testing.T, ck *Clerk, lockname string, expected bool) {
 // AFS doesn't support UNIX-domain sockets.
 //
 func port(suffix string) string {
-  s := "/var/tmp/lockserver-" 
-  s += strconv.Itoa(os.Getuid()) + "-"
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  os.Mkdir(s, 0777)
   s += strconv.Itoa(os.Getpid()) + "-"
   s += suffix
   return s
