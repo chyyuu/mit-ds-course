@@ -13,11 +13,11 @@ package paxos
 // The application interface:
 //
 // px = paxos.Make(peers []string, me string)
-// px.Max() int -- highest instance seq known, or -1
-// px.Min() int -- everything before this has been GC'd
-// px.Get(seq int) (decided bool, v interface{}) -- get info about an instance
 // px.Start(seq int, v interface{}) -- start agreement on new instance
-// px.Done(seq int) -- ok to GC all instances <= seq
+// px.Get(seq int) (decided bool, v interface{}) -- get info about an instance
+// px.Done(seq int) -- ok to forget all instances <= seq
+// px.Max() int -- highest instance seq known, or -1
+// px.Min() int -- instances before this seq have been forgotten
 //
 
 import "net"
@@ -74,7 +74,7 @@ func (px *Paxos) Max() int {
 
 //
 // the application wants to know how far
-// garbage collection has progressed on this peer;
+// forgetting has progressed on this peer;
 // paxos has discarded all instances < Min().
 //
 func (px *Paxos) Min() int {
@@ -85,7 +85,9 @@ func (px *Paxos) Min() int {
 //
 // the application wants to know whether this
 // peer thinks an instance has been decided,
-// and if so what the agreed value is.
+// and if so what the agreed value is. Get()
+// should just inspect the local peer's state;
+// it should not contact other Paxos peers.
 //
 func (px *Paxos) Get(seq int) (bool, interface{}) {
   // Your code here.

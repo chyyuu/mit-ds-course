@@ -110,13 +110,17 @@ func pp(tag string, src int, dst int) string {
   return s
 }
 
-func part(t *testing.T, tag string, npaxos int, p1 []int, p2 []int, p3 []int) {
-  for i := 0; i < npaxos; i++ {
-    for j := 0; j < npaxos; j++ {
+func cleanpp(tag string, n int) {
+  for i := 0; i < n; i++ {
+    for j := 0; j < n; j++ {
       ij := pp(tag, i, j)
       os.Remove(ij)
     }
   }
+}
+
+func part(t *testing.T, tag string, npaxos int, p1 []int, p2 []int, p3 []int) {
+  cleanpp(tag, npaxos)
 
   pa := [][]int{p1, p2, p3}
   for pi := 0; pi < len(pa); pi++ {
@@ -141,6 +145,7 @@ func TestPartition(t *testing.T) {
   const nservers = 5
   var kva []*KVPaxos = make([]*KVPaxos, nservers)
   defer cleanup(kva)
+  defer cleanpp(tag, nservers)
 
   for i := 0; i < nservers; i++ {
     var kvh []string = make([]string, nservers)
@@ -359,6 +364,7 @@ func TestHole(t *testing.T) {
   const nservers = 5
   var kva []*KVPaxos = make([]*KVPaxos, nservers)
   defer cleanup(kva)
+  defer cleanpp(tag, nservers)
 
   for i := 0; i < nservers; i++ {
     var kvh []string = make([]string, nservers)
@@ -449,6 +455,7 @@ func TestManyPartition(t *testing.T) {
   const nservers = 5
   var kva []*KVPaxos = make([]*KVPaxos, nservers)
   defer cleanup(kva)
+  defer cleanpp(tag, nservers)
 
   for i := 0; i < nservers; i++ {
     var kvh []string = make([]string, nservers)
