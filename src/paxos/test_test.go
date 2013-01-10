@@ -649,17 +649,26 @@ func TestLots(t *testing.T) {
   // periodically start a new instance
   go func () {
     for done == false {
-      n := 0
-      for i := 0; i < npaxos; i++ {
-        if (rand.Int() % 100) < 30 {
-          n++
-          pxa[i].Start(seq, rand.Int() % 10)
+      // how many instances are in progress?
+      nd := 0
+      for i := 0; i < seq; i++ {
+        if ndecided(t, pxa, i) == npaxos {
+          nd++
         }
       }
-      if n == 0 {
+      if seq - nd < 20 {
+        n := 0
+        for i := 0; i < npaxos; i++ {
+          if (rand.Int() % 100) < 30 {
+            n++
+            pxa[i].Start(seq, rand.Int() % 10)
+          }
+        }
+        if n == 0 {
           pxa[0].Start(seq, rand.Int() % 10)
+        }
+        seq++
       }
-      seq++
       time.Sleep(time.Duration(rand.Int63() % 300) * time.Millisecond)
     }
   }()
