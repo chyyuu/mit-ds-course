@@ -8,7 +8,7 @@ import "os"
 import "strconv"
 
 func check(t *testing.T, ck *Clerk, p string, b string, n uint) {
-  view, _ := ck.Ping(0)
+  view, _ := ck.Get()
   if view.Primary != p {
     t.Fatalf("wanted primary %v, got %v", p, view.Primary)
   }
@@ -130,7 +130,7 @@ func Test1(t *testing.T) {
       vx = v
       time.Sleep(PingInterval)
     }
-    check(t, ck2, ck1.me, ck3.me, vx.Viewnum + 1)
+    check(t, ck1, ck1.me, ck3.me, vx.Viewnum + 1)
   }
   fmt.Printf("OK\n")
 
