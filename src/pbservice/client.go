@@ -18,7 +18,7 @@ func MakeClerk(vshost string, me string) *Clerk {
 
 
 //
-// please use call() to send RPCs, both in client.go and in server.go.
+// please use call() to send all RPCs, both in client.go and in server.go.
 // please don't change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {

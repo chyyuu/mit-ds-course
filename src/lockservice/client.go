@@ -18,7 +18,7 @@ func MakeClerk(primary string, backup string) *Clerk {
 }
 
 //
-// please use call() to all send RPCs, in client.go and server.go.
+// please use call() to send all RPCs, in client.go and server.go.
 // please don't change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {

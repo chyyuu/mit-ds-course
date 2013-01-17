@@ -20,7 +20,7 @@ func MakeClerk(me string, server string) *Clerk {
 }
 
 //
-// please use call() to all send RPCs.
+// please use call() to send all RPCs.
 // please don't change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {
