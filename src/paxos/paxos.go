@@ -44,6 +44,7 @@ type Paxos struct {
 
 //
 // please use call() to all send RPCs.
+// please don't change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {
   c, errx := rpc.Dial("unix", srv)
