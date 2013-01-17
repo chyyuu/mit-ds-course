@@ -16,7 +16,6 @@ type PBServer struct {
   mu sync.Mutex
   l net.Listener
   dead bool // for testing
-  partitioned bool // for testing
   unreliable bool // for testing
   me string
   vs *viewservice.Clerk
@@ -108,9 +107,7 @@ func StartServer(vshost string, me string) *PBServer {
 
   go func() {
     for pb.dead == false {
-      if pb.partitioned == false {
-        pb.tick()
-      }
+      pb.tick()
       time.Sleep(viewservice.PingInterval)
     }
   }()

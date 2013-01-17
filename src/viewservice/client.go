@@ -1,7 +1,6 @@
 package viewservice
 
 import "net/rpc"
-import "log"
 import "fmt"
 
 //
@@ -24,7 +23,8 @@ func (ck *Clerk) Ping(viewnum uint) (View, error) {
   // create a connection to the server.
   c, err := rpc.Dial("unix", ck.server)
   if err != nil {
-    log.Fatal("Ping dial:", err)
+    return View{}, fmt.Errorf("Ping(%v) Dial(%v) failed: %v",
+      viewnum, ck.server, err)
   }
   defer c.Close()
 
@@ -46,7 +46,7 @@ func (ck *Clerk) Ping(viewnum uint) (View, error) {
 func (ck *Clerk) Get() (View, bool) {
   c, err := rpc.Dial("unix", ck.server)
   if err != nil {
-    log.Fatal("Ping dial:", err)
+    return View{}, false
   }
   defer c.Close()
   

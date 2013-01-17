@@ -18,20 +18,22 @@ func check(ck *Clerk, key string, value string) {
   }
 }
 
-func port(suffix string) string {
+func port(tag string, host int) string {
   s := "/var/tmp/824-"
   s += strconv.Itoa(os.Getuid()) + "/"
   os.Mkdir(s, 0777)
-  s += "pb-" 
+  s += "pb-"
   s += strconv.Itoa(os.Getpid()) + "-"
-  s += suffix
+  s += tag + "-"
+  s += strconv.Itoa(host)
   return s
 }
 
 func TestBasicFail(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "basic"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
@@ -40,7 +42,7 @@ func TestBasicFail(t *testing.T) {
 
   fmt.Printf("Single primary, no backup: ")
 
-  s1 := StartServer(vshost, port("1"))
+  s1 := StartServer(vshost, port(tag, 1))
 
   deadtime := viewservice.PingInterval * viewservice.DeadPings
   time.Sleep(deadtime * 2)
@@ -63,7 +65,7 @@ func TestBasicFail(t *testing.T) {
 
   fmt.Printf("Add a backup: ")
 
-  s2 := StartServer(vshost, port("2"))
+  s2 := StartServer(vshost, port(tag, 2))
   for i := 0; i < viewservice.DeadPings * 2; i++ {
     v, _ := vck.Get()
     if v.Backup == s2.me {
@@ -116,7 +118,7 @@ func TestBasicFail(t *testing.T) {
   fmt.Printf("Kill last server, new one should not be active: ")
 
   s2.kill()
-  s3 := StartServer(vshost, port("3"))
+  s3 := StartServer(vshost, port(tag, 3))
   for i := 0; i < viewservice.DeadPings * 2; i++ {
     v, _ := vck.Get()
     if v.Primary == s3.me {
@@ -139,16 +141,17 @@ func TestBasicFail(t *testing.T) {
 func TestFailPut(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "failput"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
 
-  s1 := StartServer(vshost, port("1"))
+  s1 := StartServer(vshost, port(tag, 1))
   time.Sleep(time.Second)
-  s2 := StartServer(vshost, port("2"))
+  s2 := StartServer(vshost, port(tag, 2))
   time.Sleep(time.Second)
-  s3 := StartServer(vshost, port("3"))
+  s3 := StartServer(vshost, port(tag, 3))
 
   for i := 0; i < viewservice.DeadPings * 3; i++ {
     v, _ := vck.Get()
@@ -227,7 +230,8 @@ func TestFailPut(t *testing.T) {
 func TestConcurrentSame(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "cs"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
@@ -237,7 +241,7 @@ func TestConcurrentSame(t *testing.T) {
   const nservers = 2
   var sa [nservers]*PBServer
   for i := 0; i < nservers; i++ {
-    sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+    sa[i] = StartServer(vshost, port(tag, i+1))
   }
 
   for iters := 0; iters < viewservice.DeadPings*2; iters++ {
@@ -325,7 +329,8 @@ func TestConcurrentSame(t *testing.T) {
 func TestConcurrentSameUnreliable(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "csu"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
@@ -335,7 +340,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
   const nservers = 2
   var sa [nservers]*PBServer
   for i := 0; i < nservers; i++ {
-    sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+    sa[i] = StartServer(vshost, port(tag, i+1))
     sa[i].unreliable = true
   }
 
@@ -421,18 +426,75 @@ func TestConcurrentSameUnreliable(t *testing.T) {
   time.Sleep(time.Second)
 }
 
+func pp(tag string, src int, dst int) string {
+  s := "/var/tmp/824-"
+  s += strconv.Itoa(os.Getuid()) + "/"
+  s += "pb-" + tag + "-"
+  s += strconv.Itoa(os.Getpid()) + "-"
+  s += strconv.Itoa(src) + "-"
+  s += strconv.Itoa(dst)
+  return s
+}
+
+func cleanpp(tag string, n int) {
+  for i := 0; i < n; i++ {
+    for j := 0; j < n; j++ {
+      ij := pp(tag, i, j)
+      os.Remove(ij)
+    }
+  }
+}
+
+func part(t *testing.T, tag string, npaxos int, p1 []int, p2 []int, p3 []int) {
+  cleanpp(tag, npaxos)
+
+  pa := [][]int{p1, p2, p3}
+  for pi := 0; pi < len(pa); pi++ {
+    p := pa[pi]
+    for i := 0; i < len(p); i++ {
+      for j := 0; j < len(p); j++ {
+        ij := pp(tag, p[i], p[j])
+        pj := port(tag, p[j])
+        err := os.Link(pj, ij)
+        if err != nil {
+          t.Fatalf("os.Link(%v, %v): %v\n", pj, ij, err)
+        }
+      }
+    }
+  }
+}
+
 // check that a partitioned primary does not serve requests.
 func TestPartition(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
-  vs := viewservice.StartServer(vshost)
-  time.Sleep(time.Second)
-  vck := viewservice.MakeClerk("", vshost)
-
   fmt.Printf("Partition an old primary: ")
 
-  s1 := StartServer(vshost, port("1"))
+  tag := "part"
+
+  var vs *viewservice.ViewServer
+  pba := make([]*PBServer, 3)
+  for i := 0; i < 4; i++ {
+    var ha []string = make([]string, 4)
+    for j := 0; j < 4; j++ {
+      if j == i {
+        ha[j] = port(tag, i)
+      } else {
+        ha[j] = pp(tag, i, j)
+      }
+    }
+    if i == 0 {
+      vs = viewservice.StartServer(ha[i])
+    } else {
+      pba[i-1] = StartServer(ha[0], ha[i])
+    }
+  }
+  defer func(){ cleanpp(tag, 4) }()
+
+  part(t, tag, 4, []int{0,1}, []int{}, []int{})
+  time.Sleep(time.Second)
+
+  vck := viewservice.MakeClerk("", port(tag, 0))
 
   for i := 0; i < viewservice.DeadPings; i++ {
     if vck.Primary() != "" {
@@ -441,42 +503,40 @@ func TestPartition(t *testing.T) {
     time.Sleep(viewservice.PingInterval)
   }
 
-  s2 := StartServer(vshost, port("2"))
-  time.Sleep(time.Second)
-  s3 := StartServer(vshost, port("3"))
-  time.Sleep(time.Second)
-
   v1, _ := vck.Get()
-  if v1.Primary != s1.me || v1.Backup != s2.me {
-    t.Fatal("wrong primary or backup")
-  }
 
-  ck := MakeClerk(vshost, "")
+  part(t, tag, 4, []int{0,1,2,3}, []int{}, []int{})
+  time.Sleep(time.Second)
+
+  ck := MakeClerk(port(tag, 0), "")
 
   ck.Put("a", "aa")
   ck.Put("b", "bb")
   check(ck, "a", "aa")
   check(ck, "b", "bb")
 
-  s1.partitioned = true
+  part(t, tag, 4, []int{0,2,3}, []int{}, []int{})
 
   for iters := 0; iters < viewservice.DeadPings * 3; iters++ {
     v, _ := vck.Get()
-    if v.Primary == s2.me && v.Backup == s3.me {
+    if v.Primary != "" && v.Backup != "" && v.Primary != v1.Primary {
       break
     }
     time.Sleep(viewservice.PingInterval)
   }
   v2, _ := vck.Get()
-  if v2.Primary != s2.me || v2.Backup != s3.me {
-    t.Fatal("wrong primary or backup 2")
+  if v2.Primary == "" || v2.Backup == "" || v2.Primary == v1.Primary {
+    t.Fatalf("wrong view %v\n", v2)
   }
+
   check(ck, "a", "aa")
   check(ck, "b", "bb")
 
-  {
+  put_finished := false
+
+  go func() {
     // try to Put to the old (partitioned) primary
-    c, err := rpc.Dial("unix", s1.me)
+    c, err := rpc.Dial("unix", pba[0].me)
     if err != nil {
       t.Fatal("could not dial partitioned server")
     }
@@ -486,24 +546,32 @@ func TestPartition(t *testing.T) {
     args.Value = "bad"
     var reply PutReply
     err = c.Call("PBServer.Put", args, &reply)
-    if err == nil && reply.Err == OK {
-      t.Fatal("Put should have failed")
-    }
+    // the RPC should not return until the partition heals.
+    put_finished = true
+  }()
+  
+  time.Sleep(3 * time.Second)
+  if put_finished {
+    t.Fatalf("Put() to partitioned server succeeded")
   }
+
   check(ck, "a", "aa")
 
-  s1.partitioned = false
+  part(t, tag, 4, []int{0,1,2,3}, []int{}, []int{})
   time.Sleep(time.Second)
-  s2.kill()
+  check(ck, "a", "aa")
+
+  part(t, tag, 4, []int{0,1,3}, []int{}, []int{})
   time.Sleep(time.Second)
+
   check(ck, "a", "aa")
   check(ck, "b", "bb")
 
   fmt.Printf("OK\n")
 
-  s1.kill()
-  s2.kill()
-  s3.kill()
+  pba[0].kill()
+  pba[1].kill()
+  pba[2].kill()
   vs.Kill()
   time.Sleep(time.Second)
 }
@@ -512,7 +580,8 @@ func TestPartition(t *testing.T) {
 func TestRepeatedCrash(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "rc"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
@@ -522,7 +591,7 @@ func TestRepeatedCrash(t *testing.T) {
   const nservers = 3
   var sa [nservers]*PBServer
   for i := 0; i < nservers; i++ {
-    sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+    sa[i] = StartServer(vshost, port(tag, i+1))
   }
 
   for i := 0; i < viewservice.DeadPings; i++ {
@@ -545,7 +614,7 @@ func TestRepeatedCrash(t *testing.T) {
       // wait long enough for new view to form, backup to be initialized
       time.Sleep(2 * viewservice.PingInterval * viewservice.DeadPings)
 
-      sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+      sa[i] = StartServer(vshost, port(tag, i+1))
 
       // wait long enough for new view to form, backup to be initialized
       time.Sleep(2 * viewservice.PingInterval * viewservice.DeadPings)
@@ -601,7 +670,8 @@ func TestRepeatedCrash(t *testing.T) {
 func TestRepeatedCrashUnreliable(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  vshost := port("v")
+  tag := "rcu"
+  vshost := port(tag+"v", 1)
   vs := viewservice.StartServer(vshost)
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
@@ -611,7 +681,7 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
   const nservers = 3
   var sa [nservers]*PBServer
   for i := 0; i < nservers; i++ {
-    sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+    sa[i] = StartServer(vshost, port(tag, i+1))
     sa[i].unreliable = true
   }
 
@@ -635,7 +705,7 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
       // wait long enough for new view to form, backup to be initialized
       time.Sleep(2 * viewservice.PingInterval * viewservice.DeadPings)
 
-      sa[i] = StartServer(vshost, port(strconv.Itoa(i+1)))
+      sa[i] = StartServer(vshost, port(tag, i+1))
 
       // wait long enough for new view to form, backup to be initialized
       time.Sleep(2 * viewservice.PingInterval * viewservice.DeadPings)

@@ -22,7 +22,7 @@ func port(tag string, host int) string {
 func cleanup(sma []*ShardMaster) {
   for i := 0; i < len(sma); i++ {
     if sma[i] != nil {
-      sma[i].kill()
+      sma[i].Kill()
     }
   }
 }
