@@ -37,12 +37,7 @@ func TestBasicFail(t *testing.T) {
   vck := viewservice.MakeClerk("", vshost)
 
   ck := MakeClerk(vshost, "")
-  _, err := ck.Get("aaa")
-  if err == nil {
-    t.Fatal("expected nil")
-  }
 
-  // single primary, no backup
   fmt.Printf("Single primary, no backup: ")
 
   s1 := StartServer(vshost, port("1"))
@@ -125,7 +120,7 @@ func TestBasicFail(t *testing.T) {
   for i := 0; i < viewservice.DeadPings * 2; i++ {
     v, _ := vck.Get()
     if v.Primary == s3.me {
-      t.Fatal("uninitialized backup promoted to primary")
+      t.Fatalf("uninitialized backup promoted to primary")
     }
     time.Sleep(viewservice.PingInterval)
   }

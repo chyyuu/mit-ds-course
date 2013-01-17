@@ -157,7 +157,7 @@ func Test1(t *testing.T) {
   // does vieserver wait for ack of previous view before
   // starting the next one?
   fmt.Printf("Viewserver waits for primary to ack view: ")
-
+  
   {
     // set up p=ck3 b=ck1, but
     // but do not ack
