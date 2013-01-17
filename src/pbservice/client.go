@@ -1,7 +1,6 @@
 package pbservice
 
 import "viewservice"
-import "fmt"
 // You'll probably need to uncomment these:
 // import "net/rpc"
 // import "time"
@@ -18,20 +17,43 @@ func MakeClerk(vshost string, me string) *Clerk {
 }
 
 
-func (ck *Clerk) Get(key string) (string, error) {
-  err := fmt.Errorf("pb Get(%v): unknown error", key)
-
-
-  // Your code here.
-
-  return "", err
+//
+// please use call() to send RPCs, both in client.go and in server.go.
+//
+func call(srv string, name string, args interface{}, reply interface{}) bool {
+  c, errx := rpc.Dial("unix", srv)
+  if errx != nil {
+    return false
+  }
+  defer c.Close()
+    
+  err := c.Call(name, args, reply)
+  if err == nil {
+    return true
+  }
+  return false
 }
 
-func (ck *Clerk) Put(key string, value string) error {
-  err := fmt.Errorf("pb Put(%v): unknown error", key)
 
+//
+// fetch a key's value from the current primary;
+// if they key has never been set, return "".
+// Get() must keep trying until it either the
+// primary replies with the value or the primary
+// says the key doesn't exist (has never been Put().
+//
+func (ck *Clerk) Get(key string) string {
 
   // Your code here.
 
-  return err
+  return "???"
+}
+
+//
+// tell the primary to update key's value.
+// must keep trying until it succeeds.
+//
+func (ck *Clerk) Put(key string, value string) {
+
+  // Your code here.
 }

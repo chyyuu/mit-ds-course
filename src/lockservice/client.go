@@ -1,7 +1,6 @@
 package lockservice
 
 import "net/rpc"
-import "log"
 
 //
 // the lockservice Clerk lives in the client
@@ -19,6 +18,23 @@ func MakeClerk(primary string, backup string) *Clerk {
 }
 
 //
+// please use call() to all send RPCs, in client.go and server.go.
+//
+func call(srv string, name string, args interface{}, reply interface{}) bool {
+  c, errx := rpc.Dial("unix", srv)
+  if errx != nil {
+    return false
+  }
+  defer c.Close()
+    
+  err := c.Call(name, args, reply)
+  if err == nil {
+    return true
+  }
+  return false
+}
+
+//
 // ask the lock service for a lock.
 // returns true if the lock service
 // granted the lock, false otherwise.
@@ -26,24 +42,14 @@ func MakeClerk(primary string, backup string) *Clerk {
 // you will have to modify this function.
 //
 func (ck *Clerk) Lock(lockname string) bool {
-  // create a connection to the server.
-  c, err := rpc.Dial("unix", ck.servers[0])
-  if err != nil {
-    // log.Printf("Lock Dial(%v) failed: %v\n", ck.servers[0], err)
-    return false
-  }
-  defer c.Close()
-  
   // prepare the arguments.
   args := &LockArgs{}
   args.Lockname = lockname
   var reply LockReply
   
   // send an RPC request, wait for the reply.
-  err = c.Call("LockServer.Lock", args, &reply)
-  if err != nil {
-    // RPC-level failure
-    log.Printf("Lock(%v) RPC failed: %v\n", ck.servers[0], err)
+  ok := call(ck.servers[0], "LockServer.Lock", args, &reply)
+  if ok == false {
     return false
   }
   

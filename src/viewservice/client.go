@@ -19,15 +19,24 @@ func MakeClerk(me string, server string) *Clerk {
   return ck
 }
 
-func (ck *Clerk) Ping(viewnum uint) (View, error) {
-  // create a connection to the server.
-  c, err := rpc.Dial("unix", ck.server)
-  if err != nil {
-    return View{}, fmt.Errorf("Ping(%v) Dial(%v) failed: %v",
-      viewnum, ck.server, err)
+//
+// please use call() to all send RPCs.
+//
+func call(srv string, name string, args interface{}, reply interface{}) bool {
+  c, errx := rpc.Dial("unix", srv)
+  if errx != nil {
+    return false
   }
   defer c.Close()
+    
+  err := c.Call(name, args, reply)
+  if err == nil {
+    return true
+  }
+  return false
+}
 
+func (ck *Clerk) Ping(viewnum uint) (View, error) {
   // prepare the arguments.
   args := &PingArgs{}
   args.Me = ck.me
@@ -35,26 +44,19 @@ func (ck *Clerk) Ping(viewnum uint) (View, error) {
   var reply PingReply
 
   // send an RPC request, wait for the reply.
-  err = c.Call("ViewServer.Ping", args, &reply)
-  if err != nil {
-    return View{}, fmt.Errorf("Ping(%v) failed: %v", viewnum, err)
+  ok := call(ck.server, "ViewServer.Ping", args, &reply)
+  if ok == false {
+    return View{}, fmt.Errorf("Ping(%v) failed", viewnum)
   }
 
   return reply.V, nil
 }
 
 func (ck *Clerk) Get() (View, bool) {
-  c, err := rpc.Dial("unix", ck.server)
-  if err != nil {
-    return View{}, false
-  }
-  defer c.Close()
-  
   args := &GetArgs{}
   var reply GetReply
-  err = c.Call("ViewServer.Get", args, &reply)
-  if err != nil {
-    fmt.Printf("Get() failed: %v", err)
+  ok := call(ck.server, "ViewServer.Get", args, &reply)
+  if ok == false {
     return View{}, false
   }
   return reply.View, true

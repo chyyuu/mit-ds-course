@@ -8,13 +8,12 @@ import "log"
 import "runtime"
 import "math/rand"
 import "os"
-import "net/rpc"
 import "strconv"
 
 func check(ck *Clerk, key string, value string) {
-  v, err := ck.Get(key)
+  v := ck.Get(key)
   if v != value {
-    log.Fatalf("Get(%v) -> %v, expected %v, err %v", key, v, value, err)
+    log.Fatalf("Get(%v) -> %v, expected %v", key, v, value)
   }
 }
 
@@ -267,10 +266,7 @@ func TestConcurrentSame(t *testing.T) {
       for done == false {
         k := strconv.Itoa(rr.Int() % nkeys)
         v := strconv.Itoa(rr.Int())
-        err := ck.Put(k, v)
-        if err != nil {
-          t.Fatalf("Put(%v, %v) failed, err=%v", k, v, err)
-        }
+        ck.Put(k, v)
       }
     }(xi)
   }
@@ -283,7 +279,7 @@ func TestConcurrentSame(t *testing.T) {
   ck := MakeClerk(vshost, "")
   var vals [nkeys]string
   for i := 0; i < nkeys; i++ {
-    vals[i], _ = ck.Get(strconv.Itoa(i))
+    vals[i] = ck.Get(strconv.Itoa(i))
     if vals[i] == "" {
       t.Fatalf("Get(%v) failed from primary", i)
     }
@@ -310,7 +306,7 @@ func TestConcurrentSame(t *testing.T) {
 
   // read from old backup
   for i := 0; i < nkeys; i++ {
-    z, _ := ck.Get(strconv.Itoa(i))
+    z := ck.Get(strconv.Itoa(i))
     if z != vals[i] {
       t.Fatalf("Get(%v) from backup; wanted %v, got %v", i, vals[i], z)
     }
@@ -367,10 +363,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
       for done == false {
         k := strconv.Itoa(rr.Int() % nkeys)
         v := strconv.Itoa(rr.Int())
-        err := ck.Put(k, v)
-        if err != nil {
-          t.Fatalf("Put(%v, %v) failed, err=%v", k, v, err)
-        }
+        ck.Put(k, v)
       }
     }(xi)
   }
@@ -383,7 +376,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
   ck := MakeClerk(vshost, "")
   var vals [nkeys]string
   for i := 0; i < nkeys; i++ {
-    vals[i], _ = ck.Get(strconv.Itoa(i))
+    vals[i] = ck.Get(strconv.Itoa(i))
     if vals[i] == "" {
       t.Fatalf("Get(%v) failed from primary", i)
     }
@@ -410,7 +403,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
 
   // read from old backup
   for i := 0; i < nkeys; i++ {
-    z, _ := ck.Get(strconv.Itoa(i))
+    z := ck.Get(strconv.Itoa(i))
     if z != vals[i] {
       t.Fatalf("Get(%v) from backup; wanted %v, got %v", i, vals[i], z)
     }
@@ -536,17 +529,11 @@ func TestPartition(t *testing.T) {
 
   go func() {
     // try to Put to the old (partitioned) primary
-    c, err := rpc.Dial("unix", pba[0].me)
-    if err != nil {
-      t.Fatal("could not dial partitioned server")
-    }
-    defer c.Close()
     args := &PutArgs{}
     args.Key = "a"
     args.Value = "bad"
     var reply PutReply
-    err = c.Call("PBServer.Put", args, &reply)
-    // the RPC should not return until the partition heals.
+    call(pba[0].me, "PBServer.Put", args, &reply)
     put_finished = true
   }()
   
@@ -630,16 +617,13 @@ func TestRepeatedCrash(t *testing.T) {
         k := strconv.Itoa((i * 1000000) + (rr.Int() % 10))
         wanted, ok := data[k]
         if ok {
-          v, err := ck.Get(k)
+          v := ck.Get(k)
           if v != wanted {
-            t.Fatalf("key=%v wanted=%v got=%v err=%v", k, wanted, v, err)
+            t.Fatalf("key=%v wanted=%v got=%v", k, wanted, v)
           }
         }
         nv := strconv.Itoa(rr.Int())
-        err := ck.Put(k, nv)
-        if err != nil {
-          t.Fatalf("Put(%v, %v) failed, err=%v", k, nv, err)
-        }
+        ck.Put(k, nv)
         // if no sleep here, then server tick() threads do not get 
         // enough time to Ping the viewserver.
         time.Sleep(10 * time.Millisecond)
@@ -653,7 +637,7 @@ func TestRepeatedCrash(t *testing.T) {
 
   ck := MakeClerk(vshost, "")
   ck.Put("aaa", "bbb")
-  if v, _ := ck.Get("aaa"); v != "bbb" {
+  if v := ck.Get("aaa"); v != "bbb" {
     t.Fatalf("final Put/Get failed")
   }
 
@@ -721,16 +705,13 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
         k := strconv.Itoa((i * 1000000) + (rr.Int() % 10))
         wanted, ok := data[k]
         if ok {
-          v, err := ck.Get(k)
+          v := ck.Get(k)
           if v != wanted {
-            t.Fatalf("key=%v wanted=%v got=%v err=%v", k, wanted, v, err)
+            t.Fatalf("key=%v wanted=%v got=%v", k, wanted, v)
           }
         }
         nv := strconv.Itoa(rr.Int())
-        err := ck.Put(k, nv)
-        if err != nil {
-          t.Fatalf("Put(%v, %v) failed, err=%v", k, nv, err)
-        }
+        ck.Put(k, nv)
         // if no sleep here, then server tick() threads do not get 
         // enough time to Ping the viewserver.
         time.Sleep(10 * time.Millisecond)
@@ -744,7 +725,7 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
 
   ck := MakeClerk(vshost, "")
   ck.Put("aaa", "bbb")
-  if v, _ := ck.Get("aaa"); v != "bbb" {
+  if v := ck.Get("aaa"); v != "bbb" {
     t.Fatalf("final Put/Get failed")
   }
 

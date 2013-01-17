@@ -32,7 +32,7 @@ func cleanup(sma []*ShardMaster) {
 // the highest Num.
 //
 func check(t *testing.T, groups []int64, ck *Clerk) {
-  c := ck.Query()
+  c := ck.Query(-1)
   if len(c.Groups) != len(groups) {
     t.Fatalf("wanted %v groups, got %v", len(groups), len(c.Groups))
   }
@@ -98,24 +98,72 @@ func TestBasic(t *testing.T) {
 
   fmt.Printf("Basic leave/join: ")
 
+  cfa := make([]Config, 6)
+  cfa[0] = ck.Query(99999)
+
   check(t, []int64{}, ck)
 
   var gid1 int64 = 1
-  ck.Join(gid1, []string{"tweedledum", "tweedledee", "crow"})
+  ck.Join(gid1, []string{"x", "y", "z"})
   check(t, []int64{gid1}, ck)
+  cfa[1] = ck.Query(-1)
 
   var gid2 int64 = 2
   ck.Join(gid2, []string{"a", "b", "c"})
   check(t, []int64{gid1,gid2}, ck)
+  cfa[2] = ck.Query(-1)
 
   ck.Join(gid2, []string{"a", "b", "c"})
   check(t, []int64{gid1,gid2}, ck)
+  cfa[3] = ck.Query(-1)
+
+  cfx := ck.Query(-1)
+  sa1 := cfx.Groups[gid1]
+  if len(sa1) != 3 || sa1[0] != "x" || sa1[1] != "y" || sa1[2] != "z" {
+    t.Fatal("wrong servers for gid %v: %v\n", gid1, sa1)
+  }
+  sa2 := cfx.Groups[gid2]
+  if len(sa2) != 3 || sa2[0] != "a" || sa2[1] != "b" || sa2[2] != "c" {
+    t.Fatal("wrong servers for gid %v: %v\n", gid2, sa2)
+  }
 
   ck.Leave(gid1)
   check(t, []int64{gid2}, ck)
+  cfa[4] = ck.Query(-1)
 
   ck.Leave(gid1)
   check(t, []int64{gid2}, ck)
+  cfa[5] = ck.Query(-1)
+
+  fmt.Printf("OK\n")
+
+  fmt.Printf("Historical queries: ")
+
+  for i := 0; i < len(cfa); i++ {
+    c := ck.Query(cfa[i].Num)
+    if c.Num != cfa[i].Num {
+      t.Fatalf("historical Num wrong")
+    }
+    if c.Shards != cfa[i].Shards {
+      t.Fatalf("historical Shards wrong")
+    }
+    if len(c.Groups) != len(cfa[i].Groups) {
+      t.Fatalf("number of historical Groups is wrong")
+    }
+    for gid, sa := range c.Groups {
+      sa1, ok := cfa[i].Groups[gid]
+      if ok == false || len(sa1) != len(sa) {
+        t.Fatalf("historical len(Groups) wrong")
+      }
+      if ok && len(sa1) == len(sa) {
+        for j := 0; j < len(sa); j++ {
+          if sa[j] != sa1[j] {
+            t.Fatalf("historical Groups wrong")
+          }
+        }
+      }
+    }
+  }
 
   fmt.Printf("OK\n")
 
@@ -144,11 +192,11 @@ func TestBasic(t *testing.T) {
 
   fmt.Printf("Minimal transfers after joins: ")
 
-  c1 := ck.Query()
+  c1 := ck.Query(-1)
   for i := 0; i < 5; i++ {
     ck.Join(int64(npara+1+i), []string{"a","b","c"})
   }
-  c2 := ck.Query()
+  c2 := ck.Query(-1)
   for i := int64(1); i <= npara; i++ {
     for j := 0; j < len(c1.Shards); j++ {
       if c2.Shards[j] == i {
@@ -166,7 +214,7 @@ func TestBasic(t *testing.T) {
   for i := 0; i < 5; i++ {
     ck.Leave(int64(npara+1+i))
   }
-  c3 := ck.Query()
+  c3 := ck.Query(-1)
   for i := int64(1); i <= npara; i++ {
     for j := 0; j < len(c1.Shards); j++ {
       if c2.Shards[j] == i {

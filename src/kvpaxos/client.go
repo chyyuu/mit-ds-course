@@ -16,6 +16,23 @@ func MakeClerk(servers []string) *Clerk {
 }
 
 //
+// please use call() to all send RPCs.
+//
+func call(srv string, name string, args interface{}, reply interface{}) bool {
+  c, errx := rpc.Dial("unix", srv)
+  if errx != nil {
+    return false
+  }
+  defer c.Close()
+    
+  err := c.Call(name, args, reply)
+  if err == nil {
+    return true
+  }
+  return false
+}
+
+//
 // fetch the current value for a key.
 // returns "" if the key does not exist.
 // keeps trying forever in the face of all other errors.
@@ -26,20 +43,13 @@ func (ck *Clerk) Get(key string) string {
   for {
     // try each known server.
     for _, srv := range ck.servers {
-      c, err := rpc.Dial("unix", srv)
-      if err == nil {
-        defer c.Close()
-        
-        args := &GetArgs{}
-        args.Key = key
-        var reply GetReply
-        err := c.Call("KVPaxos.Get", args, &reply)
-        c.Close()
-        if err == nil && (reply.Err == OK || reply.Err == ErrNoKey) {
-          return reply.Value
-        }
+      args := &GetArgs{}
+      args.Key = key
+      var reply GetReply
+      ok := call(srv, "KVPaxos.Get", args, &reply)
+      if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
+        return reply.Value
       }
-      
     }
     time.Sleep(100 * time.Millisecond)
   }
@@ -55,19 +65,13 @@ func (ck *Clerk) Put(key string, value string) {
 
   for {
     for _, srv := range ck.servers {
-      c, err := rpc.Dial("unix", srv)
-      if err == nil {
-        defer c.Close()
-        
-        args := &PutArgs{}
-        args.Key = key
-        args.Value = value
-        var reply PutReply
-        err := c.Call("KVPaxos.Put", args, &reply)
-        c.Close()
-        if err == nil && reply.Err == OK {
-          return 
-        }
+      args := &PutArgs{}
+      args.Key = key
+      args.Value = value
+      var reply PutReply
+      ok := call(srv, "KVPaxos.Put", args, &reply)
+      if ok && reply.Err == OK {
+        return 
       }
     }
     time.Sleep(100 * time.Millisecond)

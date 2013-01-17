@@ -42,6 +42,23 @@ type Paxos struct {
   // Your data here.
 }
 
+//
+// please use call() to all send RPCs.
+//
+func call(srv string, name string, args interface{}, reply interface{}) bool {
+  c, errx := rpc.Dial("unix", srv)
+  if errx != nil {
+    return false
+  }
+  defer c.Close()
+    
+  err := c.Call(name, args, reply)
+  if err == nil {
+    return true
+  }
+  return false
+}
+
 
 //
 // the application wants paxos to start agreement on
