@@ -14,7 +14,7 @@ package paxos
 //
 // px = paxos.Make(peers []string, me string)
 // px.Start(seq int, v interface{}) -- start agreement on new instance
-// px.Get(seq int) (decided bool, v interface{}) -- get info about an instance
+// px.Status(seq int) (decided bool, v interface{}) -- get info about an instance
 // px.Done(seq int) -- ok to forget all instances <= seq
 // px.Max() int -- highest instance seq known, or -1
 // px.Min() int -- instances before this seq have been forgotten
@@ -65,7 +65,7 @@ func call(srv string, name string, args interface{}, reply interface{}) bool {
 // the application wants paxos to start agreement on
 // instance seq, with proposed value v.
 // Start() returns right away; the application will
-// call Get() to find out if/when agreement
+// call Status() to find out if/when agreement
 // is reached.
 //
 func (px *Paxos) Start(seq int, v interface{}) {
@@ -103,11 +103,11 @@ func (px *Paxos) Min() int {
 //
 // the application wants to know whether this
 // peer thinks an instance has been decided,
-// and if so what the agreed value is. Get()
+// and if so what the agreed value is. Status()
 // should just inspect the local peer's state;
 // it should not contact other Paxos peers.
 //
-func (px *Paxos) Get(seq int) (bool, interface{}) {
+func (px *Paxos) Status(seq int) (bool, interface{}) {
   // Your code here.
   return false, nil
 }

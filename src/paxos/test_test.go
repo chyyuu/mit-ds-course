@@ -24,7 +24,7 @@ func ndecided(t *testing.T, pxa []*Paxos, seq int) int {
   var v interface{}
   for i := 0; i < len(pxa); i++ {
     if pxa[i] != nil {
-      decided, v1 := pxa[i].Get(seq)
+      decided, v1 := pxa[i].Status(seq)
       if decided {
         if count > 0 && v != v1 {
           t.Fatalf("decided values do not match; seq=%v i=%v v=%v v1=%v",
@@ -248,7 +248,7 @@ func TestManyForget(t *testing.T) {
       seq := (rand.Int() % maxseq)
       i := (rand.Int() % npaxos)
       if seq >= pxa[i].Min() {
-        decided, _ := pxa[i].Get(seq)
+        decided, _ := pxa[i].Status(seq)
         if decided {
           pxa[i].Done(seq)
         }
@@ -264,7 +264,7 @@ func TestManyForget(t *testing.T) {
   for seq := 0; seq < maxseq; seq++ {
     for i := 0; i < npaxos; i++ {
       if seq >= pxa[i].Min() {
-        pxa[i].Get(seq)
+        pxa[i].Status(seq)
       }
     }
   }

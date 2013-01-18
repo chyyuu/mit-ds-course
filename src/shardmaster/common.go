@@ -2,7 +2,7 @@ package shardmaster
 
 //
 // master configuration server.
-// 256 shards, by first char of key.
+// NShards shards
 // the master assigns shards to replication groups.
 //
 // RPC interface:

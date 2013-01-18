@@ -118,12 +118,15 @@ func TestBasicFail(t *testing.T) {
 
   s2.kill()
   s3 := StartServer(vshost, port(tag, 3))
-  for i := 0; i < viewservice.DeadPings * 2; i++ {
-    v, _ := vck.Get()
-    if v.Primary == s3.me {
-      t.Fatalf("uninitialized backup promoted to primary")
-    }
-    time.Sleep(viewservice.PingInterval)
+  time.Sleep(1 * time.Second)
+  get_done := false
+  go func() {
+    ck.Get("1")
+    get_done = true
+  }()
+  time.Sleep(2 * time.Second)
+  if get_done {
+    t.Fatalf("ck.Get() returned even though no initialized primary")
   }
 
   fmt.Printf("OK\n")
@@ -458,10 +461,10 @@ func part(t *testing.T, tag string, npaxos int, p1 []int, p2 []int, p3 []int) {
 }
 
 // check that a partitioned primary does not serve requests.
-func TestPartition(t *testing.T) {
+func TestPutPartition(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Partition an old primary: ")
+  fmt.Printf("Put() to a partitioned primary: ")
 
   tag := "part"
 
@@ -526,7 +529,6 @@ func TestPartition(t *testing.T) {
   check(ck, "b", "bb")
 
   put_finished := false
-
   go func() {
     // try to Put to the old (partitioned) primary
     args := &PutArgs{}
@@ -539,7 +541,111 @@ func TestPartition(t *testing.T) {
   
   time.Sleep(3 * time.Second)
   if put_finished {
-    t.Fatalf("Put() to partitioned server succeeded")
+    t.Fatalf("Put() from partitioned server succeeded")
+  }
+
+  check(ck, "a", "aa")
+
+  part(t, tag, 4, []int{0,1,2,3}, []int{}, []int{})
+  time.Sleep(time.Second)
+  check(ck, "a", "aa")
+
+  part(t, tag, 4, []int{0,1,3}, []int{}, []int{})
+  time.Sleep(time.Second)
+
+  check(ck, "a", "aa")
+  check(ck, "b", "bb")
+
+  fmt.Printf("OK\n")
+
+  pba[0].kill()
+  pba[1].kill()
+  pba[2].kill()
+  vs.Kill()
+  time.Sleep(time.Second)
+}
+
+// check that a partitioned primary does not serve requests.
+func TestGetPartition(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  fmt.Printf("Get() from a partitioned primary: ")
+
+  tag := "part"
+
+  var vs *viewservice.ViewServer
+  pba := make([]*PBServer, 3)
+  for i := 0; i < 4; i++ {
+    var ha []string = make([]string, 4)
+    for j := 0; j < 4; j++ {
+      if j == i {
+        ha[j] = port(tag, i)
+      } else {
+        ha[j] = pp(tag, i, j)
+      }
+    }
+    if i == 0 {
+      vs = viewservice.StartServer(ha[i])
+    } else {
+      pba[i-1] = StartServer(ha[0], ha[i])
+    }
+  }
+  defer func(){ cleanpp(tag, 4) }()
+
+  part(t, tag, 4, []int{0,1}, []int{}, []int{})
+  time.Sleep(time.Second)
+
+  vck := viewservice.MakeClerk("", port(tag, 0))
+
+  for i := 0; i < viewservice.DeadPings; i++ {
+    if vck.Primary() != "" {
+      break
+    }
+    time.Sleep(viewservice.PingInterval)
+  }
+
+  v1, _ := vck.Get()
+
+  part(t, tag, 4, []int{0,1,2,3}, []int{}, []int{})
+  time.Sleep(time.Second)
+
+  ck := MakeClerk(port(tag, 0), "")
+
+  ck.Put("a", "aa")
+  ck.Put("b", "bb")
+  check(ck, "a", "aa")
+  check(ck, "b", "bb")
+
+  part(t, tag, 4, []int{0,2,3}, []int{}, []int{})
+
+  for iters := 0; iters < viewservice.DeadPings * 3; iters++ {
+    v, _ := vck.Get()
+    if v.Primary != "" && v.Backup != "" && v.Primary != v1.Primary {
+      break
+    }
+    time.Sleep(viewservice.PingInterval)
+  }
+  v2, _ := vck.Get()
+  if v2.Primary == "" || v2.Backup == "" || v2.Primary == v1.Primary {
+    t.Fatalf("wrong view %v\n", v2)
+  }
+
+  check(ck, "a", "aa")
+  check(ck, "b", "bb")
+
+  get_finished := false
+  go func() {
+    // try to Get from the old (partitioned) primary
+    args := &GetArgs{}
+    args.Key = "a"
+    var reply GetReply
+    call(pba[0].me, "PBServer.Get", args, &reply)
+    get_finished = true
+  }()
+  
+  time.Sleep(3 * time.Second)
+  if get_finished {
+    t.Fatalf("Get() from partitioned server succeeded")
   }
 
   check(ck, "a", "aa")
