@@ -597,3 +597,123 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
   vs.Kill()
   time.Sleep(time.Second)
 }
+
+func TestPartition(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  tag := "part"
+  vshost := port(tag+"v", 1)
+  vs := viewservice.StartServer(vshost)
+  time.Sleep(time.Second)
+  vck := viewservice.MakeClerk("", vshost)
+
+  ck := MakeClerk(vshost, "")
+
+  fmt.Printf("Old primary does not serve Gets: ")
+
+  vshosta := vshost + "a"
+  os.Link(vshost, vshosta)
+
+  s1 := StartServer(vshosta, port(tag, 1))
+
+  deadtime := viewservice.PingInterval * viewservice.DeadPings
+  time.Sleep(deadtime * 2)
+  if vck.Primary() != s1.me {
+    t.Fatal("primary never formed initial view")
+  }
+
+  s2 := StartServer(vshost, port(tag, 2))
+  time.Sleep(deadtime * 2)
+  v1, _ := vck.Get()
+  if v1.Primary != s1.me || v1.Backup != s2.me {
+    t.Fatal("backup did not join view")
+  }
+  
+  ck.Put("a", "1")
+  check(ck, "a", "1")
+
+  os.Remove(vshosta)
+
+  // now s1 cannot talk to viewserver, so view will change.
+
+  for iter := 0; iter < viewservice.DeadPings * 3; iter++ {
+    if vck.Primary() == s2.me {
+      break
+    }
+    time.Sleep(viewservice.PingInterval)
+  }
+  if vck.Primary() != s2.me {
+    t.Fatalf("primary never changed")
+  }
+
+  // s1 can talk to s2, so s1 should learn that it
+  // should not act as primary.
+
+  get_succeeded := false
+
+  go func(){
+    args := &GetArgs{}
+    args.Key = "a"
+    var reply GetReply
+    ok := call(s1.me, "PBServer.Get", args, &reply)
+    if ok && reply.Err == OK {
+      get_succeeded = true
+    }
+  }()
+
+  time.Sleep(3 * time.Second)
+  if get_succeeded {
+    t.Fatalf("Get to old server succeeded, but should not have")
+  }
+
+  check(ck, "a", "1")
+
+  fmt.Printf("OK\n")
+
+  fmt.Printf("Partitioned old primary does not serve Gets: ")
+
+  s3 := StartServer(vshost, port(tag, 3))
+  for iter := 0; iter < viewservice.DeadPings * 3; iter++ {
+    v, _ := vck.Get()
+    if v.Backup == s3.me && v.Primary == s2.me {
+      break
+    }
+    time.Sleep(viewservice.PingInterval)
+  }
+  v2, _ := vck.Get()
+  if v2.Primary != s2.me || v2.Backup != s3.me {
+    t.Fatalf("new backup never joined")
+  }
+  time.Sleep(2 * time.Second)
+  ck.Put("a", "2")
+
+  s2.kill()
+  time.Sleep(1 * time.Second)
+
+  get_succeeded1 := false
+  go func(){
+    args := &GetArgs{}
+    args.Key = "a"
+    var reply GetReply
+    ok := call(s1.me, "PBServer.Get", args, &reply)
+    if ok && reply.Err == OK {
+      get_succeeded1 = true
+    }
+  }()
+
+  time.Sleep(2 * time.Second)
+  if get_succeeded1 == true {
+    t.Fatalf("partitioned primary served a Get")
+  }
+
+  check(ck, "a", "2")
+
+  fmt.Printf("OK\n")
+
+  s1.kill()
+  s2.kill()
+  s3.kill()
+  time.Sleep(time.Second)
+  vs.Kill()
+  time.Sleep(time.Second)
+}
