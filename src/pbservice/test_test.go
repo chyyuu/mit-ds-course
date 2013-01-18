@@ -28,7 +28,7 @@ func port(tag string, host int) string {
   return s
 }
 
-func xTestBasicFail(t *testing.T) {
+func TestBasicFail(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "basic"
@@ -140,7 +140,7 @@ func xTestBasicFail(t *testing.T) {
 }
 
 // Put right after a backup dies.
-func xTestFailPut(t *testing.T) {
+func TestFailPut(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "failput"
@@ -229,7 +229,7 @@ func xTestFailPut(t *testing.T) {
 // do a bunch of concurrent Put()s on the same key,
 // then check that primary and backup have identical values.
 // i.e. that they processed the Put()s in the same order.
-func xTestConcurrentSame(t *testing.T) {
+func TestConcurrentSame(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "cs"
@@ -325,7 +325,7 @@ func xTestConcurrentSame(t *testing.T) {
   time.Sleep(time.Second)
 }
 
-func xTestConcurrentSameUnreliable(t *testing.T) {
+func TestConcurrentSameUnreliable(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "csu"
@@ -423,7 +423,7 @@ func xTestConcurrentSameUnreliable(t *testing.T) {
 }
 
 // constant put/get while crashing and restarting servers
-func xTestRepeatedCrash(t *testing.T) {
+func TestRepeatedCrash(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "rc"
@@ -510,7 +510,7 @@ func xTestRepeatedCrash(t *testing.T) {
   time.Sleep(time.Second)
 }
 
-func xTestRepeatedCrashUnreliable(t *testing.T) {
+func TestRepeatedCrashUnreliable(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
   tag := "rcu"
