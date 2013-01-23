@@ -99,7 +99,7 @@ func TestBasic(t *testing.T) {
   fmt.Printf("Basic leave/join: ")
 
   cfa := make([]Config, 6)
-  cfa[0] = ck.Query(99999)
+  cfa[0] = ck.Query(-1)
 
   check(t, []int64{}, ck)
 
@@ -165,6 +165,38 @@ func TestBasic(t *testing.T) {
     }
   }
 
+  fmt.Printf("OK\n")
+
+  fmt.Printf("Move: ")
+  {
+    var gid3 int64 = 503
+    ck.Join(gid3, []string{"3a", "3b", "3c"})
+    var gid4 int64 = 504
+    ck.Join(gid4, []string{"4a", "4b", "4c"})
+    for i := 0; i < NShards; i++ {
+      if i < NShards / 2 {
+        ck.Move(i, gid3)
+      } else {
+        ck.Move(i, gid4)
+      }
+    }
+    cf2 := ck.Query(-1)
+    for i := 0; i < NShards; i++ {
+      if i < NShards / 2 {
+        if cf2.Shards[i] != gid3 {
+          t.Fatalf("expected shard %v on gid %v actually %v",
+                   i, gid3, cf2.Shards[i])
+        }
+      } else {
+        if cf2.Shards[i] != gid4 {
+          t.Fatalf("expected shard %v on gid %v actually %v",
+                   i, gid4, cf2.Shards[i])
+        }
+      }
+    }
+    ck.Leave(gid3)
+    ck.Leave(gid4)
+  }
   fmt.Printf("OK\n")
 
   fmt.Printf("Concurrent leave/join: ")

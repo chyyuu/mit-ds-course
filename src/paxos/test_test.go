@@ -39,11 +39,13 @@ func ndecided(t *testing.T, pxa []*Paxos, seq int) int {
 }
 
 func waitn(t *testing.T, pxa[]*Paxos, seq int, wanted int) {
+  to := 10 * time.Millisecond
   for iters := 0; iters < 50; iters++ {
     if ndecided(t, pxa, seq) >= wanted {
       break
     }
-    time.Sleep(100 * time.Millisecond)
+    time.Sleep(to)
+    to *= 2
   }
   nd := ndecided(t, pxa, seq)
   if nd < wanted {
@@ -69,6 +71,32 @@ func cleanup(pxa []*Paxos) {
       pxa[i].Kill()
     }
   }
+}
+
+func noTestSpeed(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  const npaxos = 3
+  var pxa []*Paxos = make([]*Paxos, npaxos)
+  var pxh []string = make([]string, npaxos)
+  defer cleanup(pxa)
+
+  for i := 0; i < npaxos; i++ {
+    pxh[i] = port("basic", i)
+  }
+  for i := 0; i < npaxos; i++ {
+    pxa[i] = Make(pxh, i, nil)
+  }
+
+  t0 := time.Now()
+
+  for i := 0; i < 20; i++ {
+    pxa[0].Start(i, "x")
+    waitn(t, pxa, i, npaxos)
+  }
+
+  d := time.Since(t0)
+  fmt.Printf("20 agreements %v seconds\n", d.Seconds())
 }
 
 func TestBasic(t *testing.T) {
