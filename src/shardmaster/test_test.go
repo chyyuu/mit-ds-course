@@ -6,7 +6,7 @@ import "strconv"
 import "os"
 // import "time"
 import "fmt"
-// import "math/rand"
+import "math/rand"
 
 func port(tag string, host int) string {
   s := "/var/tmp/824-"
@@ -269,7 +269,7 @@ func TestUnreliable(t *testing.T) {
   defer cleanup(sma)
 
   for i := 0; i < nservers; i++ {
-    kvh[i] = port("basic", i)
+    kvh[i] = port("unrel", i)
   }
   for i := 0; i < nservers; i++ {
     sma[i] = StartServer(kvh, i)
@@ -282,7 +282,7 @@ func TestUnreliable(t *testing.T) {
     cka[i] = MakeClerk([]string{kvh[i]})
   }
 
-  fmt.Printf("Concurrent leave/join, unreliable: ")
+  fmt.Printf("Concurrent leave/join, unreliable, failure: ")
 
   const npara = 20
   gids := make([]int64, npara)
@@ -293,9 +293,11 @@ func TestUnreliable(t *testing.T) {
     go func(i int) {
       defer func() { ca[i] <- true }()
       var gid int64 = gids[i]
-      cka[(i+0)%nservers].Join(gid+1000, []string{"a", "b", "c"})
-      cka[(i+0)%nservers].Join(gid, []string{"a", "b", "c"})
-      cka[(i+1)%nservers].Leave(gid+1000)
+      cka[1 + (rand.Int() % 2)].Join(gid+1000, []string{"a", "b", "c"})
+      cka[1 + (rand.Int() % 2)].Join(gid, []string{"a", "b", "c"})
+      cka[1 + (rand.Int() % 2)].Leave(gid+1000)
+      // server 0 won't be able to hear any RPCs.
+      os.Remove(kvh[0])
     }(xi)
   }
   for i := 0; i < npara; i++ {

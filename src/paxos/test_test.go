@@ -40,12 +40,14 @@ func ndecided(t *testing.T, pxa []*Paxos, seq int) int {
 
 func waitn(t *testing.T, pxa[]*Paxos, seq int, wanted int) {
   to := 10 * time.Millisecond
-  for iters := 0; iters < 50; iters++ {
+  for iters := 0; iters < 10; iters++ {
     if ndecided(t, pxa, seq) >= wanted {
       break
     }
     time.Sleep(to)
-    to *= 2
+    if to < time.Second {
+      to *= 2
+    }
   }
   nd := ndecided(t, pxa, seq)
   if nd < wanted {
@@ -155,6 +157,49 @@ func TestBasic(t *testing.T) {
   if pxa[0].Max() != 7 {
     t.Fatalf("wrong Max()")
   }
+
+  fmt.Printf("OK\n")
+}
+
+func TestDeaf(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  const npaxos = 5
+  var pxa []*Paxos = make([]*Paxos, npaxos)
+  var pxh []string = make([]string, npaxos)
+  defer cleanup(pxa)
+
+  for i := 0; i < npaxos; i++ {
+    pxh[i] = port("deaf", i)
+  }
+  for i := 0; i < npaxos; i++ {
+    pxa[i] = Make(pxh, i, nil)
+  }
+
+  fmt.Printf("Deaf proposer: ")
+
+  pxa[0].Start(0, "hello")
+  waitn(t, pxa, 0, npaxos)
+
+  os.Remove(pxh[0])
+  os.Remove(pxh[npaxos-1])
+
+  pxa[1].Start(1, "goodbye")
+  waitmajority(t, pxa, 1)
+  time.Sleep(1 * time.Second)
+  if ndecided(t, pxa, 1) != npaxos - 2 {
+    t.Fatalf("a deaf peer heard about a decision")
+  }
+
+  pxa[0].Start(1, "xxx")
+  waitn(t, pxa, 1, npaxos-1)
+  time.Sleep(1 * time.Second)
+  if ndecided(t, pxa, 1) != npaxos - 1 {
+    t.Fatalf("a deaf peer heard about a decision")
+  }
+
+  pxa[npaxos-1].Start(1, "yyy")
+  waitn(t, pxa, 1, npaxos)
 
   fmt.Printf("OK\n")
 }
@@ -558,6 +603,7 @@ func TestPartition(t *testing.T) {
 
   fmt.Printf("No decision if partitioned: ")
 
+  part(t, tag, npaxos, []int{0,2}, []int{1,3}, []int{4})
   pxa[1].Start(seq, 111)
   checkmax(t, pxa, seq, 0)
   
