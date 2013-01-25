@@ -94,7 +94,8 @@ func StartServer(gid int64, shardmasters []string,
   }
   kv.l = l
 
-  // please do not change any of the following code.
+  // please do not change any of the following code,
+  // or do anything to subvert it.
 
   go func() {
     for kv.dead == false {

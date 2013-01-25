@@ -77,7 +77,8 @@ func StartServer(me string) *ViewServer {
   }
   vs.l = l
 
-  // please don't change any of the following code.
+  // please don't change any of the following code,
+  // or do anything to subvert it.
 
   // create a thread to accept RPC connections from clients.
   go func() {

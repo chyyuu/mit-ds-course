@@ -84,7 +84,8 @@ func StartServer(servers []string, me int) *ShardMaster {
   }
   sm.l = l
 
-  // please do not change any of the following code.
+  // please do not change any of the following code,
+  // or do anything to subvert it.
 
   go func() {
     for sm.dead == false {

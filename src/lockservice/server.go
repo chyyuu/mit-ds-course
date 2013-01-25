@@ -89,7 +89,8 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
   }
   ls.l = l
 
-  // please don't change any of the following code.
+  // please don't change any of the following code,
+  // or do anything to subvert it.
 
   // create a thread to accept RPC connections from clients.
   go func() {

@@ -74,7 +74,8 @@ func StartServer(vshost string, me string) *PBServer {
   }
   pb.l = l
 
-  // please do not change any of the following code.
+  // please do not change any of the following code,
+  // or do anything to subvert it.
 
   go func() {
     for pb.dead == false {

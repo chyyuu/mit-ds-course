@@ -154,7 +154,8 @@ func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
     }
     px.l = l
     
-    // please do not change any of the following code.
+    // please do not change any of the following code,
+    // or do anything to subvert it.
     
     // create a thread to accept RPC connections
     go func() {
