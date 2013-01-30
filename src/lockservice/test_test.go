@@ -191,11 +191,12 @@ func TestPrimaryFail5(t *testing.T) {
 
   tl(t, ck1, "a", true)
   tl(t, ck1, "b", true)
+  tu(t, ck1, "b", true)
 
   p.dying = true
 
-  tu(t, ck2, "c", false)
-  tl(t, ck1, "c", true)
+  tu(t, ck1, "b", false)
+  tl(t, ck2, "b", true)
 
   b.kill()
   fmt.Printf("  ... Passed\n")
@@ -214,6 +215,8 @@ func TestPrimaryFail6(t *testing.T) {
   ck2 := MakeClerk(phost, bhost)
 
   tl(t, ck1, "a", true)
+  tu(t, ck1, "a", true)
+  tu(t, ck2, "a", false)
   tl(t, ck1, "b", true)
 
   p.dying = true
