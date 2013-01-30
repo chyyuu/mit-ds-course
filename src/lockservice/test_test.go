@@ -195,6 +195,7 @@ func TestPrimaryFail5(t *testing.T) {
   p.dying = true
 
   tu(t, ck2, "c", false)
+  tl(t, ck1, "c", true)
 
   b.kill()
   fmt.Printf("  ... Passed\n")
@@ -218,6 +219,7 @@ func TestPrimaryFail6(t *testing.T) {
   p.dying = true
 
   tu(t, ck2, "b", true)
+  tl(t, ck1, "b", true)
 
   b.kill()
   fmt.Printf("  ... Passed\n")
