@@ -6,11 +6,14 @@ import "log"
 import "sync"
 import "fmt"
 import "os"
+import "io"
+import "time"
 
 type LockServer struct {
   mu sync.Mutex
   l net.Listener
-  dead bool
+  dead bool  // for test_test.go
+  dying bool // for test_test.go
   am_primary bool
   primary string
   backup string
@@ -62,12 +65,33 @@ func (ls *LockServer) kill() {
   ls.l.Close()
 }
 
+//
+// hack to allow test_test.go to have primary process
+// an RPC but not send a reply. can't use the shutdown()
+// trick b/c that causes client to immediately get an
+// error and send to backup before primary does.
+//
+type DeafConn struct {
+  c io.ReadWriteCloser
+}
+func (dc DeafConn) Write(p []byte) (n int, err error) {
+  return len(p), nil
+}
+func (dc DeafConn) Close() error {
+  return dc.c.Close()
+}
+func (dc DeafConn) Read(p []byte) (n int, err error) {
+  return dc.c.Read(p)
+}
+
 func StartServer(primary string, backup string, am_primary bool) *LockServer {
   ls := new(LockServer)
   ls.primary = primary
   ls.backup = backup
   ls.am_primary = am_primary
   ls.locks = map[string]bool{}
+
+  // Your initialization code here.
 
   me := ""
   if am_primary {
@@ -97,7 +121,28 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
     for ls.dead == false {
       conn, err := ls.l.Accept()
       if err == nil && ls.dead == false {
-        go rpcs.ServeConn(conn)
+        if ls.dying {
+          // process the request but force discard of reply.
+
+
+          // without this the connection is never closed,
+          // b/c ServeConn() is waiting for more requests.
+          go func() {
+            time.Sleep(2 * time.Second)
+            conn.Close()
+          }()
+          ls.l.Close()
+
+          // this object has the type ServeConn expects,
+          // but discards writes (i.e. discards the RPC reply).
+          deaf_conn := DeafConn{c : conn}
+
+          rpcs.ServeConn(deaf_conn)
+
+          ls.dead = true
+        } else {
+          go rpcs.ServeConn(conn)
+        }
       } else if err == nil {
         conn.Close()
       }

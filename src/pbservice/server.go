@@ -94,7 +94,7 @@ func StartServer(vshost string, me string) *PBServer {
           }
           go rpcs.ServeConn(conn)
         } else {
-        go rpcs.ServeConn(conn)
+          go rpcs.ServeConn(conn)
         }
       } else if err == nil {
         conn.Close()
