@@ -42,7 +42,6 @@ func (ls *LockServer) Lock(args *LockArgs, reply *LockReply) error {
     reply.OK = true
     ls.locks[args.Lockname] = true
   }
-  ls.lastReply[args.CID] = reply.OK
 
   return nil
 }
