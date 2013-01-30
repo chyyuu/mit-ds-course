@@ -20,6 +20,7 @@ type LockServer struct {
 
   // for each lock name, is it locked?
   locks map[string]bool
+
 }
 
 
@@ -70,6 +71,7 @@ func (ls *LockServer) kill() {
 // an RPC but not send a reply. can't use the shutdown()
 // trick b/c that causes client to immediately get an
 // error and send to backup before primary does.
+// please don't change anything to do with DeafConn.
 //
 type DeafConn struct {
   c io.ReadWriteCloser
@@ -92,6 +94,7 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
   ls.locks = map[string]bool{}
 
   // Your initialization code here.
+
 
   me := ""
   if am_primary {

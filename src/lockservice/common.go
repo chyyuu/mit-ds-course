@@ -3,6 +3,8 @@ package lockservice
 //
 // RPC definitions for a simple lock service.
 //
+// You will need to modify this file.
+//
 
 //
 // Lock(lockname) returns OK=true if the lock is not held.

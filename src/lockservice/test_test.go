@@ -64,7 +64,7 @@ func TestBasic(t *testing.T) {
   fmt.Printf("OK\n")
 }
 
-func TestPrimaryFail(t *testing.T) {
+func TestPrimaryFail1(t *testing.T) {
   fmt.Printf("Primary failure: ")
   runtime.GOMAXPROCS(4)
 
@@ -103,8 +103,8 @@ func TestPrimaryFail(t *testing.T) {
   fmt.Printf("OK\n")
 }
 
-func TestPrimaryFail1(t *testing.T) {
-  fmt.Printf("Primary failure just before replying: ")
+func TestPrimaryFail2(t *testing.T) {
+  fmt.Printf("Primary failure just before successful reply: ")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -124,6 +124,28 @@ func TestPrimaryFail1(t *testing.T) {
   tl(t, ck1, "c", false)
   tu(t, ck2, "c")
   tl(t, ck1, "c", true)
+
+  b.kill()
+  fmt.Printf("OK\n")
+}
+
+func TestPrimaryFail3(t *testing.T) {
+  fmt.Printf("Primary failure just before unsuccessful reply: ")
+  runtime.GOMAXPROCS(4)
+
+  phost := port("p")
+  bhost := port("b")
+  p := StartServer(phost, bhost, true)  // primary
+  b := StartServer(phost, bhost, false) // backup
+
+  ck1 := MakeClerk(phost, bhost)
+
+  tl(t, ck1, "a", true)
+  tl(t, ck1, "b", true)
+
+  p.dying = true
+
+  tl(t, ck1, "b", false)
 
   b.kill()
   fmt.Printf("OK\n")

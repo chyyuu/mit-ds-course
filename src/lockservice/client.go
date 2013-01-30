@@ -8,12 +8,14 @@ import "net/rpc"
 //
 type Clerk struct {
   servers [2]string // primary, backup
+  // Your definitions here.
 }
 
 func MakeClerk(primary string, backup string) *Clerk {
   ck := new(Clerk)
   ck.servers[0] = primary
   ck.servers[1] = backup
+  // Your initialization code here.
   return ck
 }
 
