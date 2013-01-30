@@ -34,7 +34,7 @@ func port(suffix string) string {
 }
 
 func TestBasic(t *testing.T) {
-  fmt.Printf("Basic lock/unlock: ")
+  fmt.Printf("Test: Basic lock/unlock ...\n")
 
   runtime.GOMAXPROCS(4)
 
@@ -61,11 +61,11 @@ func TestBasic(t *testing.T) {
   p.kill()
   b.kill()
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestPrimaryFail1(t *testing.T) {
-  fmt.Printf("Primary failure: ")
+  fmt.Printf("Test: Primary failure ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -100,11 +100,11 @@ func TestPrimaryFail1(t *testing.T) {
   tu(t, ck, "d")
 
   b.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestPrimaryFail2(t *testing.T) {
-  fmt.Printf("Primary failure just before successful reply: ")
+  fmt.Printf("Test: Primary failure just before successful reply ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -126,11 +126,11 @@ func TestPrimaryFail2(t *testing.T) {
   tl(t, ck1, "c", true)
 
   b.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestPrimaryFail3(t *testing.T) {
-  fmt.Printf("Primary failure just before unsuccessful reply: ")
+  fmt.Printf("Test: Primary failure just before unsuccessful reply ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -148,11 +148,11 @@ func TestPrimaryFail3(t *testing.T) {
   tl(t, ck1, "b", false)
 
   b.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestPrimaryFail4(t *testing.T) {
-  fmt.Printf("Primary failure just before unsuccessful reply (again): ")
+  fmt.Printf("Test: Primary failure just before unsuccessful reply (again) ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -171,11 +171,11 @@ func TestPrimaryFail4(t *testing.T) {
   tl(t, ck2, "b", false)
 
   b.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestBackupFail(t *testing.T) {
-  fmt.Printf("Backup failure: ")
+  fmt.Printf("Test: Backup failure ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -210,11 +210,11 @@ func TestBackupFail(t *testing.T) {
   tu(t, ck, "d")
 
   p.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestMany(t *testing.T) {
-  fmt.Printf("Multiple clients with primary failure: ")
+  fmt.Printf("Test: Multiple clients with primary failure ...\n")
   runtime.GOMAXPROCS(4)
 
   phost := port("p")
@@ -268,5 +268,5 @@ func TestMany(t *testing.T) {
   }
 
   b.kill()
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
