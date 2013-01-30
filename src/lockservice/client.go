@@ -22,12 +22,12 @@ func MakeClerk(primary string, backup string) *Clerk {
 //
 // call() sends an RPC to the rpcname handler on server srv
 // with arguments args, waits for the reply, and leaves the
-// reply in reply. the reply argument should be a pointer
-// to a reply structure.
+// reply in reply. the reply argument should be the address
+// of a reply structure.
 //
-// the return value is true if the server responded, and false
+// call() returns true if the server responded, and false
 // if call() was not able to contact the server. in particular,
-// the reply's contents are only valid if call() returned true.
+// reply's contents are valid if and only if call() returned true.
 //
 // please use call() to send all RPCs, in client.go and server.go.
 // please don't change this function.
