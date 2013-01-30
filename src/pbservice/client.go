@@ -18,23 +18,32 @@ func MakeClerk(vshost string, me string) *Clerk {
 
 
 //
-// please use call() to send all RPCs, both in client.go and in server.go.
+// call() sends an RPC to the rpcname handler on server srv
+// with arguments args, waits for the reply, and leaves the
+// reply in reply. the reply argument should be a pointer
+// to a reply structure.
+//
+// the return value is true if the server responded, and false
+// if call() was not able to contact the server. in particular,
+// the reply's contents are only valid if call() returned true.
+//
+// please use call() to send all RPCs, in client.go and server.go.
 // please don't change this function.
 //
-func call(srv string, name string, args interface{}, reply interface{}) bool {
+func call(srv string, rpcname string,
+          args interface{}, reply interface{}) bool {
   c, errx := rpc.Dial("unix", srv)
   if errx != nil {
     return false
   }
   defer c.Close()
     
-  err := c.Call(name, args, reply)
+  err := c.Call(rpcname, args, reply)
   if err == nil {
     return true
   }
   return false
 }
-
 
 //
 // fetch a key's value from the current primary;
