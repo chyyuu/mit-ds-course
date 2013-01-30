@@ -29,4 +29,5 @@ type UnlockArgs struct {
 }
 
 type UnlockReply struct {
+  OK bool
 }

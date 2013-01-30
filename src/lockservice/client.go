@@ -62,9 +62,13 @@ func (ck *Clerk) Lock(lockname string) bool {
 
 //
 // ask the lock service to unlock a lock.
+// returns true if the lock was previously held,
+// false otherwise.
 //
 
-func (ck *Clerk) Unlock(lockname string) {
+func (ck *Clerk) Unlock(lockname string) bool {
 
   // Your code here.
+
+  return false
 }
