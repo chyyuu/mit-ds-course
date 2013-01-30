@@ -96,7 +96,7 @@ func TestBasic(t *testing.T) {
     cka[i] = MakeClerk([]string{kvh[i]})
   }
 
-  fmt.Printf("Basic leave/join: ")
+  fmt.Printf("Test: Basic leave/join ...\n")
 
   cfa := make([]Config, 6)
   cfa[0] = ck.Query(-1)
@@ -135,9 +135,9 @@ func TestBasic(t *testing.T) {
   check(t, []int64{gid2}, ck)
   cfa[5] = ck.Query(-1)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Historical queries: ")
+  fmt.Printf("Test: Historical queries ...\n")
 
   for i := 0; i < len(cfa); i++ {
     c := ck.Query(cfa[i].Num)
@@ -165,9 +165,9 @@ func TestBasic(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Move: ")
+  fmt.Printf("Test: Move ...\n")
   {
     var gid3 int64 = 503
     ck.Join(gid3, []string{"3a", "3b", "3c"})
@@ -197,9 +197,9 @@ func TestBasic(t *testing.T) {
     ck.Leave(gid3)
     ck.Leave(gid4)
   }
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Concurrent leave/join: ")
+  fmt.Printf("Test: Concurrent leave/join ...\n")
 
   const npara = 10
   gids := make([]int64, npara)
@@ -220,9 +220,9 @@ func TestBasic(t *testing.T) {
   }
   check(t, gids, ck)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Minimal transfers after joins: ")
+  fmt.Printf("Test: Minimal transfers after joins ...\n")
 
   c1 := ck.Query(-1)
   for i := 0; i < 5; i++ {
@@ -239,9 +239,9 @@ func TestBasic(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Minimal transfers after leaves: ")
+  fmt.Printf("Test: Minimal transfers after leaves ...\n")
 
   for i := 0; i < 5; i++ {
     ck.Leave(int64(npara+1+i))
@@ -257,7 +257,7 @@ func TestBasic(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestUnreliable(t *testing.T) {
@@ -282,7 +282,7 @@ func TestUnreliable(t *testing.T) {
     cka[i] = MakeClerk([]string{kvh[i]})
   }
 
-  fmt.Printf("Concurrent leave/join, unreliable, failure: ")
+  fmt.Printf("Test: Concurrent leave/join, unreliable, failure ...\n")
 
   const npara = 20
   gids := make([]int64, npara)
@@ -305,5 +305,5 @@ func TestUnreliable(t *testing.T) {
   }
   check(t, gids, ck)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }

@@ -55,7 +55,7 @@ func TestBasic(t *testing.T) {
     cka[i] = MakeClerk([]string{kvh[i]})
   }
 
-  fmt.Printf("Basic put/get: ")
+  fmt.Printf("Test: Basic put/get ...\n")
 
   ck.Put("a", "aa")
   check(t, ck, "a", "aa")
@@ -66,9 +66,9 @@ func TestBasic(t *testing.T) {
   check(t, cka[1], "a", "aaa")
   check(t, ck, "a", "aaa")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Concurrent clients: ")
+  fmt.Printf("Test: Concurrent clients ...\n")
 
   for iters := 0; iters < 20; iters++ {
     const npara = 30
@@ -98,7 +98,7 @@ func TestBasic(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   time.Sleep(1 * time.Second)
 }
@@ -168,24 +168,24 @@ func TestPartition(t *testing.T) {
     cka[i] = MakeClerk([]string{port(tag, i)})
   }
 
-  fmt.Printf("No partition: ")
+  fmt.Printf("Test: No partition ...\n")
 
   part(t, tag, nservers, []int{0,1,2,3,4}, []int{}, []int{})
   cka[0].Put("1", "12")
   cka[2].Put("1", "13")
   check(t, cka[3], "1", "13")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Progress in majority: ")
+  fmt.Printf("Test: Progress in majority ...\n")
 
   part(t, tag, nservers, []int{2,3,4}, []int{0,1}, []int{})
   cka[2].Put("1", "14")
   check(t, cka[4], "1", "14")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("No progress in minority: ")
+  fmt.Printf("Test: No progress in minority ...\n")
 
   done0 := false
   done1 := false
@@ -208,9 +208,9 @@ func TestPartition(t *testing.T) {
   cka[3].Put("1", "16")
   check(t, cka[4], "1", "16")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Completion after heal: ")
+  fmt.Printf("Test: Completion after heal ...\n")
 
   part(t, tag, nservers, []int{0,2,3,4}, []int{1}, []int{})
   for iters := 0; iters < 30; iters++ {
@@ -240,7 +240,7 @@ func TestPartition(t *testing.T) {
   }
   check(t, cka[1], "1", "15")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestUnreliable(t *testing.T) {
@@ -265,7 +265,7 @@ func TestUnreliable(t *testing.T) {
     cka[i] = MakeClerk([]string{kvh[i]})
   }
 
-  fmt.Printf("Basic put/get, unreliable: ")
+  fmt.Printf("Test: Basic put/get, unreliable ...\n")
 
   ck.Put("a", "aa")
   check(t, ck, "a", "aa")
@@ -276,9 +276,9 @@ func TestUnreliable(t *testing.T) {
   check(t, cka[1], "a", "aaa")
   check(t, ck, "a", "aaa")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Sequence of puts, unreliable: ")
+  fmt.Printf("Test: Sequence of puts, unreliable ...\n")
 
   const ncli = 30
   var ca [ncli]chan bool
@@ -315,9 +315,9 @@ func TestUnreliable(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Concurrent clients, unreliable: ")
+  fmt.Printf("Test: Concurrent clients, unreliable ...\n")
 
   for iters := 0; iters < 20; iters++ {
     const ncli = 30
@@ -353,7 +353,7 @@ func TestUnreliable(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   time.Sleep(1 * time.Second)
 }
@@ -361,7 +361,7 @@ func TestUnreliable(t *testing.T) {
 func TestHole(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Tolerates holes in paxos sequence: ")
+  fmt.Printf("Test: Tolerates holes in paxos sequence ...\n")
 
   tag := "hole"
   const nservers = 5
@@ -446,13 +446,13 @@ func TestHole(t *testing.T) {
     check(t, ck2, "q", "qq")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestManyPartition(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Many clients, changing partitions: ")
+  fmt.Printf("Test: Many clients, changing partitions ...\n")
 
   tag := "many"
   const nservers = 5
@@ -545,6 +545,6 @@ func TestManyPartition(t *testing.T) {
   }
 
   if ok {
-    fmt.Printf("OK\n")
+    fmt.Printf("  ... Passed\n")
   }
 }

@@ -78,7 +78,7 @@ func TestBasic(t *testing.T) {
   smh, gids, ha, _, clean := setup("basic", false)
   defer clean()
 
-  fmt.Printf("Basic Join/Leave: ")
+  fmt.Printf("Test: Basic Join/Leave ...\n")
 
   mck := shardmaster.MakeClerk(smh)
   mck.Join(gids[0], ha[0])
@@ -128,14 +128,14 @@ func TestBasic(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestMove(t *testing.T) {
   smh, gids, ha, _, clean := setup("basic", false)
   defer clean()
 
-  fmt.Printf("Shards really move: ")
+  fmt.Printf("Test: Shards really move ...\n")
 
   mck := shardmaster.MakeClerk(smh)
   mck.Join(gids[0], ha[0])
@@ -182,7 +182,7 @@ func TestMove(t *testing.T) {
   time.Sleep(10 * time.Second)
 
   if count > shardmaster.NShards / 3 && count < 2*(shardmaster.NShards/3) {
-    fmt.Printf("OK\n")
+    fmt.Printf("  ... Passed\n")
   } else {
     t.Fatalf("%v keys worked after killing 1/2 of groups; wanted %v",
       count, shardmaster.NShards / 2)
@@ -193,7 +193,7 @@ func TestLimp(t *testing.T) {
   smh, gids, ha, sa, clean := setup("basic", false)
   defer clean()
 
-  fmt.Printf("Reconfiguration with some dead replicas: ")
+  fmt.Printf("Test: Reconfiguration with some dead replicas ...\n")
 
   mck := shardmaster.MakeClerk(smh)
   mck.Join(gids[0], ha[0])
@@ -250,7 +250,7 @@ func TestLimp(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func doConcurrent(t *testing.T, unreliable bool) {
@@ -299,13 +299,13 @@ func doConcurrent(t *testing.T, unreliable bool) {
 }
 
 func TestConcurrent(t *testing.T) {
-  fmt.Printf("Concurrent Put/Get/Move: ")
+  fmt.Printf("Test: Concurrent Put/Get/Move ...\n")
   doConcurrent(t, false)
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestConcurrentUnreliable(t *testing.T) {
-  fmt.Printf("Concurrent Put/Get/Move (unreliable): ")
+  fmt.Printf("Test: Concurrent Put/Get/Move (unreliable) ...\n")
   doConcurrent(t, true)
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }

@@ -39,7 +39,7 @@ func TestBasicFail(t *testing.T) {
 
   ck := MakeClerk(vshost, "")
 
-  fmt.Printf("Single primary, no backup: ")
+  fmt.Printf("Test: Single primary, no backup ...\n")
 
   s1 := StartServer(vshost, port(tag, 1))
 
@@ -58,11 +58,11 @@ func TestBasicFail(t *testing.T) {
   ck.Put("1", "v1a")
   check(ck, "1", "v1a")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   // add a backup
 
-  fmt.Printf("Add a backup: ")
+  fmt.Printf("Test: Add a backup ...\n")
 
   s2 := StartServer(vshost, port(tag, 2))
   for i := 0; i < viewservice.DeadPings * 2; i++ {
@@ -86,11 +86,11 @@ func TestBasicFail(t *testing.T) {
   ck.Put("4", "44")
   check(ck, "4", "44")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   // kill the primary
 
-  fmt.Printf("Primary failure: ")
+  fmt.Printf("Test: Primary failure ...\n")
 
   s1.kill()
   for i := 0; i < viewservice.DeadPings * 2; i++ {
@@ -109,12 +109,12 @@ func TestBasicFail(t *testing.T) {
   check(ck, "3", "33")
   check(ck, "4", "44")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   // kill solo server, start new server, check that
   // it does not start serving as primary
 
-  fmt.Printf("Kill last server, new one should not be active: ")
+  fmt.Printf("Test: Kill last server, new one should not be active ...\n")
 
   s2.kill()
   s3 := StartServer(vshost, port(tag, 3))
@@ -129,7 +129,7 @@ func TestBasicFail(t *testing.T) {
     t.Fatalf("ck.Get() returned even though no initialized primary")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   s1.kill()
   s2.kill()
@@ -178,7 +178,7 @@ func TestFailPut(t *testing.T) {
   check(ck, "c", "cc")
 
   // kill backup, then immediate Put
-  fmt.Printf("Put() immediately after backup failure: ")
+  fmt.Printf("Test: Put() immediately after backup failure ...\n")
   s2.kill()
   ck.Put("a", "aaa")
   check(ck, "a", "aaa")
@@ -197,10 +197,10 @@ func TestFailPut(t *testing.T) {
   }
 
   check(ck, "a", "aaa")
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   // kill primary, then immediate Put
-  fmt.Printf("Put() immediately after primary failure: ")
+  fmt.Printf("Test: Put() immediately after primary failure ...\n")
   s1.kill()
   ck.Put("b", "bbb")
   check(ck, "b", "bbb")
@@ -217,7 +217,7 @@ func TestFailPut(t *testing.T) {
   check(ck, "a", "aaa")
   check(ck, "b", "bbb")
   check(ck, "c", "cc")
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   s1.kill()
   s2.kill()
@@ -238,7 +238,7 @@ func TestConcurrentSame(t *testing.T) {
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
 
-  fmt.Printf("Concurrent Put()s to the same key: ")
+  fmt.Printf("Test: Concurrent Put()s to the same key ...\n")
 
   const nservers = 2
   var sa [nservers]*PBServer
@@ -315,7 +315,7 @@ func TestConcurrentSame(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   for i := 0; i < nservers; i++ {
     sa[i].kill()
@@ -334,7 +334,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
 
-  fmt.Printf("Concurrent Put()s to the same key; unreliable: ")
+  fmt.Printf("Test: Concurrent Put()s to the same key; unreliable ...\n")
 
   const nservers = 2
   var sa [nservers]*PBServer
@@ -412,7 +412,7 @@ func TestConcurrentSameUnreliable(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   for i := 0; i < nservers; i++ {
     sa[i].kill()
@@ -432,7 +432,7 @@ func TestRepeatedCrash(t *testing.T) {
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
   
-  fmt.Printf("Repeated failures/restarts: ")
+  fmt.Printf("Test: Repeated failures/restarts ...\n")
 
   const nservers = 3
   var sa [nservers]*PBServer
@@ -500,7 +500,7 @@ func TestRepeatedCrash(t *testing.T) {
     t.Fatalf("final Put/Get failed")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   for i := 0; i < nservers; i++ {
     sa[i].kill()
@@ -519,7 +519,7 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
   time.Sleep(time.Second)
   vck := viewservice.MakeClerk("", vshost)
   
-  fmt.Printf("Repeated failures/restarts; unreliable: ")
+  fmt.Printf("Test: Repeated failures/restarts; unreliable ...\n")
 
   const nservers = 3
   var sa [nservers]*PBServer
@@ -588,7 +588,7 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
     t.Fatalf("final Put/Get failed")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   for i := 0; i < nservers; i++ {
     sa[i].kill()
@@ -609,7 +609,7 @@ func TestPartition1(t *testing.T) {
 
   ck := MakeClerk(vshost, "")
 
-  fmt.Printf("Old primary does not serve Gets: ")
+  fmt.Printf("Test: Old primary does not serve Gets ...\n")
 
   vshosta := vshost + "a"
   os.Link(vshost, vshosta)
@@ -673,7 +673,7 @@ func TestPartition1(t *testing.T) {
 
   check(ck, "a", "1")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   s1.kill()
   s2.kill()
@@ -696,7 +696,7 @@ func TestPartition2(t *testing.T) {
 
   s1 := StartServer(vshosta, port(tag, 1))
 
-  fmt.Printf("Partitioned old primary does not complete Gets: ")
+  fmt.Printf("Test: Partitioned old primary does not complete Gets ...\n")
 
   deadtime := viewservice.PingInterval * viewservice.DeadPings
   time.Sleep(deadtime * 2)
@@ -762,7 +762,7 @@ func TestPartition2(t *testing.T) {
 
   check(ck, "a", "2")
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
   s1.kill()
   s2.kill()

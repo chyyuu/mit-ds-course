@@ -116,32 +116,32 @@ func TestBasic(t *testing.T) {
     pxa[i] = Make(pxh, i, nil)
   }
 
-  fmt.Printf("Single proposer: ")
+  fmt.Printf("Test: Single proposer ...\n")
 
   pxa[0].Start(0, "hello")
   waitn(t, pxa, 0, npaxos)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Many proposers, same value: ")
+  fmt.Printf("Test: Many proposers, same value ...\n")
 
   for i := 0; i < npaxos; i++ {
     pxa[i].Start(1, 77)
   }
   waitn(t, pxa, 1, npaxos)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Many proposers, different values: ")
+  fmt.Printf("Test: Many proposers, different values ...\n")
 
   pxa[0].Start(2, 100)
   pxa[1].Start(2, 101)
   pxa[2].Start(2, 102)
   waitn(t, pxa, 2, npaxos)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Out-of-order instances: ")
+  fmt.Printf("Test: Out-of-order instances ...\n")
 
   pxa[0].Start(7, 700)
   pxa[0].Start(6, 600)
@@ -158,7 +158,7 @@ func TestBasic(t *testing.T) {
     t.Fatalf("wrong Max()")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestDeaf(t *testing.T) {
@@ -176,7 +176,7 @@ func TestDeaf(t *testing.T) {
     pxa[i] = Make(pxh, i, nil)
   }
 
-  fmt.Printf("Deaf proposer: ")
+  fmt.Printf("Test: Deaf proposer ...\n")
 
   pxa[0].Start(0, "hello")
   waitn(t, pxa, 0, npaxos)
@@ -201,7 +201,7 @@ func TestDeaf(t *testing.T) {
   pxa[npaxos-1].Start(1, "yyy")
   waitn(t, pxa, 1, npaxos)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestForget(t *testing.T) {
@@ -219,7 +219,7 @@ func TestForget(t *testing.T) {
     pxa[i] = Make(pxh, i, nil)
   }
 
-  fmt.Printf("Forgetting: ")
+  fmt.Printf("Test: Forgetting ...\n")
 
   // initial Min() correct?
   for i := 0; i < npaxos; i++ {
@@ -283,7 +283,7 @@ func TestForget(t *testing.T) {
     t.Fatalf("Min() did not advance after Done()")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestManyForget(t *testing.T) {
@@ -301,7 +301,7 @@ func TestManyForget(t *testing.T) {
     pxa[i] = Make(pxh, i, nil)
   }
 
-  fmt.Printf("Lots of forgetting: ")
+  fmt.Printf("Test: Lots of forgetting ...\n")
 
   const maxseq = 30
   done := false
@@ -342,7 +342,7 @@ func TestManyForget(t *testing.T) {
     }
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 //
@@ -351,7 +351,7 @@ func TestManyForget(t *testing.T) {
 func TestForgetMem(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Paxos frees forgotten instance memory: ")
+  fmt.Printf("Test: Paxos frees forgotten instance memory ...\n")
 
   const npaxos = 3
   var pxa []*Paxos = make([]*Paxos, npaxos)
@@ -409,7 +409,7 @@ func TestForgetMem(t *testing.T) {
     t.Fatalf("memory use did not shrink enough")
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 //
@@ -418,7 +418,7 @@ func TestForgetMem(t *testing.T) {
 func TestMany(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Many instances: ")
+  fmt.Printf("Test: Many instances ...\n")
 
   const npaxos = 4
   var pxa []*Paxos = make([]*Paxos, npaxos)
@@ -453,7 +453,7 @@ func TestMany(t *testing.T) {
     time.Sleep(100 * time.Millisecond)
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 //
@@ -463,7 +463,7 @@ func TestMany(t *testing.T) {
 func TestOld(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Minority proposal ignored: ")
+  fmt.Printf("Test: Minority proposal ignored ...\n")
 
   const npaxos = 5
   var pxa []*Paxos = make([]*Paxos, npaxos)
@@ -491,7 +491,7 @@ func TestOld(t *testing.T) {
     waitn(t, pxa, 1, npaxos)
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 //
@@ -500,7 +500,7 @@ func TestOld(t *testing.T) {
 func TestManyUnreliable(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Many instances, unreliable RPC: ")
+  fmt.Printf("Test: Many instances, unreliable RPC ...\n")
 
   const npaxos = 4
   var pxa []*Paxos = make([]*Paxos, npaxos)
@@ -536,7 +536,7 @@ func TestManyUnreliable(t *testing.T) {
     time.Sleep(100 * time.Millisecond)
   }
   
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func pp(tag string, src int, dst int) string {
@@ -601,23 +601,23 @@ func TestPartition(t *testing.T) {
 
   seq := 0
 
-  fmt.Printf("No decision if partitioned: ")
+  fmt.Printf("Test: No decision if partitioned ...\n")
 
   part(t, tag, npaxos, []int{0,2}, []int{1,3}, []int{4})
   pxa[1].Start(seq, 111)
   checkmax(t, pxa, seq, 0)
   
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("Decision in majority partition: ")
+  fmt.Printf("Test: Decision in majority partition ...\n")
 
   part(t, tag, npaxos, []int{0}, []int{1,2,3}, []int{4})
   time.Sleep(2 * time.Second)
   waitmajority(t, pxa, seq)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("All agree after full heal: ")
+  fmt.Printf("Test: All agree after full heal ...\n")
 
   pxa[0].Start(seq, 1000) // poke them
   pxa[4].Start(seq, 1004)
@@ -625,9 +625,9 @@ func TestPartition(t *testing.T) {
 
   waitn(t, pxa, seq, npaxos)
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("One peer switches partitions: ")
+  fmt.Printf("Test: One peer switches partitions ...\n")
 
   for iters := 0; iters < 20; iters++ {
     seq++
@@ -644,9 +644,9 @@ func TestPartition(t *testing.T) {
     waitn(t, pxa, seq, npaxos)
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 
-  fmt.Printf("One peer switches partitions, unreliable: ")
+  fmt.Printf("Test: One peer switches partitions, unreliable ...\n")
 
   for i := 0; i < npaxos; i++ {
     pxa[i].unreliable = true
@@ -667,13 +667,13 @@ func TestPartition(t *testing.T) {
     waitn(t, pxa, seq, 4)
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
 
 func TestLots(t *testing.T) {
   runtime.GOMAXPROCS(4)
 
-  fmt.Printf("Many requests, changing partitions: ")
+  fmt.Printf("Test: Many requests, changing partitions ...\n")
 
   tag := "lots"
   const npaxos = 5
@@ -772,5 +772,5 @@ func TestLots(t *testing.T) {
     waitmajority(t, pxa, i)
   }
 
-  fmt.Printf("OK\n")
+  fmt.Printf("  ... Passed\n")
 }
