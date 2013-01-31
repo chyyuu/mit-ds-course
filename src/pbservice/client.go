@@ -27,6 +27,9 @@ func MakeClerk(vshost string, me string) *Clerk {
 // if call() was not able to contact the server. in particular,
 // the reply's contents are only valid if call() returned true.
 //
+// you should assume that call() will time out and return an
+// error after a while if it doesn't get a reply from the server.
+//
 // please use call() to send all RPCs, in client.go and server.go.
 // please don't change this function.
 //

@@ -43,7 +43,19 @@ type Paxos struct {
 }
 
 //
-// please use call() to send all RPCs.
+// call() sends an RPC to the rpcname handler on server srv
+// with arguments args, waits for the reply, and leaves the
+// reply in reply. the reply argument should be a pointer
+// to a reply structure.
+//
+// the return value is true if the server responded, and false
+// if call() was not able to contact the server. in particular,
+// the reply's contents are only valid if call() returned true.
+//
+// you should assume that call() will time out and return an
+// error after a while if it doesn't get a reply from the server.
+//
+// please use call() to send all RPCs, in client.go and server.go.
 // please don't change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {
@@ -76,6 +88,8 @@ func (px *Paxos) Start(seq int, v interface{}) {
 // the application on this machine is done with
 // all instances <= seq.
 //
+// see the comments for Min() for more explanation.
+//
 func (px *Paxos) Done(seq int) {
   // Your code here.
 }
@@ -91,10 +105,36 @@ func (px *Paxos) Max() int {
 }
 
 //
-// the application wants to know how far
-// forgetting has progressed on this peer;
-// paxos has discarded all instances < Min().
+// Min() should return one more than the minimum among z_i,
+// where z_i is the highest number ever passed
+// to Done() on peer i. A peer's z_i is -1 if it has
+// never called Done().
 //
+// Paxos is required to have forgotten all information
+// about any instances it knows that are < Min().
+// The point is to free up memory in long-running
+// Paxos-based servers.
+//
+// It is illegal to call Done(i) on a peer and
+// then call Start(j) on that peer for any j <= i.
+//
+// Paxos peers need to exchange their highest Done()
+// arguments in order to implement Min(). These
+// exchanges can be piggybacked on ordinary Paxos
+// agreement protocol messages, so it is OK if one
+// peer's Min doesn't reflect another Peer's Done()
+// until after the next instance is agreed to.
+//
+// The fact that Min() is defined as a minimum over
+// *all* Paxos peers means that Min() can't increase until
+// all peers have been heard from. So if a peer is dead
+// or unreachable, other peers' Min()s won't increase
+// even if all reachable peers call Done. The reason for
+// this is that when the unreachable peer comes back to
+// life, it will need to catch up on instances that it
+// missed -- the other peers therefor cannot forget these
+// instances.
+// 
 func (px *Paxos) Min() int {
   // You code here.
   return 0
