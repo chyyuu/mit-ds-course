@@ -14,9 +14,9 @@ type LockServer struct {
   l net.Listener
   dead bool  // for test_test.go
   dying bool // for test_test.go
-  am_primary bool
-  primary string
-  backup string
+
+  am_primary bool // am I the primary?
+  backup string   // backup's port
 
   // for each lock name, is it locked?
   locks map[string]bool
@@ -88,7 +88,6 @@ func (dc DeafConn) Read(p []byte) (n int, err error) {
 
 func StartServer(primary string, backup string, am_primary bool) *LockServer {
   ls := new(LockServer)
-  ls.primary = primary
   ls.backup = backup
   ls.am_primary = am_primary
   ls.locks = map[string]bool{}
