@@ -63,7 +63,7 @@ type PingArgs struct {
 }
 
 type PingReply struct {
-  V View
+  View View
 }
 
 //

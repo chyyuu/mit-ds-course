@@ -435,6 +435,11 @@ func TestMany(t *testing.T) {
 
   const ninst = 50
   for seq := 1; seq < ninst; seq++ {
+    // only 10 active instances, to limit the
+    // number of file descriptors.
+    for seq >= 10 && ndecided(t, pxa, seq - 10) < npaxos {
+      time.Sleep(20 * time.Millisecond)
+    }
     for i := 0; i < npaxos; i++ {
       pxa[i].Start(seq, (seq * 10) + i)
     }
@@ -518,6 +523,11 @@ func TestManyUnreliable(t *testing.T) {
 
   const ninst = 50
   for seq := 1; seq < ninst; seq++ {
+    // only 10 active instances, to limit the
+    // number of file descriptors.
+    for seq >= 10 && ndecided(t, pxa, seq - 10) < npaxos {
+      time.Sleep(20 * time.Millisecond)
+    }
     for i := 0; i < npaxos; i++ {
       pxa[i].Start(seq, (seq * 10) + i)
     }

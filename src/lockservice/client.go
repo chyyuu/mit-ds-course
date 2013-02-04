@@ -7,7 +7,7 @@ import "net/rpc"
 // and maintains a little state.
 //
 type Clerk struct {
-  servers [2]string // primary, backup
+  servers [2]string // primary port, backup port
   // Your definitions here.
 }
 

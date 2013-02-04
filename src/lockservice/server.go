@@ -20,7 +20,6 @@ type LockServer struct {
 
   // for each lock name, is it locked?
   locks map[string]bool
-
 }
 
 
