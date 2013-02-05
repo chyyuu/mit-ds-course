@@ -1,0 +1,327 @@
+6.824 2012 Lecture 6: Consistency
+
+Topic: consistency
+  Consistency = meaning of concurrent reads and writes
+  Less obvious than it may seem!
+  Choice trades off between performance and programmer-friendliness
+    Huge factor in many designs
+  Today's paper a case study: distributed shared memory
+    Similar to labs 4/5
+
+Many systems have storage/memory w/ concurrent readers and writers
+  Multiprocessors, databases, AFS, lab extent server, lab YFS
+  You often want to improve in ways that risk changing behavior:
+    add caching
+    split over multiple servers
+    replicate for fault tolerance
+  How do we know if an optimization is correct?
+  We need a way to think about correct execution of distributed programs
+  Most of these ideas from multiprocessors and databases 20/30 years ago
+  For now, just correctness and efficiency, not fault-tolerance
+
+Naive distributed memory
+  [diagram]
+  M0, M1, M2, LAN
+  each machine has a local copy of all of memory
+  read: from local memory
+  write: send update msg to each other host (but don't wait)
+  fast: never waits for communication
+  Does this memory work well?
+   
+Example 1:
+  M0:
+    v0 = f0();
+    done0 = 1;
+  M1:
+    while(done0 == 0)
+      ;
+    v1 = f1(v0);          
+    done1 = 1;
+  M2:
+    while(done1 == 0)
+      ;
+    v2 = f2(v0, v1);
+  Intuitive intent:
+    M2 should execute f2() with results from M0 and M1
+    waiting for M1 implies waiting for M0
+
+Example 1 won't work with naive distributed memory:
+
+Problem A:
+  [time diagram]
+  M0's writes of v0 and done0 may be interchanged by network
+  leaving v0 unset but done0=1
+  how to fix? would lab RPC fix?
+
+Problem B:
+  [time diagram]
+  M2 sees M1's writes before M0's writes
+  i.e. M2 and M1 disagree on order of M0 and M1 writes
+  how to fix?
+
+Naive distributed memory is fast but has unexpected behavior
+  maybe it isn't "correct"
+  maybe we should never have expected Example 1 to work
+
+How can we write correct distributed programs w/ shared storage?
+  Memory system promises to behave according to certain rules.
+  We write programs assuming those rules.
+  Rules are a "consistency model"
+  Contract between memory system and programmer
+
+What makes a good consistency model?
+  There are no "right" or "wrong" models
+  A model may make it harder or easier to program
+    i.e. lead to more or less intuitive results
+  A model may be harder or easier to implement efficiently
+  Also application dependent
+    e.g. Web pages vs memory
+
+How about "strict consistency":
+  each instruction stamped with its start time (global time)
+  Rule 1: LD gets value of most recent previous ST to same address
+  Rule 2: each machine executes instructions one at a time, in order
+  Essentially the same as on uniprocessor
+  Very intuitive consistency model
+
+Would strict consistency avoid problem A and B?
+
+How do you implement strict consistency?
+  Time:  1  2  3  4
+  M0:    ST       ST
+  M1:       LD LD
+  Time between instructions << speed-of-light between machines!
+  How is LD@2 even aware of ST@1?
+  How does ST@4 know to pause until LD@3 has finished?
+    how does ST@4 know how long to wait?
+  Too hard to implement!
+
+A reasonable model: sequential consistency
+  Is an execution (a set of operations) correct?
+  There must be some total order of operations such that
+  1. each machine's instructions appear in-order in the total order
+  2. all machines see results consistent with that total order
+     i.e. reads see most recent write in the total order
+
+A sequentially consistent system would not have Problems A/B
+  Problem A
+    M0's execution order was v0= done0=
+    M1 saw done0= v0=
+    each machine's operations must appear in execution order
+    so cannot happen w/ sequential consistency
+  Problem B
+    M1 saw v0= done0= done1=
+    M2 saw done1= v0=
+    this cannot occur given a single total order
+    so cannot happen w/ sequential consistency
+
+Better performance than strict consistency
+  System has some freedom in how it interleaves different machines' ops
+  not forced to order by op start time, as in strict consistency
+  system can delay a read or write while it finds current values
+
+Performance is still not great
+  Once a machine's write completes, other machines' reads must see new data
+  Thus communication cannot be omitted or much delayed
+  Thus either reads or writes (or both) will be expensive
+
+A simple implementation of sequential consistency
+  [diagram]
+  single memory server
+  each machine sends r/w ops to server, in order, waiting for reply
+  server picks order among waiting ops
+  server executes one by one, sending replies
+  
+This simple implementation will be slow
+  single server will get overloaded
+  no local cache, so all operations wait for server
+
+Idea 1:
+  partition memory across multiple servers
+  eliminates single-server bottleneck
+  can serve many machines in parallel if they don't use same memory
+  Lamport paper from 1979 shows system is seq consistent if:
+    1. each machine executes one op at a time, waiting for it to complete
+    2. executes ops on each mem location one at a time
+  i.e. you can have lots of independent machines and memory systems
+    
+Idea 2:
+  if a memory location is not written, you can replicate it
+  i.e. cache it on each machine, so reads are fast
+  but must ensure reads and writes are ordered
+    once the write modifies the location, no read should return old value
+    thus must revoke cached copies before writing
+    this delays writes to improve read performance
+
+which brings us to IVY, which uses both ideas, and more
+  IVY = Integrated  shared  Virtual  memory  at Yale
+  Memory Coherence in Shared Virtual Memory Systems, Li and Hudak, PODC 1986
+
+Why is IVY cool?
+  Acts like an expensive shared-memory multiprocessor
+  On a network of cheap machines
+  [diagram: LAN, machines w/ RAM, MGR]
+  Runs threaded code w/o modification
+    e.g. matrix multiply, physical simulation, sort
+  Lab 5/6 is closely related to IVY, though much simpler
+
+IVY big picture
+  [diagram: M0+pagedMem, M1+pagedMem, LAN]
+  Operates on pages of memory, stored in machine DRAM (no mem server)
+  Uses VM hardware to intercept reads/writes
+
+Simplified IVY:
+  Only one copy of a page at a time (on one machine)
+  All other copies marked invalid in VM tables
+  If M0 faults (read or write):
+    Find the one copy -- e.g. in M1
+    Tell M1 to invalidate it in VM tables
+    Fetch the page contents from M1
+    M0 marks the page read+write in VM tables
+  Provides sequential consistency:
+    Order of reads/writes set by order in which page moves
+  Slow: what if a page is read by many machines, never written?
+    Have to fault + send page for every read
+  
+IVY allows multiple reader copies between writes
+  No need to force an order for reads that occur between two writes
+  Let them occur concurrently -- a copy of the page at each reader
+
+Thus IVY's core strategy:
+  Either
+    * multiple read-only copies and no writeable copies, or
+    * one writeable copy, no other copies
+  => Before write, invalidate all other copies
+  => Must track one writer (owner) and copies (copy_set)
+
+Why crucial to invalidate all copies before write?
+  Once a write completes, all subsequent reads *must* see new data
+  If one could read stale data, this could occur:
+  M0:  wv=0      wv=99  wdone=1
+  M1:       rv=0                rdone=1  rv=0
+  But we know that can't happen with sequential consistency
+
+Message types:
+  [don't list these on board, just for reference]
+  RQ read query (reader to MGR)
+  RF read forward (MGR to owner)
+  RD read data (owner to reader)
+  RC read confirm (reader to MGR)
+  &c
+
+(see ivy-code.txt on web site)
+
+scenario 1: M0 has writeable copy, M1 wants to read
+  [time diagram: M 0 1]
+  0. page fault on M1, since page must have been marked invalid
+  1. M1 sends RQ to MGR
+  2. MGR sends RF to M0, MGR adds M1 to copy_set
+  3. M0 marks page as access=read, sends RD to M1
+  5. M1 marks access=read, sends RC to MGR
+
+scenario 2: now M2 wants to write
+  [time diagram: M 0 1 2]
+  0. page fault on M2
+  1. M2 sends WQ to MGR
+  2. MGR sends IV to copy_set (i.e. M1)
+  3. M1 sends IC msg to MGR
+  4. MGR sends WF to M0, sets owner=M2, copy_set={}
+  5. M0 sends WD to M2, access=none
+  6. M2 marks r/w, sends WC to MGR
+
+what if there were no RC message?
+  i.e. MGR unlocked after sending RF?
+  could RF be overtaken by subsequent WF?
+  or does IV/IC+ptable[p].lock hold up any subsequent RF?
+    but invalidate can't acquire ptable lock -- deadlock?
+
+no IC?
+  i.e. MGR didn't wait for holders of copies to ack?
+
+no WC?
+  e.g. MGR unlocked after sending WF to M0?
+  MGR would send subsequent RF, WF to M2 (new owner)
+  What if such a WF/RF arrived at M2 before WD?
+    No problem! M2 has ptable[p].lock locked until it gets WD
+  RC + info[p].lock prevents RF from being overtaken by a WF
+  so it's not clear why WC is needed!
+    but I am not confident in this conclusion
+
+what if two machines want to write the same page at the same time?
+
+what if one machine reads just as ownership is changing hands?
+
+does IVY provide strict consistency?
+  no: MGR might process two STs in order opposite to issue time
+  no: ST may take a long time to revoke read access on other machines
+      so LDs may get old data long after the ST issues
+
+In what situations will IVY perform well?
+  1. Page read by many machines, written by none
+  2. Page written by just one machine at a time, not used at all by others
+  Cool that IVY moves pages around in response to changing use patterns
+
+Will page size of e.g. 4096 bytes be good or bad?
+  good if spatial locality, i.e. program looks at large blocks of data
+  bad if program writes just a few bytes in a page
+    subsequent readers copy whole page just to get a few new bytes
+  bad if false sharing
+    i.e. two unrelated variables on the same page
+      and at least one is frequently written
+    page will bounce between different machines
+      even read-only users of a non-changing variable will get invalidations
+    even though those computers never use the same location
+
+What about IVY's performance?
+  after all, the point was speedup via parallelism
+
+What's the best we could hope for in terms of performance?
+  Nx faster on N machines
+
+What might prevent us from getting Nx speedup?
+  Network traffic (moving lots of pages)
+  locks
+  Many machines writing the same page
+  application is inherently non-scalable
+
+How well do they do?
+  Figure 4: near-linear for PDE
+  Figure 6: very sub-linear for sort
+  Figure 7: near-linear for matrix multiply
+
+Why did sort do poorly?
+  Here's my guess
+  Partitions data over machines
+  Phase 1: Local sort of 2*N partitions for N machines
+  Phase 2: 2N-1 merge-splits; each round sends all data over network
+  Phase 1 probably gets linear speedup
+  Phase 2 probably does not -- limited by LAN speed
+    also more machines may mean more rounds
+  So for small # machines, local sort dominates, more machines helps
+  For large # machines, communication dominates, more machines don't help
+  Also, more machines shifts from n*log(n) local sort to n^2 bubble-ish short
+
+How could one speed up IVY?
+  paper suggests splitting up MGR
+  or eliminating MGR and using broadcast to find pages
+  next week: relax the consistency model
+    allow multiple writers to same page!
+
+***
+
+Paper intro says DSM subsumes RPC -- is that true?
+  When would DSM be better than RPC?
+    More transparent. Easier to program.
+  When would RPC be better?
+    Isolation. Control over communication. Tolerate latency.
+    Portability. Define your own semantics.
+  Might you still want RPC in your DSM system? For efficient sleep/wakeup?
+
+Known oddities in Section 3.1 pseudo-code
+  Fault handlers must wait for owner to send p before confirming to manager
+  Deadlock if owner has page r/o and takes write fault
+    Worrisome that no clear order ptable[p].lock vs info[p].lock
+  Write server / manager must set owner=request_node
+  Manager parts of fault handlers don't ask owner for the page
+  Does processing of the invalidate request hold ptable[p].lock?
+    probably can't -- deadlock

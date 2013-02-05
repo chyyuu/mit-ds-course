@@ -1,0 +1,275 @@
+6.824 2012 Lecture 11: two-phase commmit
+
+Topic: fault-tolerance for distributed systems
+  Yesterday: crash recovery for single system
+  Today: crash recovery for distributed system
+
+Crash recovery:
+  A bunch of computers are cooperating on some task
+  Some crash, or network fails
+  You don't want to leave state in some unknown partial state
+  Can you back out before repair?
+  Can you complete after repair?
+
+Strategy: 
+  Generalize transactions to have sub-parts on different computers
+  Then make atomic distributed transactions
+
+Example:
+  calendar system
+  want to schedule meetings with multiple participants
+  one server hold calendars of users A-M, another server holds N-Z
+  [diagram: two servers]
+  sched(u1, u2, t):
+    begin_transaction
+      if reserve(u1, t) and reserve(u2, t):
+        print "yes"
+      else
+        print "no"
+    end_transaction
+  the reserve() calls are RPCs to the two calendar servers
+  either might say yes, no, or fail
+  We want both to reserve, or both not to reserve.
+  We don't want only one to reserve
+  Need an "Atomic Commit Protocol"
+
+Idea: only tentative changes at participating servers
+  so they can later decide to commit or abort
+  reserve_handler(u, t):
+    lock u[t]
+    if u[t] is free:
+      u[t] = taken -- IN TEMPORARY STORAGE
+      return 1 -- WITHOUT RELEASING LOCK
+    return 0
+  commit_handler():
+    copy temporary u[t] to real u[t]
+    unlock u[t]
+  abort_handler():
+    discard temporary u[t]
+    unlock u[t]
+
+Idea: some single entity decides whether to commit
+  let's call it the Transaction Coordinator (TC)
+  four entities: client, TC, server A, server B
+  [time diagram]
+  client sends RPCs to A, B
+  on end_transaction, client sends "go" to TC
+  TC/A/B execute some protocol...
+  TC reports "commit" or "abort" to client
+
+We want two properties:
+  TC, A, and B each have a notion of committing
+  Correctness:
+    if any commit, none abort
+    if any abort, none commit
+  Performance:
+    if no failures, and A and B can commit, then commit.
+    if failures, come to some conclusion ASAP.
+
+Let's do correctness first.
+
+Correct atomic commit protocol:
+  [time diagram: client, TC, A, B]
+  client sends "go" to TC
+  TC sends "prepare" messages to A and B.
+  A and B respond, saying whether they're willing to commit.
+  If both say "yes", TC sends "commit" messages.
+  If either says "no", TC sends "abort" messages.
+  A/B "decide to commit" if they get a commit message.
+    I.e. they actually modify the user's calendar.
+
+Why is this correct?
+  Neither can commit unless they both agreed.
+
+What about performance?
+  Crashes or message losses can still prevent completion.
+  Bad b/c A/B hold locks until commit/abort decided.
+  
+We have two types of problems:
+  Timeout. I'm up, but I don't recv a msg I expect.
+    Maybe the other host crashed. Maybe the network is broken.
+    We cannot usually tell the difference, so must be correct in either case.
+  Reboot. I crashed, and I'm rebooting, and I need to clean up.
+    
+Let's deal with timeout first.
+  Where do hosts wait for messages?
+  1) TC waits for yes/no.
+  2) A and B wait for commit/abort.
+
+Termination protocol summary:
+  TC t/o for yes/no -> abort
+  B t/o from TC, B voted no -> abort
+  B t/o from TC, B voted yes
+    B asks A for status
+    A says commit -> commit
+    A says abort -> abort
+    A says no -> abort
+    otherwise -> wait for TC
+
+Handling TC timeout waiting for yes/no.
+  TC has not sent any "commit" messages.
+  So TC can safely abort, and send "abort" messages.
+  We've preserved correctness, but sacrificed performance.
+  Because (maybe) A and B were both prepared to commit,
+    but network delayed one of the messages,
+    we could have committed, but TC didn't know it.
+  TC is being conservative.
+
+Handling A/B timeout while waiting for commit/abort.
+  Let's talk about just B (A is symmetric).
+  If B voted "no", it can unilaterally abort.
+  So what if B voted "yes"?
+  Can B unilaterally decide to abort?
+    No! TC might have gotten "yes" from both,
+    and sent out "commit" to A, but crashed before sending to B.
+    So then A would commit and B would abort: incorrect.
+  B can't unilaterally commit, either:
+    A might have voted "no".
+
+B could just wait forever until it gets commit/abort from TC.
+  But you can do better than that:
+
+Termination protocol for B if it voted "yes":
+  B sends "status" request message to A.
+    Asks if A heard "commit" or "abort" from TC
+  If B doesn't hear reply from A: no decision, wait for TC.
+  If A received "commit" or "abort" from TC: B decides the same way.
+    Can't disagree with TC...
+  If A voted "no": B and A both abort.
+    TC can't have decided "commit".
+  If A voted "yes": no decision possible!
+    TC might have decided "commit" and replied to client.
+    Or TC might have timed out and aborted.
+    A and B must wait for the TC.
+
+What have we achieved?
+  Can resolve some timeout situations w/ guaranteed correctness.
+  But sometimes A and B must block.
+  Due to TC failure, or failure of TC's network connection.
+
+What are the challenges for crash/reboot?
+  Would like to restart and continue, perhaps w/ termination protocol
+  If A/B sent "yes" before crash, must remember!
+    Can't change to "no" (and thus abort) after restart
+    Since TC may have seen previous yes and told A to commit
+  If TC sent "commit" or "abort" before crash, must remember!
+    Can't change mind since A/B/client have already acted.
+
+How to remember state across crash?
+  TC/A/B have disk (or other non-volatile storage).
+  Before sending yes/no/commit/abort, write decision to disk.
+  A/B must also remember overall state of transaction
+    Temporary copies of modified data (e.g. u[t])
+    Which data are locked
+
+Crash recovery protocol:
+  If you're the TC, and there's no "commit" on disk, abort.
+    Because no commit on disk -> you didn't send any "commit" messages.
+  If you're A/B, and no "yes" on disk, abort.
+    No "yes" on disk -> didn't vote yes -> nobody could have committed.
+  If you're A/B, and there is a "yes" on your disk:
+    Ordinary termination protocol, might block.
+  If everyone has rebooted and is reachable, you can decide.
+    Ask TC if it has "commit" on its disk.
+
+This protocol is called "two-phase commit".
+  What properties does it have?
+  1. All hosts that decide reach the same decision.
+  2. No commit unless everyone says "yes".
+  3. No failures and all "yes", then commit.
+  4. If failures, then repair, will reach a decision.
+  5. TC failure can make servers block w/ locks held until repair.
+
+2PC perspective
+  Useful within a single smallish distributed system
+  Bad that TC crash can cause indefinite blocking
+  Bad that locks can't be released until very end (even if no crash)
+  Rarely used on a large scale
+    E.g. not between banks, not between airlines
+    Nobody wants to give up control: can't release locks
+    Usually separate commit, reconcile later if someone else aborted
+
+Case study: Argus
+
+Argus's big ideas:
+  Language support for distributed programs
+    Very cool: language abstracts away ugly parts of distrib systems
+  Easy persistence:
+    Language objects are persistent, programmer need not use DB
+    Automatic crash recovery of language objects
+  Easy concurrency:
+    Implicit locking of language objects
+  Easy RPC model:
+    RPCs are transactions w/ two-phase commit
+    Programmer need not worry about RPC failure: abort undoes RPC
+
+Picture
+  "guardian" is like an RPC server
+  "handler" is an RPC handler
+  "action" is a distributed atomic transaction
+  top-level action on A
+    RPC to B
+      B sends RPC to C
+    RPC to D
+  top-level commit
+    prepare msgs to B, C, D
+    commit msgs to B, C, D
+
+Benefits best seen by studying mail example
+  page 398: walk through send mail to many users example
+
+what if one user doesn't exist?
+  but mail has already been delivered to some other users
+  how to un-do?
+
+why do nested transactions make sense?
+  are they just a feature? or necessary?
+  does xactions + RPC => nested transactions?
+  required by modularity? 
+    you don't know who is calling, but you want to be atomic
+  required in case RPC fails but larger xaction wants to proceed?
+
+what happens when a guardian that did sub-action receives final commit?
+
+what if that guardian crashes before it gets final commit/abort decision?
+
+what happens if a guardian crashes while it is committing?
+  has finalized some of the action's updates, not others
+
+what happens if an RPC times out -- no reply?
+  maybe target got the RPC
+  is there ambiguity about whether it executed?
+
+what if user reads mail during send-to-many transaction?
+  how does user not see tentative new mail?
+  does reading user block? where?
+
+read_mail also deletes it
+  what if new mail arrives just before msg_list$trim()?
+  will it be deleted but not returned?
+  why not? what lock protects? where is the lock acquired? released?
+
+what if a user is on the list twice?
+  locks are held until end of top-level xaction
+  deadlock?
+
+how do locks work?
+  is there a separate lock server?
+
+is implicit locking the right thing?
+  very convenient!
+  don't have to worry about forgetting to lock!
+  does it ever lock too much? too long?
+    easy to get deadlock
+    all locks held to final commit
+  does it ever not lock something you'd like to lock?
+  hard case:
+    if user not in table
+      add user to table
+    lock on whole table is correct but low concurrency
+    lock per entry is not really correct (no entry to lock!)
+
+performance?
+  could the email example handle a high load?
+
+is it good to build locks/rpc/2PC/persistence/recovery into language?

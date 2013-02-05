@@ -1,0 +1,322 @@
+6.824 2012 Lecture 4: RPC wrap-up; Plan 9
+
+How does the lab RPC library use threads?
+
+client classes:
+  rpcc (one per server connection)
+  connection (one per rpcc, may come and go)
+  PollMgr (one per process, shared by all connections)
+
+client threads:
+  application threads
+    waits for reply in call1
+  PollMgr thread
+    up-call to connection when readable
+    up-call to rpcc:got_pdu when whole msg
+    rpcc::got_pdu wakes up sleeping app thread
+  note: no per-rpcc or per-connection threads
+
+why not have app thread directly read the reply from the TCP conn?
+  i.e. why the up-calls?
+
+server classes:
+  rpcs (one per service)
+  tcpsconn (one per rpcs)
+  connection (many per rpcs)
+  ThrPool (one per rpcs)
+  PollMgr (one per process)
+
+server threads:
+  tcpsconn, accept()s + makes connections
+  PollMgr thread
+    up-call to connection for incoming request
+    up-call to rpcs::got_pdu
+    enq() into ThrPool's fifo
+  ThrPool's 10 workers
+    deq() from fifo
+    call rpcs::dispatch with msg
+
+why ThrPool?
+  why not fire up a new thread per RPC request?
+
+Let's run through abbreviated RPC code in handout
+  call1:
+    why locks m_ at start/end, ca.m in middle?
+    wait(ca.c)
+  got_pdu:
+    broadcast(ca.c)
+    lock order, deadlock...
+  dispatch:
+    why the nonce check? what prob does this solve?
+  when could INPROGRESS occur?
+  when could FORGOTTEN occur?
+    long delayed request
+  what is the client nonce for?
+
+RPC and mutexes may produce distributed deadlock
+  suppose server s1's handler does this:
+    lock m
+    rpc call s2
+    unlock m
+  and server s2's handler does this:
+    rpc call s1
+  ThrPool makes nested RPCs dangerous even w/o mutexes
+    imagine if pool was only one worker
+  you will run into this in Lab 4
+    lock server sends revoke RPCs back to clients
+  lesson: don't even call RPCs from handlers!
+    have handler queue work or change state, then return
+    a background thread should send the RPC
+
+checkduplicate_and_update(cn, xid, xid_rep, &b, &sz)
+  must keep s[cn/xid] -- nil, INPROGRESS, DONE
+    if DONE, also b+sz
+  if s[cn/xid] == INPROGRESS
+    return INPROGRESS
+  if s[cn/xid] == DONE
+    return DONE, return b and sz
+  if xid <= previous xid_rep
+    return FORGOTTEN
+  else
+    s[cn/xid] = INPROGRESS
+    return NEW
+
+  must also trim s[]
+    discard s[cn/xid] if xid <= xid_rep
+    and free buf
+
+what must add_reply(cn, xid, b, sz) do?
+  checkduplicate_and_update already set s[cn/xid] = INPROGRESS
+  s[cn/xid] = DONE
+  remember b and sz.
+
+any final questions about tomorrow's lab?
+
+***
+
+Since writing a distributed application has a number of additional
+challenges over sequential programming, it would be nice if there ways
+to simplify it. First better RPC (distributed objects), then
+distributed O/S (plan 9), next time MapReduce.
+
+Why is RPC not sufficient? Let's look at YFS RPC (admittedly a bit
+primitive, but nevertheless):
+  programmer has to write stubs
+  few data structures can be passed to the client or server
+    for example, can you pass a C++ object?  
+    a pointer and dereference it remotely?
+  programmer must design a scheme for naming remote objects
+  server must map names to objects
+    locks: lockid_t
+    extents: extendid_t
+
+better object support: distributed object systems
+  e.g. Network Objects, CORBA, Java RMI
+  "remote object references"
+    real object is on server
+    client code written as if referencing local object
+    method calls are actually sent to server
+  object refs as RPC return values
+    c = cartserver.create()
+  RPC for object methods
+    c.add(item)
+  pass remote object to any server
+    warehouse.ship(c)
+  automatic location of object's server
+    warehouse can do c.list()
+  distributed GC
+
+first a simple call/return (loosely based on Java RMI)
+  server has some ordinary object o1
+  sends it to the client
+  client: o.fn("hello")
+  what is o on the client?
+  which server to send to?
+  what object on server?
+  what about "hello"?
+  what does RPC message contain?
+  how does server find the real object?
+
+how about passing an object as an argument?
+  o1.fn(o2)
+  what must o2 look like in the RPC message?
+    server host, object ID
+  o1's server needs to cook up a stub object for o2
+    where does it get stub type, implementation?
+
+when can a server free an object?
+  only when no client has a live reference
+  server must somehow learn when new client gets a reference
+  and when client local ref count drops to zero
+  so clients must send RPCs to server to note first/last knowledge
+
+are network objects useful?
+  could YFS use them?
+  automatic stub generation would be good
+    it's easy for client and server to disagree in our labs
+  passing refs among hosts might very cool
+    automatically track server location
+    useful if it's not obvious what the right server is
+    e.g. if > 1 lock_server
+  hard to guess about GC
+    local GC certainly hugely convenient
+    but remote objects are often persistent
+    files, shopping carts -- probably really live in a DB
+
+retrospective on RPC
+  more convenenient than direct socket programming
+  marshaling, stubs, appearance of function call is nice
+    but not life-changing
+  but *not* like local call -- not transparent
+    failure
+    no shared memory
+    slow
+    introduces concurrency
+  most of the value is in avoiding network programming mess
+    *not* in the analogy to procedure calls
+
+****
+
+Why are we reading the Plan 9 paper?
+  we're interested in infrastructure for distributed computing
+  just talked about RPC -- pretty low level
+  today and next few lectures will be about higher-level infrastructures
+  this is about architecture and research style, not techniques
+
+idea: distributed operating system
+  analogy: single-machine o/s great platform for apps
+    takes care of scheduling, storage, mem mgt, security, &c
+    universal platform for phone/laptop/server/supercomputer
+  why not distributed o/s as infrastructure for distributed systems?
+  many projects in 80s/90s: plan9, amoeba, locus, v, ...
+  common approach:
+    pick a unifying abstraction
+    use it to unify remote and local interaction -- transparency
+    examples: IPC, dsm, RMI, files (plan 9)
+
+Who are the authors?
+  same bell labs group that invented UNIX in the 1970s
+  values:
+    simplicity
+    tools that work together (pipes, grep, ascii files)
+    file-centric (/dev, stdin)
+    use what you make -- but don't solve probs you don't have
+  they liked the single-machine time-sharing environment
+    fostered cooperation, community
+  unhappy with 80s isolated PC/workstation model
+
+Big goals?
+  computing environment for programmers, researchers
+  use modern workstation/server/network hardware
+  regain collaborative feel of single time-shared machine
+  avoid per-workstation maintenance / config
+
+Sacrifices?
+  willing to take years, little commercial/publishing pressure
+  willing to tear up existing s/w
+    if needed to get the *right* design
+    this is a big deal in practice -- POSIX compatibility is a bummer
+  willing to pool money to buy shared infrastructure
+  willing to all play the same game (not e.g. everyone chooses own O/S)
+
+What did the Plan 9 system look like?
+  [diagram]
+  lots of cheap "terminals"
+    cpu/mem/keyboard/display/net
+    maybe no disk
+    standard Plan 9 software
+    only for interactive s/w (editors) not e.g. compiler
+    sit down at any -- log in -- looks the same!
+  LAN
+  expensive compute servers
+  file server
+  (not much new at diagram level)
+
+The new part is the O/S design
+
+Unifying design principles:
+  Everything is a file
+  One protocol
+  Private, malleable name spaces
+
+Everything is a file
+  devices (just like UNIX)
+  network (write "connect 18.26.4.9!23" to /net/tcp/0/ctl)
+  graphics windows /dev/cons, /dev/mouse
+  /proc/123/mem (ps, debuggers)
+
+Why is "everything a file" a good idea?
+  one set of utilities (ls, cat, mount) manages lots of resources
+    vs per-subsystem system calls, protocols, formats, &c
+  less duplication of effort
+    each kind of thing doesn't need its own naming, protection, &c
+  analogous to UNIX idea of ASCII formats, stdin/out
+    allows general tools like grep, awk, and combinations (e.g. pipes)
+  easy to replace / interpose
+
+Why might "everything a file" be a *bad* idea?
+
+Only one protocol -- 9P
+  protocol needed to access network file servers &c
+  system call -> 9P -> network -> user-level server
+    (next lab's use of fuse is a bit like this)
+  9P is file-oriented: open, read, write, &c
+  can mount a 9P server anywhere in local name space, e.g. /foo
+  all servers speak 9P -- files, windows, names, network, ftp
+
+Why is "only 9P" a good idea?
+  need some protocol make "everything a file" work across machines
+  wasteful to have file server, graphics server, &c to have different protocols
+  9P replaces a host of specialized protocols
+    since all services appear as files,
+    all can be accessed remotely via 9P
+  no need for special per-service protocols
+    example: no need for special ssh/telnet protocol
+    instead of ssh from h1 to h2,
+    mount h1's /dev/cons on h2's /dev/cons,
+    fire up a shell on h2
+
+Why might "only 9P" be a *bad* idea?
+
+Private, malleable name spaces
+  easy for processes to "mount" directories, files
+  intention is that users customize to make it easy to find their resources
+  conventions prevent chaos
+    /dev/cons (my terminal)
+    /dev/mouse
+    /bin/date (executable for my architecture)
+
+Why customizable namespaces a good idea?
+  remote exec on compute server can reproduce entire environment
+    all resources via files + mimic local names
+  re-create someone else's environment, for debugging
+    different s/w versions, perhaps from backup snapshots
+
+Why might customizable per-user namespace be a *bad* idea?
+  i.e. why not do it like UNIX -- all users seem same file namespace?
+
+The three principles work together
+  Everything is a file + share with 9P => can share everything
+    e.g. mount cpu server's /proc locally, debug remote program
+  Remote execution can duplicate local environment 
+    cpu command 
+    mounted files, devices, windows, &c
+    contrast to ssh, where remote machine may be very different
+
+Other Plan 9 ideas (some of which other systems now have)
+  /proc (really from UNIX 8th edition)
+  utf-8
+  backups via snapshot to worm
+  rfork
+
+What's missing?
+  as user computing environment?
+    good support for disconnected laptops? iPads?
+    would we want it in preference to athena?
+  as an infrastructure for building distributed systems?
+    i.e. if you are google or facebook
+    no story for fault tolerance?
+    no story for big computation?
+    no story for scalable storage, services?
+
+(based on notes by Russ Cox)

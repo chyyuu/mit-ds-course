@@ -1,0 +1,275 @@
+6.824 2012 Lecture 12: state machine replication
+
+General topic area: Fault tolerance
+  last week: crash recovery for single machines and distributed systems
+    all about continuing after fault is repaired
+    but no service in the meantime
+  next few weeks: high availability
+    how to provide service while some machines are down
+    how to survive permanent failures
+  today and next week: state machine replication
+    replicate data so that it is "always" available
+    if one replica fails, use another one
+  note: still assuming fail-stop; no malice, no bugs
+
+state machine replication
+  works for any kind of replicated service: storage or lock server or whatever
+  every replica must see same operations in same order
+    if deterministic, replicas will end up with same state
+    disaster if replicas diverge
+  [client, replicas, client sends stream of arithmetic ops to all]
+  how to handle multiple clients sending operations to replicas?
+    [two clients sending to all replicas]
+    what if replicas see different operation orders?
+    easy solution:
+      [clients, master, backups]
+      all operations to master
+      master chooses order
+      master sends to backups
+      "primary/backup"
+    there are other approaches
+      quorum/voting systems can avoid master but enforce order
+      primary/backup is simpler
+  when to respond to a request?
+    before backups perform request?  after?
+    must be after: can't say "yes" to client but then forget after master fails
+  do all replicas have to acknowledge?
+    depends on recovery scheme
+  what if primary fails?
+    one backup takes over as primary
+    clients change where they send operations
+  how many replicas?
+    assume repair or replacement
+    enough that low P(all fail) during one repair period
+
+what are the big issues that need to be solved?
+  what's a good level of abstraction?
+    maybe "state" = who holds each lock
+    maybe "state" = machine registers and RAM content
+  how to decide if primary has failed?
+    disaster if network partition causes two primaries
+  how to reconstruct primary's state on backup after failure?
+    backup may not have seen last few operations
+  how to hide change-over from clients?
+    clients may need to re-send request
+    and thus clients may effectively repeat a request
+  how to bring newly joined backup up to speed?
+
+Case study: Hypervisor-based Fault-tolerance
+  Bressoud and Schneider
+  SOSP 1995
+
+Motivation
+  Goal: fault tolerance / availability for any existing s/w
+    by running same instructions &c on two computers
+  Transparent: any app, any O/S
+  Would be magic if it worked well!
+
+Plan 1:
+  [simple diagram]
+  Two machines
+  Identical start state: registers, program, memory contents
+  Maybe they will stay identical
+  If one fails, the other just keeps going, no time/data/work is lost
+
+What will go wrong with Plan 1?
+  external outputs will be duplicated
+  must send external inputs to both
+  inputs must arrive at the same time at both
+  interrupts must arrive at same time at both
+  CPUs unlikely to run at exactly the same speeds
+
+How exact must we be about timing of interrupts?
+  is it ok if timing differs a little bit?
+  what does it mean for timing to be exact?
+
+How are they able to control I/O and interrupt timing?
+  they slip a virtual machine / hypervisor under the O/S
+  
+What is a hypervisor?
+  a piece of software
+  emulates a real machine precisely
+    so an O/S &c can run on a hypervisor
+    "guest"
+  as if hypervisor simulated each instruction
+    and kept simulated registers, memory, &c
+  BUT as much as possible runs guest on real h/w!
+    can be much faster than interpreting instructions
+  Many fascinating details, see VMware papers for x86 story
+
+Hypervisor gives us control
+  Suppress output from backup, detect interrupts/input at primary, &c
+  Still need a scheme for delivering I/O inputs and interrupts
+  From primary to backup, at the right times
+
+But: hard to know when interrupt happened at primary, repeat at backup
+  Answer: HP PA-RISC recovery counter
+    It forces an interrupt every N instructions
+  This allows primary and backup hypervisor to get control 
+    at exactly the same point in the code
+
+Epochs
+  Primary alternates epoch and end of epoch; backup does too
+  Every epoch is same # of instructions, e.g. 4000 instructions
+  Primary during epoch E:
+    Execute handlers for interrupts delivered during E-1
+    I/O output instructions proceed as normal
+    I/O input is from data collected during E-1 interrupts
+    Hypervisor hides new interrupts, just records, w/ I/O input
+  Primary at end of epoch E:
+    Send interrupt info, and I/O input, to backup
+    Wait for backup to ACK
+    Send "done with E" to backup
+  Backup during epoch E:
+    Execute handlers for interrupts primary told us of during E-1
+    I/O output instructions do nothing
+    I/O input instructions consume I/O input data sent by primary
+    Ignore interrupts from backup devices
+  Backup at end of epoch E:
+    Process and buffer interrupt/input msgs from primary
+    Wait for "done with E+1" from primary
+    Start epoch E+1
+
+Note backup lags primary by one epoch
+  Backup doesn't start 7 until primary is done with 7
+  So backup knows all input/interrupts for 7 when it starts 7
+  And backup knows if primary completed 7 (i.e. didn't crash)
+    
+What if primary fails during epoch E?
+  Backup finishes with E-1
+  Backup times out waiting for "done with E"
+
+Can backup just switch to being primary for epoch E?
+  No: primary may have asked devices for I/O during E-1
+  Backup did not, so will expect interrupts that will never happen
+
+What if primary did the following I/O during "failover" epoch E:
+  read input -- will promoted backup see that input?
+  wrote output -- will promoted backup repeat that output?
+  failed just before output -- will backup write?
+  got an interrupt + didn't forward to backup -- will backup miss it?
+  asked its dev h/w to interrupt -- will backup h/w interrupt later?
+
+Failover strategy:
+  Backup times out waiting for "done with E"
+  Backup executes epoch E as backup (no output, I/O suppressed)
+  Switches to primary for E+1
+  Hypervisor generates "uncertain interrupts" for I/O started <= E
+    Since backup didn't actually generate the requests
+    O/S drivers know they should repeat I/O if they get an uncertain interrupt
+    Re-issue disk read/write, re-send packet, &c
+
+Details of I/O during failover:
+  Primary read input:
+    Backup will see the input too, since delivered w/ intr at end of E-1
+  Primary wrote output:
+    Backup will *not* write during E
+    Uncertain interrupt -> backup will repeat during E+x
+    So disk/net/&c will see output twice!
+  Primary didn't get as far as writing output:
+    Uncertain interrupt -> backup will write during E+x
+  Primary got an interrupt:
+    Backup will *not* get an interrupt during E
+    BUT hypervisor knows interrupt is pending, b/c saw request instr during E-x
+    Hypervisor will issue uncertain interrupt at end of E
+
+(all this is based on footnote 5 on page 4, and IO1 and P8 on page 5)
+
+Will the outside world tolerate repeated output?
+  In general, maybe not
+    E.g. controlling an instrument in a scientific experiment
+  Network protocols:
+    No problem, Must handle duplicated packets anyway
+  Shared disk:
+    No problem, repeated write of same data 
+
+Do O/S drivers on primary talk directly to h/w?
+  I suspect O/S talks to device simulated/mediated by hypervisor
+  Hypervisor needs to be able to collect input read from
+    devices and sent it to backup
+  So hypervisor must be intervening (and understand) access to dev h/w
+  Also hypervisor must initialize dev h/w when backup takes over
+
+Figure 1 shows a shared disk
+  Rather than separate disk per machine with identical content
+  Only the primary writes the disk
+  Why does shared disk make the design easier?
+  Disk writes are non deterministic
+    one disk may have bad sector and write fails
+  Simplifies recovery of failed machine
+    Don't need to copy whole disk from survivor
+
+Won't disk failures ruin the fault-tolerance story?
+  Can be fixed separately, w/ RAID
+
+Does the backup read the disk directly?
+  No: why not?
+  Suppose primary reads and then immediately writes.
+  Backup might read the new data, should see old.
+
+Today's question:
+  What if each computer had its own disk replica (not dual-ported)
+  Would that make the system more fault-tolerant?
+  How would we modify the system?
+  How would recovery have to be changed?
+
+What if ethernet cable breaks?
+  primary still running
+  backup will try to promote itself
+  that's part of what the fail-stop assumption assumes away...
+
+What if we want to re-start a failed+repaired primary?
+
+What if the computers have multiple cores + threads?
+  Would this scheme work w/o modification?
+
+What we can expect for performance?
+
+When will performance be bad?
+  Frequent interrupts -- may be delayed by epoch scheme
+  Lots of input -- must be sent over ethernet
+  Many privileged instructions -- many hypervisor traps
+
+Should epochs be short or long?
+  Short means many end-of-epoch pauses + chatter
+  Long means less overhead
+    But I/O interrupts delayed longer
+
+What performance do they see?
+  CPU-bound: Figure 2
+
+Disk-bound (really seek-bound): Figure 3
+  Why do writes do better than reads?
+  Why much better relative performance for disk-bound than CPU-bound?
+  Why does Figure 3 write performance level off?
+    Why isn't it heading down towards 1.0, as in Figure 2?
+
+What is the limiting factor in performance?
+  442-microsecond epoch overhead
+  442 us is 22100 instructions (50 mHz)
+    So 22000-instruction epochs -> 2x slowdown for CPU-bound
+    Plus time to emulate privileged instructions
+
+Is the 442 microseconds CPU time, or network time?
+  Figure 4 ATM experiment suggests CPU time, but not clear
+
+Does anyone use these ideas today?
+  Five years ago I said "no" -- too slow
+    Instead, specialized replicated storage systems
+    Like my original client/server diagram, for put/get &c
+  But now: yes!
+  VMware has a fault-tolerant VM system
+  Same basic idea, but more complete and sophisticated
+  no epochs
+    primary has no restrictions on where interrupts occur
+    backup can cause them to occur at same place
+  primary holds each output until backup ACKs
+    to ensure backup will produce same output if primary fails
+    but primary can continue executing while it waits
+  fault-tolerant network disks
+  copes with partition by test-and-set on disk
+    at most one of primary and backup will win
+    no progress if network disk not reachable
+  automatic creation of new backup after failure
+    on some spare VM host, don't need to repair same hardware
+  much faster: only 10% slow-down, not paper's 2X

@@ -1,0 +1,272 @@
+6.824 2012 Lecture 20: Dynamo
+
+Dynamo: Amazon's Highly Available Key-value Store
+DeCandia et al, SOSP 2007
+
+Why are we reading this paper?
+  It's a real system: used for e.g. shopping cart at Amazon
+  DB tradition:
+    You can't have strong consistency AND high availability
+    Most database-like systems opt for consistency
+  Dynamo's big break with tradition: eventual consistency
+  One of first production storage systems based on eventual consistency
+    Followed by Cassandra, Voldemort, Riak, CouchDB
+    (git is also eventually consistent, though quite different)
+
+Environment
+  [data centers, app servers ("clients"), Dynamo nodes]
+  *not* full replica per site as in PNUTS, MegaStore
+  sounds like e.g. 10 data centers, each item at 3 of them
+  seems like this would yield frequent WAN traffic
+  maybe they get locality at a higher level?
+    i.e. direct UK customers to amazon.co.uk, with multiple datacenters in UK
+    with low latency between them
+
+Things I think about when looking at a storage design:
+  WAN?
+  Finding data?
+  Agreement on placement?
+  Fresh reads?
+  Ordered writes? for replication and read freshness
+  Read-modify-write? w/o lost updates
+  Durable writes?
+  Partitions?
+  Temporary server failure?
+  Permanent server failure?
+
+Their Obsessions
+  SLA, 99.9th percentile of delay
+  constant failures
+  "data centers being destroyed by tornadoes"
+  "always writeable"
+
+Where does that take us?
+  high availability
+  always writeable
+  write in any partition
+  writes in multiple partitions
+  no paxos, no primary, no "view" of live servers
+  conflicting versions
+
+The Big Idea: eventual consistency
+  accept writes at any replica
+  allow divergent replicas
+  allow reads to see stale or conflicting data
+  resolve conflicts when failures go away
+    reader must merge and then write
+
+Why eventual consistency makes sense
+  Allows writes at any time
+    In minority partition, if master unreachable, &c
+    Unlike PNUTS which must block for master
+    Unlike Paxos-based systems which don't work outside majority partition
+  Simplifies some parts of the system
+    No need for agreement on exactly which node is master for each record
+    No need for careful view change
+    Easier puts()s vs crash recovery, join, leave
+
+What are they giving up
+  Fresh reads
+  Simple reads: must merge and re-write
+  Nothing like PNUTS test-and-set-write
+
+IVY/yfs/Harp ... PNUTS ... Dynamo/Bayou/filesync
+  Dynamo is like a standard DB (or Harp) when all goes well
+  Like Bayou when there are failures
+
+Data model
+  simple k/v
+  hash, not ordered, no range scans
+
+Query model
+  get(k) -> set of values and "context"
+    context is version info
+  put(k, v, context)
+    context indicates which versions this put merges
+
+Data placement
+  load balance, including as servers join/leave
+  replicating
+  finding keys, including if failures
+  encourage puts and gets to see each other
+  avoid conflicting versions spread over many servers
+
+Consistent hashing
+  [ring, and physical view of servers]
+  node ID = random
+  key ID = hash(key)
+  coordinator: successor of key
+    clients send puts/gets to coordinator
+    join/leave only affects neighbors
+  replicas at successors
+    "preference list"
+  coordinator forwards puts (and gets...) to nodes on preference list
+  virtual nodes
+
+Failure handling: quorum
+  goal: gets should have high prob of seeing most recent puts
+  goal: but don't block
+  N nodes in preference list
+    we try to ensure they all have all data
+  coordinator waits for W replies during put()
+  coordinator waits for R replies during get()
+  if failures aren't too crazy, client sees all recent versions
+    it may still have to merge and re-write
+
+What if coordinator can't reach W out of N during put()?
+  Wait? Fail? Write to fewer than W?
+  Just reaches farther around the ring
+  That node remembers "hint" that data belongs elsewhere
+  Will forward once real home is reachable
+
+What if coordinator can't get R replies during get()?
+  Paper seems to say the read fails
+  I wonder if it would be better to return the data you do get?
+  Though if app wanted that, maybe it should set R=1
+
+Do these quorums guarantee intersection?
+  I.e. that my get() will see all previous writes?
+  They are really "sloppy" quorums
+  Real quorums would block writers if too few nodes available
+  Quorums just increase probability of good behavior
+    That reads will see recent writes
+
+How should clients resolve conflicts?
+  Depends on the application
+  Shopping basket: take union? thus un-deletes
+    Weaker than Bayou, but simpler
+  Some apps probably can use latest wall-clock time
+    E.g. if I'm updating my password
+    This is pretty simple for apps
+
+How to detect whether two versions conflict?
+  If they are not bit-wise identical, must client always merge+write?
+  We have seen this problem before...
+
+Version vectors
+  Example:
+    v1: [a:1]
+           v2: [a:1,b:2]
+    VVs indicate v1 supersedes v2
+    Dynamo nodes automatically take care of this
+  Example:
+    v1: [a:1]
+           v2: [a:1,b:2]
+    v3: [a:2]
+    Client must merge
+
+What happens if two clients concurrently write?
+  To e.g. increment a counter
+  Each does read-modify-write
+  So they both see the same initial version
+
+Won't the VVs get big?
+  Dynamo deletes least-recently-updated entry if VV has > 10 elements
+
+Impact of deleting a VV entry?
+  won't realize one version subsumes another, will merge when not needed:
+    put@b: [b:4]
+    put@a: [a:3, b:4]
+    forget b: [a:3]
+    now, if you sync w/ [b:4], looks like a merge is required
+  can you mistakenly think one DOES subsume another?
+    and thus mistakenly fail to merge?
+    I can't think of one
+    * one reason is each node won't forget its own previous version
+    * another is that oldest element is dropped
+  forgetting the oldest is clever
+    since that's the element most likely to be present in other branches
+    so if it's missing, forces a merge
+
+To which coordinator does a client send request? (4.5)
+  maybe via *random* load balancer, then wrong node forwards
+  maybe client library knows key->node mapping
+  maybe client sends to any of top N (end of Sec 5)
+    and last coord tells client which of N responded fastest
+
+What if client can't contact coordinator?
+
+Do put()s wait for a disk write?
+  4.1 implies yes
+  clearly a problem: end of 6.1 talks about fixing
+  only one of N writes to disk -- and presumably isn't in W waited for
+
+Temporary server failures?
+  Where do puts go?
+  Do RPCs keep timing out?
+  How to heal server when it restarts?
+  What if node with hinted keys fails?
+    Nodes nearby on ring periodically compare/sync DBs
+
+Permanent server failures / additions?
+  Manual maintenance of list
+  System doesn't have to guess permanent vs temporarily failure
+    Since handling is very different!
+
+Is the design inherently low delay?
+  No: client may be forced to contact distant coordinator
+  No: coordinator has to wait for W or R responses
+
+What parts of design are likely to help limit 99.9th pctile delay?
+  This is a question about variance, not mean
+  Bad news: consulting multiple nodes for get/put is a lose
+    time = max(servers), if you have to talk to lots, at least one will be slow
+  Good news: Dynamo only waits for W or R out of N
+    cuts off tail of delay distribution
+    e.g. if nodes have 1% chance of being busy with something else
+    or if a few nodes are broken, network overloaded, &c
+
+No real Eval section, only Experience
+
+How does Amazon use Dynamo?
+  shopping cart (merge)
+  session info (maybe Recently Visited &c?) (most recent TS)
+  product list (mostly r/o, R=1 W=N)
+
+They claim main advantage of Dynamo is flexible N, R, W
+  What do you get by varying them?
+  N-R-W
+  3-2-2 : default, reasonable fast R/W, reasonable durability
+  3-3-1 : fast W, slow R, not very durable
+  3-1-3 : fast R, slow W, durable
+  3-3-3 : ??? reduce chance of R missing W?
+  3-1-1 : doesn't seem useful
+
+They had to fiddle with the load balance (6.2)
+  Old scheme:
+    Random choice of node ID meant new node had to split old nodes' ranges
+    Which required expensive scans of on-disk DBs
+  New scheme:
+    Pre-determined set of Q evenly divided ranges
+    Each node is coordinator for a few of them
+    New node takes over a few entire ranges
+    Store each range in a file, can xfer whole file
+
+How useful is ability to have multiple versions? (6.3)
+  I.e. how useful is eventual consistency
+  This is a Big Question for them
+  6.3 claims 0.06% of reads see multiple versions
+  So perhaps 0.06% of writes benefitted from always-writeable?
+    I.e. would have blocked in primary/backup scheme
+  But maybe not!
+    They seem to say divergent versions caused by concurrent writes
+    Not by e.g. disconnected data centers
+    Concurrent writes maybe better solved w/ test-and-set-write
+
+Performance / throughput (Figure 4, 6.1)
+  Figure 4 says average 10ms read, 20 ms writes
+    the 20 ms must include a disk write
+    10 ms probably includes waiting for R/W of N
+    so nodes are all in same datacenter? all in same city?
+  Figure 4 says 99.9th pctil is about 100 or 200 ms
+    Why?
+    "request load, object sizes, locality patterns"
+    does this mean sometimes they had to wait for coast-coast msg? 
+
+Wrap-up
+  The big issue is eventual consistency
+  Maybe only way to get high availability + no blocking on WAN
+    But PNUTS and MegaStore claim WAN is super reliable
+  Awkward model for some applications (stale reads, merges)
+    This is hard for us to tell from paper
+  No agreement on whether it's good for storage systems

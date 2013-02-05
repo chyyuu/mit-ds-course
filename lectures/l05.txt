@@ -1,0 +1,307 @@
+6.824 2012 Lecture 13: Paxos
+
+From Paxos Made Simple, by Leslie Lamport, 2001
+
+introduction
+  overall topic: fault-tolerant replicated services
+  saw replicated state machine last time, primary/backup
+  today: robust agreement on primary
+  Lab 6!
+
+replicated state machine via primary/backup
+  [many clients, primary, backup, state, operations]
+  if all servers see same sequence of ops
+    they will remain replicas, so one can take over from another
+  works for deterministic local services: lock, block storage, files
+  how to ensure all replicas see same sequence of ops?
+    clients send all operations to current primary
+    primary chooses order, sends to backups, replies to client
+  if primary fails, clients switch to backup
+
+broken plan for primary failure:
+ how about:
+   backup pings primary
+   takes over if gets no response from primary
+ doesn't work:
+   pings lost => two primaries
+   pings delayed => two primaries
+   partition => two primaries
+
+basic problem:
+  backup can't distinguish broken network from dead primary
+    but it should act differently in the two cases!
+  seems like an impossible problem -- but it's not
+
+the basic idea behind Paxos
+  three or more servers
+  there can be at most one network partition with a majority of servers
+  only the majority partition (if any) can have primary
+
+Paxos is a fault-tolerant agreement protocol
+ general-purpose algorithm
+ one or more servers each propose a value
+ correctness:
+   if agreement reached, all agreeing nodes see same value
+ fault-tolerance:
+   only a majority is required
+   == can tolerate non-reachability of a minority of servers
+
+what shall we use Paxos to agree on?
+  for a primary/backup replicated state machine system
+  we want to agree on who is the primary, and who are the backups
+  let's just agree on the set of live servers
+    and always have the primary be the live server with lowest ID
+
+config service provides "views" and "view change"
+ system goes through a sequence of views
+ view: view# and set of participants
+ Paxos ensures agreement on unique successor of each view
+ example:
+   0, S1, S2, S3
+   1, S2, S3
+   2, S2, S3, S4
+   3, S1, S2, S3, S4
+ two uses:
+   current view implies current primary
+   previous view tells new primary who to get state from
+
+what does config service need from Paxos?
+ one or more nodes will see change in set of pingable nodes
+ call Paxos("i+1 S1 S2")
+   maybe just one such call, maybe more than one
+   all same i+1
+   maybe all same srv list, maybe different
+ eventually Paxos says "decided i+1 S1 S2"
+
+config srv creates separate Paxos instance for each view change
+  so from now on in lecture, agreeing on just a single new view
+
+general Paxos approach
+ one (or more) nodes decide to be the proposer
+ proposer contacts participants, tries to assemble a majority
+ if a majority respond, we're done
+
+Paxos has two phases
+ proposer can't just send "do you promise to commit to this value?"
+   can't promise: maybe everyone else just promised to a different value
+   have to be able to change mind
+ so: prepare, and accept
+
+exchange:
+ proposer        acceptors
+     prepare(n) ->
+  <- prepare_ok(n_a, v_a)
+     accept(n, v') ->
+  <- accept_ok(n)
+     decided(v') ->
+
+why n?
+ to distinguish among multiple rounds, e.g. proposer crashes, simul props
+ want later rounds to supersede earlier ones
+ numbers allow us to compare early/late
+ n values must be unique, comparable, and roughly follow time
+ n = <time, server ID>
+
+definition: server S accepts n/v
+  it responded accept_ok to accept(n, v)
+
+definition: n/v is chosen
+  a majority of servers accepted n/v
+
+the crucial property:
+ if a value was chosen, any subsequent choice must be the same value
+   i.e. protocol must not change its mind
+   maybe a different proposer &c, but same value!
+   this allows us to freely start new rounds after crashes &c
+ tricky b/c "chosen" is system-wide property
+   e.g. majority accepts, then proposer crashes
+   nodes cannot tell locally
+
+so:
+ proposer doesn't send out value with prepare
+ acceptors send back any value they have already accepted
+ if there is one, proposer proposes that value
+   to avoid changing an existing choice
+ if no value already accepted,
+   proposer can propose any value (e.g. a client request)
+ proposer must get prepare_ok from majority
+   to guarantee intersection with majority formed by existing choice
+
+now the protocols
+
+state:
+ must persist across reboots
+ n_p (highest prepare seen)
+ n_a, v_a (highest accept seen)
+
+proposer(v):
+ choose n, unique and higher than any n seen so far
+ send prepare(n) to all servers including self
+ if prepare_ok(n_a, v_a) from majority:
+   v' = v_a with highest n_a; choose own v otherwise
+   send accept(n, v') to all
+   if accept_ok(n) from majority:
+     send decided(v') to all
+
+acceptor's prepare(n) handler:
+ if n > n_p
+   n_p = n
+   reply prepare_ok(n_a, v_a)
+
+acceptor's accept(n, v) handler:
+ if n >= n_p
+   n_a = n
+   v_a = v
+   reply accept_ok(n)
+
+if acceptor times out (i.e. doesn't see decide())
+  become a proposer
+
+example 1 (normal operation):
+  server set is S1, S2, S3
+  S3 just crashed
+  S1's pings would see S3 is now dead
+  S1's config server asks Paxos to agree on vid+1, S1, S2
+  S1 is proposer
+S1: p1    a1v1    d1
+S2: p1    a1v1    d1
+S3: (p1)  (a1v1)  (d1)
+
+Note Paxos only requires a majority of the servers
+  so we can continue even though S3 was down
+  proposer must not wait for S3's responses! fast timeout.
+
+What would happen if network partition?
+  I.e. S3 was alive?
+  S3 would also initiate Paxos for new view
+  S3's prepare would not assemble a majority
+
+Paxos must assemble a majority
+  But a majority of what?
+  If there are seven servers, and S1 thinks S4 S5 S6 S7 are down,
+    can it proceed with a majority among just S1 S2 S3?
+
+the homework question:
+ How does Paxos ensure that the following sequence of events can't
+ happen? What actually happens, and which value is ultimately chosen?
+ A: p1 a1foo
+ B: p1       p2 a2bar
+ C: p1 a1foo p2 a2bar
+ C's prepare_ok to B really included "foo"
+   thus a2foo, and so no problem
+ the point: if the system has already reached agreement
+   subsequent proposer will re-use agree value, learned during propose phase
+
+example 2 (concurrent proposers):
+scenario:
+A1 starts proposing n=10
+A1 sends out just one accept v=10
+A3 starts proposing n=11
+  but A1 does not receive its proposal
+  A3 only has to wait for a majority of proposal responses
+A1: p10 a10v10 
+A2: p10        p11
+A3: p10        p11  a11v11
+A1 and A3 have accepted different values!
+what will happen?
+  what will A2 do if it gets a10v10 accept msg from A1?
+  what will A1 do if it gets a11v11 accept msg from A3?
+what if A3 were to crash at this point (and not restart)?
+
+how about this:
+A1: p10  a10v10               p12
+A2: p10          p11  a11v11  
+A3: p10          p11          p12   a12v10
+has the system agreed to a value at this point?
+
+what's the commit point?
+  i.e. exactly when has agreement been reached?
+  i.e. at what point would changing the value be a disaster?
+  after a majority has the same v_a? no -- why not?
+  after a majority has the same v_a/n_a? yes -- why sufficient?
+
+what if new proposer chooses n < old proposer?
+ i.e. if clocks are not synced
+ cannot make progress, though no correctness problem
+
+what if an acceptor crashes after receiving accept?
+A1: p1  a1v1
+A2: p1  a1v1 reboot  p2  a2v?
+A3: p1               p2  a2v?
+A2 must remember v_a/n_a across reboot! on disk
+  might be only intersection with new proposer's majority
+  and thus only evidence that already agreed on v1
+
+what if an acceptor reboots after sending prepare_ok?
+ does it have to remember n_p on disk?
+ if n_p not remembered, this could happen:
+ S1: p10            a10v10
+ S2: p10 p11 reboot a10v10 a11v11
+ S3:     p11               a11v11
+ 11's proposer did not see value 10, so 11 proposed its own value
+ but just before that, 10 had been chosen!
+ b/c S2 did not remember to ignore a10v10
+
+can Paxos get stuck?
+  yes, if there is not a majority that can communicate
+  how about if a majority is available?
+
+That was Lab 6; now for Lab 7.
+
+Remember:
+  replicated lock server
+  primary and a few backups
+  all servers execute all operations in the same order
+  layers:
+    lock_server
+    RSM
+    config
+    Paxos
+  paxos ensures agreement on squence of views
+    <vid 0, S1 S2 S3>
+    <vid 1, S2 S3>
+    <vid 2, S1 S2>
+    ...
+
+How do new views get triggered?
+  all nodes ping each other
+  if pingable nodes != view's live nodes
+    start new Paxos instance for vid+1
+  if node reboots
+    start new Paxos instance
+
+RSM assigns sequence number to client requests
+  e.g. acquire, release
+  called "viewstamp" = vid:seq
+  0:0, 0:1, 0:2, 1:0, 1:1, 2:0
+  all replicas execute client requests in viewstamp order
+    can't execute 0:2 until executed 0:1
+
+how to continue after a view change?
+  if primary from prev view still running, use its state
+  if a backup from prev view still running, use its state
+  if no server from prev view still running
+    must wait for one to re-join!
+    even if Paxos reached agreement
+
+if primary crashes, will all backups have the same state?
+  no: maybe some backups saw last operation, and some did not
+  if state is small, pick one backup and send its state to all
+  if state is large
+    find last operation, send to backups that missed it
+
+what if backup B1 was the only one to see the last operation
+  and B1 is down/separated for a while
+  and then B1 re-joins
+  problem: B1 executed an operation that no-one else saw
+  if state is small, replace B1's state
+  if state is large
+    need a way to abort the last operation
+    read the Harp paper
+
+summary
+ overall goal: replicated state machines
+ needs a single sequence of views
+   e.g. sequence of primaries
+ paxos chooses each new view; one paxos instance per view
+ servers must

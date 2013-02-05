@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="StyleSheet" href="style.css" type="text/css">
+<title>6.824 Lab 3: Paxos-based Key/Value Service</title>
+</head>
+
+<body>
+<div align="center">
+<h2><a href="../index.html">6.824</a> - Spring 2013</h2>
+</div>
+
+<div align="center">
+<h1>6.824 Lab 4: Sharded Key/Value Service</h1>
+</div>
+
+
+<div align="center">
+<h3>Due: April 12, 5:00pm</h3>
+</div>
+
+<hr>
+
+<h3>Introduction</h3>
+
+<p>
+In this lab you'll build a key/value storage system that "shards,"
+or partitions, the
+keys over a set of replica groups. A shard is a subset of the
+key/value pairs; for example, all the keys starting with "a" might be
+one shard, all the keys starting with "b" another, etc. The reason for
+sharding is performance. Each replica group handles puts and gets for
+just a few of the shards, and the groups operate in parallel; thus
+total system throughput (puts and gets per unit time) increases in
+proportion to the number of groups.
+
+<p>
+Your sharded key/value store will have two main components. First, a
+set of replica groups. Each replica group is responsible for a subset
+of the shards. A replica consists of a handful of servers that use
+Paxos to to replicate the group's shard. The second component is the
+"shard master". The shard master decides which replica group should
+serve each shard; this information is called the configuration. The
+configuration changes over time. Clients consult the shard master in
+order to find the replica group for a key, and replica groups consult
+the master in order to find out what shards to server. The shard
+master uses Paxos to replicate the configuration.
+
+<p>
+A sharded storage system must be able to shift shards among
+replication groups. One reason is that some groups may become more
+loaded than others, so that shards need to be moved to balance the
+load. Another reason is that replica groups may join and leave the
+system: new replica groups may be added to increase capacity, or
+existing replica groups may be taken offline for repair or retirement.
+
+<p>
+The main challenge in this lab will be handling reconfiguration in the
+replica groups. Within a single replica group, all group members must
+agree on when a reconfiguration occurs relative to client Put and Get
+requests. For example, a Put may arrive at about the same time as a
+reconfiguration that causes the replica group to stop being
+responsible for shard holding the Put's key. All replicas in the group
+must agree on whether the Put occurred before or after the
+reconfiguration. If before, the Put should take effect and the new
+owner of the shard will see its effect; if after, the Put won't take
+effect and client must re-try at the new owner. The correct approach
+is to have each replica group use Paxos to log not just the sequence
+of Puts and Gets but also the sequence of reconfigurations.
+
+<p>
+Reconfiguration also requires interaction among the replica groups.
+For example, in configuration 10 group G1 may be responsible for shard
+S1. In configuration 11, group G2 may be responsible for shard S1.
+During the reconfiguration from 10 to 11, G1 must send the contents of
+shard S1 (the key/value pairs) to G2.
+
+<p>
+You will need to ensure that at most one replica group is serving
+requests for each shard. Luckily it is reasonable to assume that each
+replica group is always available, because each group uses Paxos for
+replication and thus can tolerate some network and server failures. As
+a result, your design can rely on one group to actively hand off
+responsibility to another group during reconfiguration. This is
+simpler than the situation in primary/backup replication (Lab 2),
+where the old primary is often not reachable and may still think it is
+primary.
+
+<p>
+This lab's general architecture (a configuration service and a set of
+replication groups) is patterned at a high level on a number of
+systems: Flat Datacenter Storage, BigTable, Spanner, FAWN, Apache
+HBase, Rosebud, and many others. These systems differ in many details
+from this lab, though, and are also typically more sophisticated and
+capable. For example, your lab lacks persistent storage for key/value
+pairs and for the Paxos log; it sends more messages than required per
+Paxos agreement; it cannot evolve the sets of peers in each Paxos
+group; its data and query models are very simple; and handoff of
+shards is slow and doesn't allow concurrent client access.
+
+<h3>Collaboration Policy</h3>
+
+You must write all the code you hand in for 6.824, except for code
+that we give you as part of the assignment. You are not allowed to
+look at anyone else's solution, and you are not allowed to look at
+code from previous years. You may discuss the assignments with other
+students, but you may not look at or copy each others' code.
+
+<h3>Software</h3>
+
+<p>
+Do a <tt>git pull</tt> to get the latest lab software. We supply you
+with new skeleton code and new tests in <tt>src/shardmaster</tt> and
+<tt>src/shardkv</tt>.
+
+<pre>
+$ cd ~/6.824
+$ git pull
+...
+$ cd src/shardmaster
+$ go test
+Basic leave/join: --- FAIL: TestBasic (0.00 seconds)
+test_test.go:37:    wanted 1 groups, got 0
+--- FAIL: TestUnreliable (0.32 seconds)
+test_test.go:37:    wanted 20 groups, got 0
+FAIL
+$
+</pre>
+
+<h3>Part 1: The Shard Master</h3>
+
+<p>
+First you'll implement the Shard Master, in <tt>shardmaster/server.go</tt>.
+When you're done, you should pass all the tests in the
+<tt>shardmaster</tt> directory (after ignoring Go's many complaints):
+
+<pre>
+$ cd ~/6.824/src/shardmaster
+$ go test
+Basic leave/join: OK
+Historical queries: OK
+Move: OK
+Concurrent leave/join: OK
+Minimal transfers after joins: OK
+Minimal transfers after leaves: OK
+Concurrent leave/join, unreliable: OK
+PASS
+$
+</pre>
+
+<p>
+The shardmaster manages a sequence of numbered configurations. Each
+configuration describes a set of replica groups and an assignment of
+shards to replica groups. Whenever this assignment needs to change,
+the shard master creates a new configuration with the new assignment.
+Key/value clients and servers contact the shardmaster when they want
+to know the current (or a past) configuration.
+
+<p>
+Your implementation must support the RPC interface described
+in <tt>shardmaster/common.go</tt>, which consists of Join, Leave,
+Move, and Query RPCs. You should not change common.go or client.go.
+
+<p>
+The Join RPC's arguments are a unique non-zero replica group
+identifier (GID) and an array of server ports. The shardmaster should
+react by creating a new configuration that include the new replica
+group. The new configuration should assign some shards to the new
+group. The shardmaster should come as close as it can to evenly
+dividing the shards among the groups.
+
+<p>
+The Leave RPC's arguments are the GID of a previously joined group.
+The shardmaster should create a new configuration that does not
+include the group, and that assigns the group's shards to the
+remaining groups. The resulting assignment should divide the shards as
+evenly as possible.
+
+<p>
+The Move RPC's arguments are a shard number and a GID. The shardmaster
+should assign the shard to the GID.
+
+<p>
+The Query RPC's argument is a configuration number. The shardmaster
+replies with the configuration that has that number. If the number is
+-1 or bigger than the biggest known configuration number, the
+shardmaster should reply with the latest known configuration. 
+
+<p>
+The very first configuration should be numbered zero. It should
+contain no groups, and all shards should be assigned to GID zero (an
+invalid GID). The next configuration (created in response to a Join
+RPC) should be numbered 1, &c. There will usually be significantly
+more shards than groups (i.e., each group will serve more than
+one shard), in order that load can be shifted at
+a fairly fine granularity.
+
+<p>
+Your shardmaster must be fault-tolerant, using your Paxos library
+from Lab 3.
+
+<p>
+Hint: start with a stripped-down copy of your kvpaxos server.
+
+<p>
+Hint: Go maps are references. If you assign one variable of type map
+to another, both variables refer to the same map. Thus if you want to
+create a new Config based on a previous one, you need to create a new
+map object (with make()) and copy the keys and values individually.
+
+<h3>Part 2: Sharded Key/Value Server</h3>
+
+Now you'll build shardkv, a sharded fault-tolerant key/value storage system.
+You'll modify <tt>shardkv/client.go</tt>,
+<tt>shardkv/common.go</tt>, and <tt>shardkv/server.go</tt>.
+
+<p>
+Each shardkv server will operate as part of a replica group. Each
+replica group will serve Get/Put operations on one shard of key-space.
+Use key2shard() in client.go to find which shard a key belongs to.
+Multiple replica groups will cooperate to serve the complete set of
+shards. A single instance of the shardmaster service will assign
+shards to replica groups. When this assignment changes, replica groups
+will have to hand off shards to each other.
+
+<p>
+Your storage system must provide sequential consistency to
+applications that use its client interface. That is, completed
+application calls to the Clerk.Get() and Clerk.Put() methods
+in <tt>shardkv/client.go</tt> must appear to have affected all
+replicas in the same order. A Clerk.Get() should see the value written
+by the most recent Clerk.Put() (in that order) to the same key. This
+will get tricky when Gets and Puts arrive at about the same time as
+configuration changes.
+
+<p>
+You are allowed to assume that a majority of servers in each Paxos
+replica group are alive and can talk to each other, can talk to a
+majority of the shardmaster servers, and can talk to a majority of
+each other replica group. Your implementation must operate (serve
+requests and be able to re-configure as needed) if a minority of
+servers in some replica group(s) are dead, temporarily unavailable, or
+slow.
+
+<p>
+We supply you with client.go code that sends each RPC to the
+replica group responsible for the RPC's key. It re-tries if the
+replica group says it is not responsible for the key; in that case,
+the client code asks the shardmaster for the latest configuration and
+tries again. You'll have to modify client.go as part of your support
+for dealing with duplicate client RPCs, much as in the kvpaxos lab.
+
+<p>
+When you're done your code should pass the shardkv tests:
+<pre>
+$ cd ~/6.824/src/shardkv
+$ go test
+Basic Join/Leave: OK
+Shards really move: OK
+Reconfiguration with some dead replicas: OK
+Concurrent Put/Get/Move: OK
+Concurrent Put/Get/Move (unreliable): OK
+PASS
+$
+</pre>
+
+<p>
+Hint: your server will need to periodically check with the
+shardmaster to see if there's a new configuration; do this
+in tick().
+
+<p>
+Hint: you should have a function whose job it is to examine recent
+entries in the Paxos log and apply them to the state of the shardkv
+server. Don't directly update the stored key/value database in the
+Put/Get handlers; instead, attempt to append a Put or Get operation to
+the Paxos log, and then call your log-reading function to find out
+what happened (e.g., perhaps a reconfiguration was entered in the log
+just before the Put/Get).
+
+<p>
+Hint: your server should respond with an ErrWrongGroup error to a
+client RPC with a key that the server isn't responsible for (i.e. for
+a key whose shard is not assigned to the server's group). Make sure
+your Get/Put handlers make this decision correctly in the face of a
+concurrent re-configuration.
+
+<p>
+Hint: process re-configurations one at a time, in order.
+
+<p>
+Hint: during re-configuration, replica groups will have
+to send each other the keys and values for some shards.
+
+<p>
+Hint: call px.Done() to let Paxos free old parts of its log.
+
+<h3>Handin procedure</h3>
+
+Attach your code as a gzipped tar file in an e-mail to <a
+href="mailto:6.824-submit@pdos.csail.mit.edu">6.824-submit@pdos.csail.mit.edu</a>
+by the deadline at the top of the page.  To do this, execute these commands:
+
+<pre>
+$ cd ~/6.824/src
+$ tar czvf [athena-user-name]-lab-4.tgz .
+</pre>
+
+That should produce a file called <tt>[your_user_name]-lab-4.tgz</tt>.
+Attach that file to an email and send it to the 
+address above.
+
+<hr>
+
+<address>
+Please post questions on <a href="http://piazza.com">Piazza</a>.
+<p>
+
+</address>
+
+ </body>
+ </html>
+
+<!--  LocalWords:  Paxos Sharded shard sharding sharded Put's src shardmaster
+ -->
+<!--  LocalWords:  shardkv cd TestBasic TestUnreliable Go's RPCs RPC's GID px
+ -->
+<!--  LocalWords:  kvpaxos Config ErrWrongGroup Handin gzipped czvf whoami tgz
+ -->

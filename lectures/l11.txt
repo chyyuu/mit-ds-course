@@ -1,0 +1,352 @@
+6.824 2012 Lecture 8: Optimism, Causality, Vector Timestamps
+
+Consistency so far
+  Concurrency forces us to to think about meaning of reads/writes
+  Sequential consistency: everyone sees same read/write order (IVY)
+  Release consistency: everyone sees writes in unlock order (TreadMarks)
+
+Sequential and release consistency are slow:
+  in general, must ask before each operation
+  IVY: read faults and write faults -> ask manager
+  TreadMarks: acquire and release -> ask lock manager
+  Can we get better performance by weakening consistency?
+
+Optimistic Concurrency Control
+  Do the operation now (e.g., read/write cached copy)
+  Check if it was OK later
+  Recover if not OK
+
+A simple example -- optimistic peer-to-peer chat
+  We each have a computer attached to internet
+  When I type something, send msg to each participant
+  Recv msg -> add to end of chat window
+
+Do we care about message ordering for chat?
+  Network may deliver in different order at different participants
+  Joe: The answer is 40
+  Fred: No, it's 41
+  Alice: That's correct
+  Maybe Sam sees different order:
+    Joe: 40
+    Alice: That's correct
+
+What went wrong in this example?
+  Alice "computed" her message based on certain inputs
+  Sam can only interpret if he has seen those inputs too
+
+Definition: x causally precedes y
+  Joe does x, then Joe does y, or
+  Joe does x, Joe sends msg to Fred, Fred does y, or
+  transitive closure of above
+
+Definition: causal consistency
+  if x causally precedes y, everyone sees x before y
+
+Slow implementation of causal consistency
+  Unique ID for every msg
+  Node keeps set of all msg IDs received -- "history"
+  When sending m, send current history set, too
+  Receiver delays incoming msg m until has received everything in m's set
+
+History sets will grow huge -- can we abbreviate?
+  Each node numbers its msgs 1, 2, 3, &c
+  Somehow ensure in-order delivery from each node (easy of numbered)
+  Then history need only include latest # seen from each node
+    H1/4 implies saw 1, 2, 3 also
+  This notation doesn't grow over time, unlike history sets
+  Formalized as Vector Timestamp
+
+Vector Timestamp (as in TreadMarks):
+  Each node numbers its own actions (sent msgs, in this case)
+  VT is a vector of numbers, one slot per node
+  Each message sent out with a VT
+  VT[i]=x => sender had seen all msgs from node i up through #x
+
+VT comparisons
+  to answer "should msg A be displayed before msg B?"
+  four situations: a < b, a > b, a = b, a || b
+  a < b if a[i] <= b[i] for all i, and a[j] < b[j] for some j
+  a || b if a[i] < b[i] and a[j] > b[j], for some i,j
+    i.e. neither came before the other
+
+CBCAST -- "causal broadcast" protocol
+  [diagram: node, msg buf, VC, chat app]
+  Just what we need for peer-to-peer chat
+  From Cornell Isis research project
+  Each node keeps a local VT called vector clock, VC
+  When node i sends msg m:
+    increment VC[i]
+    send m with VC
+  Received messages buffered but maybe not processed (displayed, for chat)
+  Process m from i only if m's VT <= VC, except VT[i] = VC[i] + 1
+    i.e. local node has seen every msg that causally precedes m
+    Update VC: VC[i] = max(VC[i], VT[i])
+    Subsequent sent msgs will reflect receipt of m (+ causally preceding msgs)
+
+Example:
+  All VCs start <0,0,0>
+  M0 sends <1,0,0>
+  M1 receives <1,0,0>
+  M1 sends <1,1,0>
+  M2 receives <1,1,0> -- must delay
+  M2 receives <1,0,0> -- can process, unblocks other msg
+
+Why faster then sequential consistency?
+  M0 sends <1,0>
+  M1 sends <0,1>
+  M0 and M1 are allowed to disagree on order!
+  No global order => no central (slow) IVY MGR
+
+Causal consistency still allows more surprises than sequential
+  Sam can still see:
+    Joe: 40
+    Fred: 41
+    Bob: 42
+    Alice: That's correct
+  So programmers have to be more careful
+
+Why not implement sequential consistency in an optimistic way?
+  That is, fire off msgs whenever, and check sequentiality on receipt?
+  Checking a trace for sequentiality is NP-complete
+  Even though generating one (as IVY does) is simple
+  Thus optimism+causality is common in distributed systems
+
+TreadMarks uses VTs -- for what?
+  M0: a1 x=1 r1
+  M1:             a1 a2 y=x r2 r1
+  M2:                             a2 print x, y r2
+  What's the "right" answer?
+    we need to define what LRC guarantees!
+    answer: when you acquire a lock,
+      you see all writes by previous holder
+      and all writes previous holder saw 
+  What does TreadMarks do?
+    M2 and M1 need to decide what M2 needs and doesn't already have
+    TM uses VTs to count acquires/releases
+    On M2's acquire, M1 sends its VC to M2
+    M2 subtracts to see what M1 knew that M2 didn't
+    M2 knows to ask M0 for x=1
+
+TM also uses VTs to order writes to same variable by different machines:
+  M0: a1 x=1 r1  a2 y=9 r2
+  M1:              a1 x=2 r1
+  M2:                           a1 a2 z = x + y r2 r1
+  M2 is going to hear "x=1" from M0, and "x=2" from M1.
+    How does M2 know what to do?
+
+VTs are often used for optimistic updating of replicated data
+  Everyone has a copy, anyone can write
+  Don't want IVY-style MGR or locking: network delays, failures
+  Need to sync replicas, accept only "newest" data, detect conflicts
+  File sync (Tra, Ficus, Coda, Rumor)
+  Distributed DBs (Amazon Dynamo, Voldemort, Riak)
+
+File synchronization
+  Multiple computers have a copy of all files
+  Each can modify its local copy
+  Merge changes later -- optimistic
+
+Scenario:
+  user has files replicated at work, at home, on laptop
+  hosts may be off, on airplane, &c -- not always on Internet
+  work on H1 for a while, sync changes to H2
+  work on H2, sync changes to H3
+  work on H3, sync to H1
+  overall goal: push changes around to keep machines identical
+
+Example 1:
+  Focus on a single file
+  H1: f=1 ->H2       ->H3
+  H2:            f=2
+  H3:                       ->H2
+  What is the right thing to do?
+  Is it enough to simply take file with latest modification time?
+  Yes in this case, as long as you carry them along correctly.
+    I.e. H3 remembers mtime assigned by H1, not mtime of sync.
+
+Example 2:
+  H1: f=1 ->H2 f=2
+  H2:                  f=0 ->H1
+  H2's mtime will be bigger.
+  Should the file synchronizer use "0" and discard "2"?
+    No! They were conflicting changes. We need to detect this case.
+    Modification times are not enough by themselves
+
+Big goal: No Lost Updates
+  Only OK for sync to copy version x2 over version x1 if
+    x2 includes all updates that are in x1.
+
+What if there were concurrent updates?
+  So that neither version includes the other's updates?
+  Copying would then lose one of the updates
+  So sync doesn't copy, declares a "conflict"
+  Conflicts are a necessary consequence of optimistic writes
+
+How to decide if one version contains all of another's updates?
+  We could record each file's entire modification history.
+  List of hostname/localtime pairs.
+  And carry history along when synchronizing between hosts.
+  For example 1:   H2: H1/T1,H2/T2   H3: H1/T1
+  For example 2:   H1: H1/T1,H1/T2   H2: H1/T1,H2/T3
+  Then its easy to decide if version X supersedes version Y:
+    If Y's history is a prefix of X's history.
+
+We can use VTs to compress these histories!
+  One VT per file
+  Number each host's writes to a file (or assign wall-clock times)
+  Just remember # of last write from each host
+  VT[i]=x => file version includes all of host i's updates through #x
+
+VTs for Example 1:
+  After H1's change: v1=<1,0,0>
+  After H2's change: v2=<1,1,0>
+  v2 > v1, so H1 accept's H2's copy
+  v1 < v2, so H1 ignores H3's copy (no conflict since <)
+
+VTs for Example 2:
+  After H1's first change: v1=<1,0,0>
+  After H1's second change: v2=<2,0,0>
+  After H2's change: v3=<1,1,0>
+  v3 neither < nor > v1
+    thus neither has seen all the other's updates
+    thus there's a conflict
+
+What if there *are* conflicting updates?
+  VTs can detect them, but then what?
+  Depends on the application.
+  Easy: mailbox file with distinct messages, just union.
+  Medium: changes to different lines of a C source file (diff+patch).
+  Hard: changes to the same line of C source.
+  Reconciliation must be done manually for the hard cases.
+
+What about file deletion?
+  Can H1 just forget a file's VT if it deletes the file?
+    No: when H1 syncs w/ H2, it will look like H2 has a new file.
+  H1 must remember deleted files and their VTs.
+  Treat delete like a file modification.
+    H1: f=1  ->H2 
+    H2:           del  ->H1
+    second sync sees H1:<1,0> H2<1,1>, so delete wins at H1
+  There can be delete/write conflicts
+    H1: f=1  ->H2  f=2
+    H2:            del  ->H1
+    H1:<2,0> vs H2:<1,1> -- conflict
+
+How to delete the VTs of deleted files?
+
+Is it enough to wait until all hosts have seen the delete msg?
+  Sync would carry, for deleted files, set of hosts who have seen del
+  Turns out not to work:
+    H1 sees everyone has seen del, forgets about VT
+    H1 syncs w/ H2, which doesn't yet know everyone knows
+    For all H2 knows, some H3 hasn't seen del, might send file to H1
+    So H2 must tell H1 about file, del, and VT
+
+Working VT GC scheme from Ficus replicated file system
+  Phase 1: accumulate set of nodes that have seen delete
+    terminates when == complete set of nodes
+  Phase 2: accumulate set of nodes that have completed Phase 1
+    when == all nodes, can totally forget the file
+  If H1 then syncs against H2,
+    H2 must be in Phase 2, or completed Phase 2
+    if in Phase 2, H2 knows H1 once saw the delete, so need not tell H1 abt file
+    if H2 has completed Phase 2, it doesn't know about the file either
+
+A classic problem with VTs:
+  Many hosts -> big VTs
+  Easy for VT to be bigger than the data!
+  No very satisfying solution
+
+Many file synchronizers don't use VTs -- e.g. Unison, rsync
+  File modification times enough if only two parties, or star
+  Need to remember "modified since last sync"
+  VTs needed if you want any-to-any sync with > 2 hosts
+
+Summary
+  Replication + optimistic updates for speed, fault tolerance
+  Causal consistency yields reasonably sane order of optimistic updates
+  Vector Timestamps a cheap implementation of causality / defn of "newest"
+
+-------
+
+Optimistic Replication Using Vector Time Pairs
+Russ Cox and William Josephson
+
+what's the overall goal?
+  fast + flexible file sync
+
+specific problems w/ existing file synchronizers? e.g. Ficus/Rumor
+  must exchange VT for every file during sync
+  must store VT for every file
+  must store VT for every deleted file
+  (note VTs can be big if many hosts involved)
+
+what's the key idea?
+  two vector times: mod time (mt) and sync time (st)
+  what you have vs what you know
+
+sync time
+  each file has a sync time
+  when H1 syncs to H2
+    sync times of files set of elementwise max
+  VT[i] is wall-clock time, not a count of events
+
+sync time example for one file
+      1     2     3     4
+  H1: f=1  ->H2  ->H3
+  H2:                  ->H3
+  H3:
+  when H2 syncs to H3:
+    file mt at H2 is <1,0,0>
+    file st at H3 is <3,0,0>
+  thus H3 knows it has synced since last file change
+  so far, not a win over single VT per file
+
+usually you're syncing lots of files
+  common case: almost all files are up to date
+    syncs usually only xfer a few files
+  how to detect "no sync required" w/o exchanging all files' VTs?
+  if all H2's files have been synced since H1's most recent change,
+    don't need to copy anything from H1 to H2
+  so H2 needs min(st), H1 needs max(mt)
+
+Tra uses this observation for each directory
+  dir mt = elementwise max over all descendents' mt
+  dir st = elementwise max over all descendents' st
+
+Example:
+  H1 and H2 sync at time 5
+    all H2 files' st set to <5,5>
+    so H2 dir st = <5,5>
+  H1 and H2 sync again at time 6
+    no recent changes, so H1 dir mt = <1,0>
+    so quick compare shows H1 dir mt < H2 dir st
+  one file changed on H1
+    so H1 dir mt=<7,0>, H2 dir st = <6,6>
+  sync at time 8
+    H1 mt=<7,0> !<= H2 st=<6,6>
+    so they must compare per-file VTs
+
+does dir sync/mod sound like an important optimization?
+  yes, for big directories
+  millions of files -> vast VT traffic
+  Tra can reduce that to a just two VTs
+  I have this problem!
+
+why couldn't we do this w/ single VT?
+  e.g. compare H1's max(file VTs) vs H2's min(file VTs)
+  max(file VTs) is a good conservative estimate of latest update
+  but min(file VTs) is likely to be <0,0,...>
+    it has to be elementwise (min not generally defined on VTs)
+    and there will usually be some file that wasn't modified on each host
+  result: it will always seem like there is new information
+
+how does Tra handle deletion?
+  does not have delete notices; host just deletes the file and its VTs
+  dir sync time proves no file existed as of that time!!!
+  during sync
+    if other file mt < dir st, he should delete
+    if other file mt > dir st?
+      delete/write conflict?
+      or new file?
+      look at file creation time vs st to decide

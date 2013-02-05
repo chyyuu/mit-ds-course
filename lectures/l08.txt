@@ -1,0 +1,264 @@
+6.824 2012 Lecture 18: SUNDR
+
+Secure Untrusted Data Repository (SUNDR)
+Li, Krohn, Mazieres, and Shasha
+OSDI 2004
+
+team lists + descriptions due next week
+  just a few sentences
+  1-page writeup May 11
+  demos on May 17 (last day of classes)
+
+intro
+  previous lecture was PBFT
+    how to cope with a malicious server
+    replicate and cross-check
+    very general -- state machine -- any operations
+  suppose you wanted cloud-based storage
+    [diagram]
+    buy storage service from Acme Storage Company
+  Acme might not be trustworthy
+    does their software have bugs?
+    do they apply all the latest O/S security patches?
+    is their machine room locked?
+    are their employees corrupt?
+  would we be happy if Acme used 3f+1 PBFT replicas?
+
+suppose *all* servers are corrupt
+  can we still get any security properties?
+  surprising result: you can!
+
+what properties would we like?
+  privacy
+  authentic <-- SUNDR focuses on this
+  available
+
+use example -- data authenticity
+  bunch of programmers cooperating on O/S development
+  they store their source "in the cloud"
+  user A adds password protection to login.c
+  user B adds remote login to net.c
+  user C creates a release tar file
+  the release better not have just net.c change!
+
+let's start with a simple design
+  server: put(k,v), get(k) -> v
+  how can client check that get returns the same value that was put?
+  idea: have the key be a cryptographic hash of the value
+    k = H(v)
+    put(k, v)
+  and check it:
+    v' = get(k)
+    assert(H(v') == k)
+  if a client knows the key,
+    it also knows the cryptographic hash of the value
+    so if A gives k to B, B can also check
+  we can store complex tree structures (like file systems)
+    each block contains keys of child blocks
+    [diagram: h -> block with name/hash pairs -> file contents]
+  what bad things can the server do to us?
+    it cannot lie about content
+    it can ignore a put or get
+  we are using the server as a communication channel
+    we are at both ends of that channel!
+    using cryptography to authenticate data sent on that channel
+  annoyances:
+    we cannot choose keys (must be hash of value, not e.g. "net.c")
+    we cannot change the value associated with a key
+
+what if we want to change the value for a key?
+  use public-key cryptography to sign data
+  each user has a public/private key pair
+  users know each others' public keys
+  include my signature in values that I put()
+    put(k, v+sign(k+v))
+    + means append (there are some details to get right)
+  to read:
+    v+sig = get(k)
+    check sign(k+v) == sig
+    why does the signature cover k?
+  now:
+    any user can check get() result
+    I can change the value associated with a key
+  what bad things can the server do?
+    return an old signed value
+  this is still not a file system
+    directories?
+    multiple users updating shared set of files?
+    and it does not do well on our login.c/net.c example
+
+idea:
+  don't store the data directly on the server
+  instead, server stores a log of signed FS operations
+  the clients interpret the operations, not the server
+
+the paper's straw man
+  slow, but general and correct
+  [explain log scheme]
+  [w login.c / uA / sig, w net.c / uB, r login.c / uC, r net.c / uC]
+  client asks server for a copy of the current log
+    run all ops in log to create FS
+    appends new operation, which includes signature over whole log
+    writes new log back to server
+  server must implement a lock
+
+can the server entirely forge an operation?
+  how do we know what the set of legit users is?
+
+is it OK for client to check the signature on just the last log entry?
+
+does client have to check the sig on *all* log entries?
+  why enough to check just last entry of each user?
+  
+summary of what a client must validate when it fetches the log
+  its own latest operation is there (so must remember on disk...)
+  latest op of each user is correctly signed
+
+can the server omit the very last operation?
+  yes! if it is not mine
+  the server can omit all operations after my last op
+  i.e. it can conceal other users' recent operations
+
+what will happen if the server conceals the most recent operations?
+  U2 signed: ... O6 O7
+  U1 asks for log, server sends: ... O6 (omits O7)
+  U1 signs ... O6 O8, sends to server
+  can the server ever show O8 to U2?
+  now U2 signs: ... O6 O7 O9
+  can the server ever show O9 to U1?
+  so: from now on the server can only show U1 its own new operations
+    and can only show U2 its new operations
+  this is a forking attack
+
+fork consistency:
+  only attack is a fork attack: conceal operations
+  all users see the same log before the first concealed op
+  if server conceals UX's op from UY,
+    can never show either any more of the other's ops
+
+why is fork consistency good enough?
+  after all, the server *can* perform a forking attack!
+  it's good that it's a violent attack
+    after a while it will be obvious that we've been attacked
+    easy to detect if users compare notes
+  much better than allowing a concealed op, but showing subsequent ops
+
+why must fetches be in the log? (see examples on page 3)
+  (this is today's paper question)
+  what attack would be possible if fetches weren't logged?
+  U1: O1 O2      
+  U2:       fetch O3
+  server could conceal O2 from U2's fetch,
+    then reveal O2 only when U2 performed O3
+  this is *not* fork consistency -- server can show ops after concealing one
+  logging the fetches turns this into an detectable forking attack
+    if server told U1 that O2 came after O1,
+    server can only hide O2 from U2 by forking
+
+does the straw man do well on our login.c/net.c example?
+  can the server show new net.c and old login.c?
+  that depends...
+
+why is the straw man not enough?
+  need to xfer the whole log to check signatures
+  and you need to play/interpret the log entries
+  caching optimizations possible, but expensive if you are away for a weekend
+
+can we get rid of log, just keep current directory tree?
+  each i-node/directory block contains crypto hashes of children?
+  i construct new tree reflecting my operation,
+    maybe sharing structure with old tree,
+    and sign the new root block?
+
+why is a signed directory tree not quite right?
+  how can U1 prevent U2 from writing U1's files/directories?
+    /u owned by root, /u/rtm owned by rtm
+    but rtm needs to modify /u in order to modify an rtm file!
+  how can i check that server didn't drop one of my operations?
+    i.e. return a stale root hash to someone?
+    can't e.g. check my last op is in log and was signed by others
+    i.e. how can we ensure fork consistency?
+
+first, a user should sign only its own files/directories
+  each user owns a set of files/dirs
+  each user has its own i-number space: rtm/23
+  each user updates its own i-number -> content mapping
+  per-user i-handle
+  i-handle points to current i-table
+  i-table maps i-number to hash of i-node
+  directory block maps name to user#/i-number
+    thus my directories can hold your files
+    i-number lets you modify those files w/o changing my directory
+
+all this stuff is stored in the "block store"
+  key/value pairs, key = hash(value)
+  so block store can't lie about value for a key
+  but as usual we are worried about freshness and missing operations
+
+now the file system is the collection of users' i-handles
+  we really have a sequence of new i-handles
+  arrange as a time-line per user
+
+second, use version vectors to verify that operations are uniquely ordered
+  i.e. to ensure fork consistency
+
+version structure (VS)
+  client signs+sends one for each operation
+  server remembers each user's current VS
+  u2's VS:
+    "u2"
+    u2's i-handle (hash of u2's i-table)
+    version vector:
+      u1 7
+      u2 3
+      u3 6
+    u2's signature over VS
+
+how client u2 executes an operation
+  get all users' VSs from server
+  validate
+  get i-tables &c from block server
+  store new i-table, i-handle with mods
+  new VS:
+    new i-handle
+    increment u2's version #
+  put VS back to server
+
+how do version vectors evolve in correct operation?
+  U1: 1,0           2,2
+  U2:      1,1  1,2     2,3
+
+how should u2 validate a set of fetched VSs?
+  u2's VS is up to date (so u2 must remember last VS on disk)
+  version vectors of diff users can be totally ordered
+  i.e. 2,2 < 2,3
+
+what would version vectors look like if server hid an update?
+  U1: 1,0       [2,1]
+  U2:      1,1        1,2
+
+do the version vectors give us fork consistency?
+  can the server show future U1 VSs to U2?
+    e.g. 3,1
+    no: 3,1 and 1,2 cannot be ordered!
+  can the server show future U2 VSs to U1?
+    e.g. 1,3
+    no: 1,3 and 2,1 cannot be ordered
+
+why aren't we done at this point?
+  the server still needs to serialize operations w/ lock
+  [timeline: u1 read .. u1 commit, u2 read .. u2 commit]
+  server will be idle between sending current VVs, and waiting for new one
+    i.e. between UPDATE and matching COMMIT
+  we cannot just allow concurrent operations:
+    not orderable, would look like an attack
+
+contrast to PBFT
+  SUNDR:
+    doesn't require server to be trusted
+    vulnerable to fork attack
+      but good chance you can detect it
+  PBFT:
+    not vulnerable to fork attack
+    but 2f+1 of 3f+1 servers must be trustworthy
+      and you can't detect if this fails

@@ -1,0 +1,193 @@
+6.824 2012 Lecture 7: Release consistency
+
+Today:
+  Lazy release consistency
+  TreadMarks
+  Contrast to IVY and sequential consistency
+
+Labs 4+5 implement a form of RC; not lazy like TreadMarks
+  
+Review: what makes a good consistency model?
+  Model is a contract between memory system and programmer
+    Programmer follows some rules about reads and writes
+    Model provides guarantees
+  Model embodies a tradeoff
+    Intuitive for programmer
+    vs.
+    Can be implemented efficiently
+
+Treadmarks high level goals?
+  Better DSM performance.
+  Run existing parallel code.
+
+What specific problems with previous DSM are they trying to fix?
+  false sharing: two machines use diff vars on same page, at least one writes
+    IVY => page bounces back and forth
+    but doesn't need to if different vars
+  send only written bytes -- not whole pages
+
+Big idea: write diffs
+  goal: don't send whole page, just written bytes
+  on M1 write fault:
+    tell other hosts to invalidate but keep hidden copy
+    M1 makes hidden copy as well
+  on M2 fault:
+    M2 asks M1 for recent modifications
+    M1 "diffs" current page against hidden copy
+    M1 send diffs to M2
+    M2 applies diffs to its hidden copy
+
+Next goal: allow multiple readers+writers
+  to cope with false sharing
+  => no invalidation when a machine writes
+  => no r/w -> r/o demotion when a machines reads
+  => multiple *different* copies of a page!
+     which should a reader look at?
+  diffs help: can merge writes to same page
+  but when to send the diffs?
+    no invalidations -> no page faults -> what triggers sending diffs?
+
+Big idea: release consistency
+  no-one should read data w/o holding a lock!
+    so let's assume a lock server, much like in lab
+  send out write diffs on release, to all copies of pages written
+  this is a new consistency model!
+    M0 won't see M1's writes until M1 releases a lock
+    so machines can temporarily disagree on memory contents
+    if you always lock:
+      locks force order -> no stale reads -> like sequential consistency
+    if you don't lock:
+      reads can return stale data
+      concurrent writes to same var -> trouble
+  benefit?
+    multiple machines can have copies of a page, even when 1 or more writes
+    => no bouncing of pages due to false sharing
+    => read copies can co-exist with writers
+  relies on write diffs
+    otherwise can't reconcile concurrent writes to same page
+
+Big idea: lazy release consistency
+  only fetch write diffs on acquire of a lock
+    only fetch from previous holder of that lock
+  i.e., nothing happens at time of write or release
+  LRC is yet another new consistency model!
+    LRC hides some writes that RC reveals (example below)
+  benefit?
+    if you don't acquire lock on object, you don't have to fetch updates to it
+    => if you use just some vars on a page, no need to fetch writes to others
+    => less network traffic
+
+Example 1 (false sharing)
+x and y are on the same page.
+M0: a1 for(...) x++ r1
+M1: a2 for(...) y++ r2  a1 print x, y r1
+What does IVY do?
+What does Treadmarks do?
+  M0 and M1 both get cached writeable copy of the page
+  when they release, each computes diffs against original page
+  M1's a1 causes it to pull write diffs from last holder of lock 1
+    so M1 updates x in its page
+
+Example 2 (LRC)
+x and y on same page (otherwise IVY avoids copy too)
+M0: a1 x=1 r1
+M1:           a2 y=1 r2
+M2                      a1 print x r1
+What does IVY do?
+What does Treadmarks do?
+  M2 only asks previous holder of lock 1 for write diffs
+  M2 does not see M1's modification to y, even tho on same page
+
+Q: is LRC a win over IVY if each variable on a separate page? (no)
+
+Q: why is LRC a reasonably intuitive model for programmers?
+   same as sequential consistency if you always lock
+   but non-locking code, like v=f(); done=1; does not work
+
+Example 3 (motivate vector timestamps)
+M0: a1 x=1 r1
+M1:             a1 a2 y=x r2 r1
+M2:                             a2 print x, y r2
+What's the "right" answer?
+  we need to define what LRC guarantees!
+  answer: when you acquire a lock,
+    you see all writes by previous holder
+    and all writes previous holder saw 
+What does TreadMarks do?
+  M2 and M1 need to decide what M2 needs and doesn't already have
+  uses "vector timestamps"
+  each machine numbers its releases (i.e. write diffs)
+  M1 tells M2:
+    at release, had seen M0's writes through #20, &c
+    0: 20
+    1: 25
+    2: 19
+    3: 36
+    ...
+    this is a "vector timestamp"
+  M2 remembers a vector timestamp of writes it has seen
+  M2 compares w/ M1's VT to see what writes it needs from other machines
+
+More on VTs next lecture...
+
+VTs order writes to same variable by different machines:
+M0: a1 x=1 r1  a2 y=9 r2
+M1:              a1 x=2 r1
+M2:                           a1 a2 z = x + y r2 r1
+M2 is going to hear "x=1" from M0, and "x=2" from M1.
+  How does M2 know what to do?
+
+Could the VTs for two values of the same variable not be ordered?
+M0: a1 x=1 r1
+M1:              a2 x=2 r2
+M2:                           a1 a2 print x r2 r1
+
+Programmer rules / system guarantees?
+  1. programmer must lock around all writes to shared variables
+     to order writes to same var
+     otherwise "latest value" not well defined
+  2. to read latest value, must lock
+  3. if no lock for read, guaranteed to see values that
+     contributed to the variables you did lock
+
+Example of when LRC might work too hard.
+M0: a2 z=99 r2  a1 x=1 r1
+M1:                            a1 y=x r1
+TreadMarks will send z to M1, because it comes before x=1 in VT order.
+  Assuming x and z are on the same page.
+  Even if on different pages, M1 must invalidate z's page.
+But M1 doesn't use z.
+How could a system understand that z isn't needed?
+  Require locking of all data you read
+  => Relax the causal part of the LRC model
+
+Q: could TreadMarks work without using VM page protection?
+   it uses VM to
+     detect writes to avoid making hidden copies (for diffs) if not needed
+     detect reads to pages => know whether to fetch a diff
+   neither is really crucial
+   so TM doesn't depend on VM as much as IVY does
+     IVY used VM faults to decide what data has to be moved, and when
+     TM uses acquire()/release() and diffs for that purpose
+
+Performance?
+
+Figure 3 shows mostly good scaling
+  is that the same as "good"?
+  though apparently Water does lots of locking / sharing
+
+How close are they to best possible performance?
+  maybe Figure 5 implies there is only about 20% fat to be cut
+
+Does LRC beat previous DSM schemes?
+  they only compare against their own straw-man ERC
+    not against best known prior work
+  Figure 9 suggests not much win, even for Water
+
+Has DSM been successful?
+  clusters of cooperating machines are hugely successful
+  DSM not so much
+    main justification is transparency for existing threaded code
+    that's not interesting for new apps
+    and transparency makes it hard to get high performance
+  MapReduce or message-passing or shared storage more common than DSM

@@ -1,0 +1,116 @@
+<html>
+<head>
+  <title>6.824 Spring 2013: Final project</title>
+  <style type="text/css">
+    kbd {
+      color: #007700;
+      font-family: monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>6.824 Spring 2013: Final project</h1>
+
+In the second half of the course you'll work on a distributed systems
+project of your choice in teams of two or three. The goal is to have
+fun and to explore more advanced topics; you don't have to do
+novel research.
+
+<p>
+We'll grade you on how much you got working, how elegant your design
+is, how well you can explain it, and how interesting and creative your
+solution is. Time is limited, so try to make sure
+your goals are reasonable; perhaps set a minimum goal that's
+definitely achievable and a more ambitious goal if things go well.
+
+<h2>Schedule and Deliverables</h2>
+
+<ul>
+
+<li> April 5: Form groups of 2 to 3. E-mail us a project
+proposal, just a paragraph or two.
+
+<li> Week of April 8: first project conference with 6.824 staff --
+we'll schedule a meeting with each team to discuss your proposal.
+
+<li> Week of May 1: second project conference.
+
+<li> May 10: e-mail us a two-page write-up.
+
+<li> Week of May 13: final conference with 6.824 staff, with demonstration.
+
+<li> Week of May 13: short in-class demonstration.
+
+</ul>
+
+
+<h2>Ideas</h2>
+
+Here's a list of ideas to get you started thinking -- but you should
+feel free to pursue your own ideas.
+
+
+<ul>
+
+<li> Measure the performance of Lab 4, identify the bottlenecks,
+and modify it to make it faster.
+
+<li> Extend Lab 4 so that it performs well with large amounts of
+data (e.g. hundreds of gigabytes per server), particularly
+when servers temporarily or permanently fail. Have a look at
+RAMCloud, Flat Datacenter Storage, Petal, and FAB for ideas.
+
+<li> Make Lab 4 (or some other design) work well when the replicas are
+separated by a wide-area network (e.g. are 100s or 1000s of miles
+apart).
+
+<li> Build a fault-tolerant replicated system in the style of
+Hypervisor Fault Tolerance, using a modern virtual machine.
+
+<li> Build a general-purpose library for state-machine replication.
+
+<li> Extend Lab 4 so that it store data (and Paxos state)
+persistently on disk, for fast recovery after reboots.
+
+<li> Build a fault-tolerant file server, perhaps using FUSE.
+
+<li> Build a secure distributed system using x86
+<a href="http://www.intel.com/content/dam/www/public/us/en/documents/technology-briefs/intel-trusted-execution-technology-software-dev-guide.pdf">Trusted
+Execution Technology</a>.
+
+<li> Add atomic transactions to Lab 4, using two-phase commit
+and/or snapshots.
+
+<li> Build a system with asynchronous replication (like Dynamo or
+Ficus or Bayou). Perhaps add stronger consistency (as in COPS
+or Walter).
+
+<li> Build a file synchronizer.
+
+<li> Build a
+<a href="http://www.cdf.toronto.edu/~csc469h/fall/handouts/nitzberg91.pdf">distributed shared memory</a> (DSM) system, so that you can run
+multi-threaded shared memory parallel programs on a cluster of
+machines, using paging to give the appearance of real shared memory.
+When a thread tries to access a page that's on another machine, the
+page fault will give the DSM system a chance to fetch the page over
+the network from whatever machine currently stores.
+
+<li> Build a distributed RAID in the style of Petal, or a voting-based
+storage system like FAB. Maybe you can get standard operating systems
+to talk to you network virtual disk using iSCSI.
+
+<li> Build a coherent caching system for use by web sites (a bit
+like memcached).
+
+<li> Build a distributed cooperative web cache.
+
+<li> Build a better tracker for BitTorrent.
+
+<li> Build a collaborative editor like EtherPad.
+
+</ul>
+</body>
+</html>

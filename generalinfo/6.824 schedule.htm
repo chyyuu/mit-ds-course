@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0045)http://pdos.csail.mit.edu/6.824/schedule.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>
+6.824 Schedule: Spring 2013
+</title>
+</head>
+
+<body bgcolor="#ffffff" text="#000000">
+
+<div align="center">
+<h2>
+<a href="http://pdos.csail.mit.edu/6.824/index.html">6.824</a> Schedule: Spring 2013
+</h2>
+<h3>
+Tues/Thurs, 1pm–2:30pm, 32-144
+</h3>
+</div>
+
+Here is the tentative schedule of lectures and due dates.
+The lecture notes and paper questions
+for future dates are copies from previous years,
+and may change.
+<p>
+
+  <style>
+
+table.calendar {
+    font-family: arial, helvetica;
+    font-size: 10pt;
+    empty-cells: show;
+    border: 1px solid #000000;
+}
+
+table.calendar tr td {
+    border: 1px solid #aaaaaa;
+}
+
+table.calendar tr {
+   vertical-align: top;
+   height: 75px;
+   background: #EEEEEE;
+}
+
+table.calendar tr.header {
+    text-align: center;
+    background: #8888FF;
+    height: auto;
+    font-weight: bold;
+}
+
+.lecture {
+    background: #FFFFAA;
+}
+
+.holiday {
+    background: #ccFFcc;
+}
+
+.special {
+    background: #AAAAFF;
+}
+
+.lab {
+    background: #00CCCC;
+}
+
+.important {
+    background: #FFAAAA;
+}
+
+.reading {
+    color: #3333FF;
+}
+
+.handout {
+    color: #009900;
+}
+
+.deadline {
+    color: #FF0000;
+    font-weight: bold;
+}
+
+.note {
+    color: #888800;
+}
+
+.assignment {
+  color: #0aa00a;
+}
+
+td.week {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+.date {
+  color: #444444
+}
+
+  </style>
+
+<table class="calendar" cellspacing="0" cellpadding="6" width="100%">
+ <thead>
+  <tr style="font-weight:bold; font-size:13px; background-color:#444444; color:#ffffff; height: 25px; text-align: center;">
+   <td>Monday</td><td>Tuesday</td><td>Wednesday</td><td>Thursday</td><td>Friday</td>
+  </tr>
+
+   <!-- 31-jan - 4feb -->
+   <tr>
+     <td class="special"><font class="date">4 feb</font><br>Reg Day</td>
+     <td class="lecture"><font class="date">5 feb</font><br>
+      <b>LEC 1:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l01.txt">Introduction</a>
+        <a href="http://pdos.csail.mit.edu/6.824/notes/l01-handout.pdf">handout</a><br>
+     </td>
+
+     <td><font class="date">6 feb</font></td>
+     <td class="lecture"><font class="date">7 feb</font><br>
+      <b>LEC 2:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l02.txt">Infrastructure: RPC, threads, Go</a>
+<br>
+      <font class="reading"><b>Preparation</b>:
+        Take the <a href="http://tour.golang.org/">tour</a> of Go.
+	(<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qgo">Question</a>)
+	</font>
+     </td>
+     <td><font class="date">8 feb</font><br>
+     </td>
+   </tr>
+
+   <!-- 7-feb - 11feb -->
+   <tr>
+     <td><font class="date">11 feb</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-1.html">Lab 1</a>
+
+     </td>
+
+     <td class="lecture"><font class="date">12 feb</font><br>
+
+      <b>LEC 3:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l03.txt">Fault tolerance; primary/backup replication</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/bressoud-hypervisor.pdf">Hypervisor</a>
+	(<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qhypervisor">Question</a>)<br>
+     </font></td>
+
+     <td><font class="date">13 feb</font></td>
+
+     <td class="lecture"><font class="date">14 feb</font><br>
+
+      <b>LEC 4:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l04.txt">More Primary/Backup</a>
+<br>
+      <font class="reading"><b>Preparation</b>: 
+        Read <a href="http://pdos.csail.mit.edu/6.824/papers/fds.pdf">Flat Datacenter Storage</a>
+
+     </font></td>
+
+     <td><font class="date">15 feb</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-2.html">Lab 2, Part A</a>
+     </td>
+   </tr>
+
+   <!-- 14-feb - 18feb -->
+   <tr>
+
+     <td class="holiday"><font class="date">18 feb</font><br>
+      President's day </td>
+
+     <td class="special"><font class="date">19 feb</font><br>
+        Monday Schedule
+
+     </td><td class="date"><font class="date">20 feb</font></td>
+
+     <td class="lecture"><font class="date">21 feb</font>
+
+      <b>LEC 5:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l05.txt">Fault Tolerance:
+      Paxos</a> <br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/paxos-simple.pdf">Paxos</a> (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qpaxos">Question</a>)<br>
+
+     </font></td>
+
+     <td><font class="date">22 feb</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-2.html">Lab 2, Part B</a>
+     </td>
+   </tr>
+
+   <!-- 21-feb - 25feb -->
+   <tr>
+
+     <td><font class="date">25 feb</font></td>
+
+     <td class="lecture"><font class="date">26 feb</font><br>
+
+      <b>LEC 6:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l06.txt">Case Studies: Replicated File System</a><br>
+
+      <font class="reading"><b>Preparation</b>: 
+        Read <a href="http://pdos.csail.mit.edu/6.824/papers/bliskov-harp.pdf">Harp</a>
+	(<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qharp">Question</a>)
+
+     </font></td>
+
+     <td><font class="date">27 feb</font></td>
+
+     <td class="lecture"><font class="date">28 feb</font><br>
+
+      <b>LEC 7:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l07.txt">Replication in Wide Area File Systems</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/spanner.pdf">Spanner</a> 
+
+     </font></td>
+     <td><font class="date">1 mar</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-3.html">Lab 3, Part A</a>
+     </td>
+   </tr>
+
+   <!-- 28-feb - 4mar -->
+   <tr>
+     <td><font class="date">4 mar</font></td>
+
+     <td class="lecture"><font class="date">5 mar</font><br>
+
+      <b>LEC 8:</b>
+ <a href="http://pdos.csail.mit.edu/6.824/notes/l08.txt">Security: Untrusted servers</a><br>
+     <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/li-sundr.pdf">SUNDR</a> (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qsundr">Question</a>)<br>
+
+     </font></td>
+
+     <td><font class="date">6 mar</font></td>
+
+     <td class="lecture"><font class="date">7 mar</font><br>
+
+
+      <b>LEC 9:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l09.txt">Consistency: Sequential consistency</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/li-dsm.pdf">Shared Virtual Memory</a>
+	     (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qivy">Question</a>)
+
+     </font></td>
+
+     <td class="special"><font class="date">8 mar</font><br>
+       <font class="deadline"><b>ADD DATE</b></font><br>
+     </td>
+   </tr>
+
+   <!-- 7-mar - 11mar -->
+   <tr>
+     <td><font class="date">11 mar</font></td>
+
+     <td class="lecture"><font class="date">12 mar</font><br>
+
+      <b>LEC 10:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l10.txt">Consistency: Relaxed consistency</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/keleher-treadmarks.pdf">TreadMarks</a> (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qtreadmarks">Question</a>)
+
+     </font></td>
+     <td><font class="date">13 mar</font><br>
+       <font class="assignment"><b>Assignment</b>:
+	 <a href="http://pdos.csail.mit.edu/6.824/project.html">Project</a></font>
+     </td>
+
+     <td class="lecture"><font class="date">14 mar</font><br>
+
+      <b>LEC 11:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l11.txt">Version Vectors; File Synchronization</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/ficus.pdf">Ficus</a>
+
+     </font></td>
+
+     <td><font class="date">15 mar</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-3.html">Lab 3, Part B</a>
+     </td>
+   </tr>
+
+   <!-- 14-mar - 18mar -->
+   <tr>
+
+     <td><font class="date">18 mar</font></td>
+
+     <td class="lecture"><font class="date">19 mar</font><br>
+
+      <b>LEC 12:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l12.txt">Eventual Consistency</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/bayou-conflicts.ps">Bayou</a> (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qbayou">Question</a>)
+
+     </font></td>
+
+     <td><font class="date">20 mar</font></td>
+
+     
+     <td class="important"><font class="date">21 mar</font><br>
+      <font class="deadline"><b>QUIZ 1</b></font>:
+		Mid-term quiz during lecture time<br>
+
+		<b>open book and notes</b><br>
+		<b>scope</b>: Lectures 1–11
+     </td>
+
+     <td><font class="date">22 mar</font><br>
+
+   </td></tr>
+
+
+   <!-- 20 mar - 25mar -->
+   <tr>
+     <td align="center" colspan="5" class="holiday"><font class="date">25 mar – 29 mar</font><br><b>SPRING VACATION</b><br>
+     </td>
+   </tr>
+
+   <!-- 27 mar - 1 apr -->
+   <tr>
+     <td><font class="date">1 apr</font>
+     </td>
+     <td class="lecture"><font class="date">2 apr</font><br>
+
+     <b>LEC 13:</b>
+  <a href="http://pdos.csail.mit.edu/6.824/notes/l13.txt">Case Studies: Relaxed Consistency</a><br>
+       <font class="reading"><b>Preparation</b>:
+     Read <a href="http://pdos.csail.mit.edu/6.824/papers/cooper-pnuts.pdf">PNUTS</a>
+     (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qpnuts">Question</a>)<br>
+     </font></td>
+
+     
+
+     <td><font class="date">3 apr</font></td>
+
+     <td class="lecture"><font class="date">4 apr</font><br>
+
+      <b>LEC 14:</b>
+<a href="http://pdos.csail.mit.edu/6.824/notes/l14.txt">Peer-to-peer Systems: Dynamo</a><br>
+      <font class="reading"><b>Preparation</b>: 
+        Read <a href="http://pdos.csail.mit.edu/6.824/papers/dynamo.pdf">Dynamo</a>
+
+     </font></td>
+
+     <td><font class="date">5 apr</font> <br>
+       <font class="deadline">Due: Project team and proposal</font><br>
+    </td>
+   </tr>
+
+   <!-- 4-apr - 8apr -->
+   <tr>
+     <td><font class="date">8 apr</font></td>
+
+     <td class="lecture"><font class="date">9 apr</font><br>
+      <b>Project Meeting #1</b>
+     </td>
+
+     <td><font class="date">10 apr</font><br>
+     </td>
+
+     <td class="lecture"><font class="date">11 apr</font><br>
+
+
+      <b>LEC 15:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l15.txt">Fault Tolerance: Two-phase commit</a><br>
+      <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/liskov-argus.pdf">Argus</a>
+	(<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qargus">Question</a>)
+
+     </font></td>
+
+     
+     <td><font class="date">12 apr</font><br>
+     <font class="deadline">Due: </font>
+	<a href="http://pdos.csail.mit.edu/6.824/labs/lab-4.html">Lab 4</a>
+
+     </td>
+   </tr>
+
+   <!-- 10 apr - 15apr -->
+
+   <tr>
+     <td class="holiday"><font class="date">15 apr</font><br>Patriots Day</td>
+     <td class="holiday"><font class="date">16 apr</font><br>
+      Patriots Day
+     </td>
+
+
+     <td><font class="date">17 apr</font></td>
+     <td class="lecture"><font class="date">18 apr</font><br>
+
+<b>LEC 16:</b> <a href="http://pdos.csail.mit.edu/6.824/notes/l16.txt">Distributed Operating Systems</a>
+<br>
+      <font class="reading"><b>Preparation</b>:
+        Read <a href="http://pdos.csail.mit.edu/6.824/papers/plan9.pdf">Plan 9</a>
+         (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=qplan9">Question</a>)
+
+     </font></td>
+
+     <td class="day"><font class="date">19 apr</font></td>
+   </tr>
+
+   <!-- 18apr - 22apr -->
+   <tr>
+     <td><font class="date">22 apr</font></td>
+
+     <td class="lecture"><font class="date">23 apr</font><br>
+
+      <b>LEC 17:</b>
+ <a href="http://pdos.csail.mit.edu/6.824/notes/l17.txt">Big Computing: MapReduce</a><br>
+     <font class="reading"><b>Preparation</b>:
+	Read <a href="http://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf">MapReduce</a> <br>
+
+     </font></td>
+
+     <td><font class="date">24 apr</font><br>
+     </td>
+
+     <td class="special"><font class="date">25 apr</font><br>
+       <font class="deadline"><b>DROP DATE</b></font><br>
+       <b>No lecture — Hacking day</b><br>
+     </td>
+
+
+     <td><font class="date">26 apr</font><br>
+     </td>
+   </tr>
+
+   <!-- 25apr - 29apr -->
+   <tr>
+     <td><font class="date">29 apr</font></td>
+     <td class="special"><font class="date">30 apr</font><br>
+       <b>No lecture — Hacking day</b><br>
+     </td>
+
+     <td><font class="date">1 may</font></td>
+
+
+     <td class="lecture"><font class="date">2 may</font><br>
+     <b>Project Meeting #2</b>
+     </td>
+
+
+     
+     <td class="day"><font class="date">3 may</font><br></td>
+   </tr>
+
+   <!-- 2may - 6may -->
+   <tr>
+     <td><font class="date">6 may</font></td>
+
+     <td class="lecture"><font class="date">7 may</font><br>
+
+      <b>LEC 18:</b> TBA
+
+     </td>
+
+     <td><font class="date">8 may</font>
+     </td>
+
+     <td class="lecture"><font class="date">9 may</font><br>
+
+       <b>LEC 19:</b>  TBA
+
+     </td>
+
+     <td><font class="date">10 may</font><br>
+     <font class="deadline">Due:
+	Project write-up. </font>
+     </td>
+   </tr>
+
+   <!-- 8 may - 13 may -->
+   <tr>
+
+     <td><font class="date">13 may</font><br></td>
+     <td class="lecture"><font class="date">14 may</font><br>
+       <b>Project Meeting #3</b>
+     </td>
+
+     <td><font class="date">15 may</font><br>
+     </td>
+
+     <td class="lecture"><font class="date">16 may</font><br>
+       <b>Last day of classes</b><br>
+       <b>Demo Day</b><br>
+       <font class="reading"><b>Preparation</b>: 
+	 Read <a href="http://pdos.csail.mit.edu/6.824/papers/katabi-analogicfs.pdf">
+	   AnalogicFS experience paper</a> 
+	 (<a href="http://pdos.csail.mit.edu/6.824/questions.html?q=q23">Question</a>)</font><br>
+     </td>
+     <td class="date"><font class="date">17 may</font><br></td>
+
+   <!-- 15 may - 20 may -->
+   </tr><tr>
+     <td align="center" colspan="5" class="special"><font class="date">20 may – 24 may</font><br>Final Exam Period
+      <br>
+      <font class="deadline"><b>Date/time of final exam to be announced</b></font>
+     </td>
+   </tr>
+ </thead>
+ <tbody>
+
+ </tbody>
+</table>
+
+</p><hr>
+<address>
+For questions or comments, email <a href="mailto:6.824-staff@pdos.csail.mit.edu">6.824-staff@pdos.csail.mit.edu</a>.<br>
+Back to <a href="http://pdos.csail.mit.edu/6.824/index.html">6.824 home</a>.
+</address>
+
+
+
+</body></html>
