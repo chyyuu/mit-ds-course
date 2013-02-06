@@ -51,10 +51,10 @@ Project: extend lab in any way you like.
   one-page report
   demo in last class meeting
 
-Yandong Mao is TA, office hours on Web.
+Neha Narula is TA, office hours on Web.
 
 
-Example:
+Example: AFS
   single shared file system, so users can cooperate
   lots of client computers
   [diagram: clients, network, vague set of servers] 
@@ -65,7 +65,7 @@ Topic: architecture
     Block server(s) -> FS logic in clients?
     Separate naming + file servers?
     Separate FS + block servers?
-  Single machine room or unified wide area system?
+  Single machine room in compus or unified wide area system?
     Wide-area dramatically more difficult.
   Client/server or peer-to-peer?
   Interact w/ performance, security, fault behavior.
@@ -77,6 +77,8 @@ Topic: implementation
   Most systems organize distribution with some structuring framework(s)
     RPC, RMI, DSM, MapReduce, &c
 
+  <chy> **MapReduce**  high level paradigm
+	
 Topic: performance
   Distribution can hurt: network b/w and latency bottlenecks
     Lots of tricks, e.g. caching, threaded servers
@@ -249,11 +251,7 @@ RPC library simplifies client/server communication
     rpcs (just one)
     server handlers
 
-lock_demo.cc
-  new lock_client(dst) -- create client stubs, connect to server
-  lc->stat(1) -- looks like an ordinary C++ method call
-
-lock_client.cc
+client.go
   new rpcc(dst) -- creates connection to server
   each stub method (stat, acquire, release):
     cl->call(...)
@@ -264,13 +262,13 @@ lock_client.cc
     call cl->call()
   (really lock_client.cc should be generated automatically)
 
-lock_smain.cc
+common.go
   create rpcs (creates thread to listen for client msgs)
   register lock_server's handler functions
   you will have to register two new handlers
   (really lock_smain.cc should be generated automatically)
 
-lock_server.cc
+server.go
   handlers
   you will have to add two new handlers
   a table of locks (use C++ STL map class)
@@ -280,9 +278,6 @@ lock_server.cc
     release() must wake up waiting acquire()
     both must avoid using table at the same time
 
-Why this arrangement?
-  lock_demo and lock_server are "application logic"
-    they don't know much about RPC
-    almost as if lock_demo were directly calling lock_server
-  lock_client and lock_smain know about RPC glue
-  this arrangement keeps the real app logic from being polluted by RPC details
+test_test.go
+   test the results.	
+
