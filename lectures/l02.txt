@@ -1,16 +1,11 @@
-6.824 2012 Lecture 2: RPC
+6.824 2013 Lecture 2: Infrastructure: RPC and threads
 
 Remote Procedure Call (RPC)
-  a key piece of distrib sys machinery -- and lab 1
+  a key piece of distrib sys machinery; you'll see in lab 1
   goal: easy-to-program network communication
     hides most details of client/server communication
     client call is much like ordinary procedure call
     server handlers are much like ordinary procedures
-  alternatives?
-    format/send network packets directly
-    distributed shared memory
-    map/reduce
-    ...
   RPC is widely used!
 
 RPC ideally makes net communication look just like fn call:
@@ -22,424 +17,243 @@ RPC ideally makes net communication look just like fn call:
       return z
     }
   RPC aims for this level of transparency
-  Hope: even novice programmers can use function call!
 
 RPC message diagram:
   Client             Server
     request--->
        <---response
 
-RPC software structure:
-
-Client  Client     RPC       Net      RPC             Server      Handler
- App     Stub      lib                lib              Stub
-
-call    marshall   send     request   recv  dispatch  unmarshall  fn(args)
-                   wait               wait                        work...
-return  unmarshall recv     response  send            marshall    return
+Software structure
+  client app         handlers
+    stubs           dispatcher
+   RPC lib           RPC lib
+     net  ------------ net
  
 A few details:
-  Marshalling is tricky for arrays, pointers, objects, &c
-  Client needs to find server's network address ("binding")
-  Client may have multiple threads sending to server
-    match response to waiting thread
-  Server may create thread per request
+  Marshalling: format data into packets
+    Tricky for arrays, pointers, objects, &c
+    Go's RPC library is pretty powerful!
+  Binding: how does client know how to talk to the server?
+    Might be a name service -- e.g. DNS
+  Threads:
+    Client often has many threads, so > 1 call outstanding, match up replies
+    Handlers may be slow, so server often runs each in a thread
+
+Look at lab-1.go handout (from last lecture):
+  contains some fragments from the lab-1 code we give you
+  main() shows application view: setup, then fn calls
+  "Clerk" is client-side code that knows how to talk to specific server
+    thus not quite like an ordinary fn call
+  clerk.Lock() is a stub: turns fn call into RPC junk
+    you'll modify Lock to try the backup if the primary fails
+  LockServer holds the application-level state (lock table)
+  LockServer.Lock() is a handler
+    contains app-level server code
+    RPC library calls it
+    you'll modify Lock() to forward to the backup
 
 Hard challenge: failures
-  network may drop, delay, duplicate, re-order messages
-  network might break altogether, and maybe recover
-  server might crash, and maybe re-start
+  network may drop or delay packets
+  network may be temporarily or permanently broken
+  server may crash, maybe re-start
   can we hide this from client applications and server handlers?
 
-Birrell RPC paper
-  we will see many Birrell papers
-  from Xerox PARC, which invented LANs and workstations in 1970s
-  paper's main concerns:
-    naming
-    minimize # of packets (slow CPUs -> slow pkt handling) (we use TCP)
-    failures
+Basic choice in RPC library design:
+  Punt failures to application?
+    this makes RPC hard to use (no longer like fn call)
+  Hide failures from application?
+    pretty convenient if possible
+    but what about e.g. permanent server failure?
 
-Naming RPC servers
-  Used Grapevine, a name service (a little like DNS)
-  Export(service name, server host)
-  Import(service name) -> server host
-  level of indirection:
-    clients need not hard-code server names
-    multiple servers (use closest)
-    replacement of servers
-
-Let's talk about how a client can handle failure
-  client sends a request
+Let's talk about how RPC can hide failure from application
   suppose network discards the request packet
-  what will client observe?
-  what should the client do?
-  how long should client wait before rxmt?
-
-Would it be enough to layer RPC on top of TCP?
-  After all, TCP is a reliable transport protocol
+  what will client RPC library observe?
+  what should the client RPC library do?
+  how long should it wait before rxmt?
 
 Now suppose the network delivered request, but discarded response
-  what will client observe?
-  what should the client do?
+  what will client RPC library observe?
+  what should it do?
 
-Simple retransmission leads to "at-least-once" behavior
+Client re-sending leads to "at-least-once" behavior
 
-Would our lock_server work under at-least-once?
-  no: [arrow diagram]
-    send acquire, response lost
-    timeout, re-send acquire, server will wait forever!
-  you could argue that server shouldn't double-grant
-  but there are other bad scenarios:
-    send acquire
-    send release, network delays it
-    re-send release, received
-    acquire again
-    now first release delivered, incorrectly releases lock
+Would at-least-once RPC cause trouble for a non-replicated lock server?
+  bad case: [arrow diagram]
+    send Lock(), response lost
+    timeout, RPC re-sends Lock(), server will say "no"
+  another bad case:
+    send Lock
+    send Unlock, network delays it
+    RPC re-sends Unlock, received
+    Lock again
+    now first Unlock delivered, incorrectly releases lock
 
 Is at-least-once ever OK?
   yes: if no side effects -- read-only operations
   yes: if application has its own plan for detecting duplicates
 
 How can RPC system provide better behavior?
-  server remember the requests it has seen, detect duplicates
-    requests need unique IDs (XIDs), ID repeated on rxmt
-  what to do if server sees a duplicate?
-    client may still need the reply
-    so server remembers replies to previously executed RPCs
-  this yields "exactly-once" behavior
-    assumes failures are eventually repaired
-    and that client re-tries forever
+  server RPC library detects duplicate request
+    returns previous reply instead of re-running handler
+  "at most once"
+  client includes unique ID (UID) with each request
+    uses same UID for re-send
+  server:
+    if seen[uid]:
+      r = old[uid]
+    else
+      r = handler()
+      old[uid] = r
+      seen[uid] = true
 
-Exactly-once is possible but difficult
-  Server must remember table across reboots (e.g. on disk)
-  Why doesn't the following server code provide exactly-once?
-    if s[xid] != DONE:
-      x = handler(args)
-      s[xid] = DONE
-    else:
-      return previous value
-  We will return to this problem later in the course
-
-Birrell RPC protocol provides "at-most-once"
-  server says OK -> executed once
-  server says CRASH -> zero or one times, unknown which
-  why? much easier than exactly once, more useful than at-least-once
-
-at-most-once is easy if server does not crash:
-  server maintains s[xid] (state), r[xid] (return value)
-  (this code assumes just one server thread, thus no locks or PENDING)
-  if s[xid] == DONE:
-    return r[xid]
-  x = handler(args)
-  s[xid] = DONE
-  r[xid] = x
-  return x
+some at-most-once complexities
+  how to ensure UID is unique?
+    big random number?
+    combine unique client ID (ip address?) with sequence #?
+  server must eventually discard info about old RPCs
+    when is discard safe?
+    idea:
+      unique client IDs
+      per-client RPC sequence numbers
+      client includes "seen all replies <= X" with every RPC
+      much like TCP sequence #s and acks
+    or only allow client one outstanding RPC at a time
+      arrival of seq+1 allows server to discard all <= seq
+    or client agrees to keep retrying for < 5 minutes
+      server discards after 5+ minutes
+  how to handle dup req while original is still executing?
+    server doesn't know reply yet; don't want to run twice
+    idea: "pending" flag per executing RPC; wait or ignore
 
 What if the server crashes?
-  Just before or just after call to handler()
-  After server restart:
-    Can't tell whether handler() was called
-    Client will re-send request (no response due to crash)
-    Server *must* reply with CRASH
+  if at-most-once duplicate info in memory, server will forget
+    and accept duplicate requests
+  maybe it should write the duplicate info to disk?
+  maybe replica server should also replicate duplicate info?
 
-How to decide if a request is a re-sent copy of one sent before crash?
+What about "exactly once"?
+  at-most-once plus unbounded retries
 
-Answer:
-  server has a number that uniquely identifies restarts
-    Birrell calls it the ID, we call it the server nonce
-  client obtains server's ID when it first connects
-    during "bind"
-  client sends server ID in every RPC request
-  server checks whether ID in request == current ID
-    if equal, then any previous transmission will be in server's replies[] table
-    if not equal, return CRASH
+Go RPC is "at-most-once"
+  open TCP connection
+  write request to TCP connection
+  TCP may retransmit, but server's TCP will filter out duplicates
+  no retry in Go code (i.e. will NOT create 2nd TCP connection)
+  Go RPC code returns an error if it doesn't get a reply
+    perhaps after a timeout (from TCP)
+    perhaps server didn't see request
+    perhaps server processed request but server/net failed before reply came back
 
-What should client do if server says CRASH?
-  might have been executed already, might not have been
-  thus you know:
-    maybe you transferred the money, maybe you didn't
-    but you know it didn't transfer twice
-    and you know you have to track down what actually happened
-      e.g. ask bank for transaction record
-  this situation is pretty rare
-  more on this later in the course
+Go RPC's at-most-once isn't enough for Lab 1
+  it only applies to a single RPC call
+  if primary fails, your client will have to re-send to backup
+    backup may have already seen forwarded request from primary
+  Go RPC can't detect this kind of duplicate
 
-How to ensure server never reuses an ID?
-  server could store ID on disk (if it has a disk)
-  or use boot time (if it has access to a clock)
-  or use a big random number (if it has a source of randomness)
+***
 
-When can server discard old saved return values?
-  after e.g. five seconds? no!
-  server can discard if client will never retransmit
-    == if client has received response
-  have client tell server which replies it has received
-  or: client tells server it has received all replies up through some XID
-    lab RPC's xid_rep, in every request message
-
-Lab RPC request message format
-  (TCP/IP headers...)
-  xid
-  proc#
-  client nonce
-  server nonce
-  xid_rep
-  arguments...
-
-Lab RPC response message format
-  (TCP/IP headers...)
-  xid
-  error code
-  return value
-
-[draw these on the board as arrow diagrams]
-
-Example 1: ordinary calls
-  bind req: xid=1 sn=? proc=1
-  bind reply: xid=1 sn=22
-  ...
-  req: xid=6 sn=22 xid_rep=5 proc=2 args...
-    r[6] = r1
-    server deletes xid<=5 from s[]/r[]
-  reply: xid=6 r1
-  req: xid=7 sn=22 xid_rep=6 proc=2 args...
-  reply: xid=7
-
-Why not let xid_rep be implicitly xid - 1 ?
-  to allow multiple outstanding RPCs from one client
-  example: xid=7 sent before reply for xid=6 arrives
-
-Client has to compute xid_rep
-  it is highest xid through which all replies have been received
-  our code keeps set of replied-to xids, looks for contiguous prefix
-
-Example 2: duplicate requests (client resends too soon, or response lost)
-  req: xid=8 ...
-  req: xid=8 ... (again)
-  if handler has finished when 2nd req arrives:
-    reply with r[8]
-    thus two replies with xid=8
-    client will ignore 2nd reply, no thread waiting for that xid
-  if handler has not finished:
-    ignore request (thus need more than just DONE -- INPROGRESS)
-
-Example 3: server reboot
-  req: xid=9 sn=22 ...
-  server crash, reboot, new sn=23
-  req: xid=9 sn=22 ... (retransmission)
-  server sees 22 != 23, replies FORGOTTEN
-
-l02.cc hand-out has simplified RPC code from lab1
-  I've omitted error checks, locks, &c
-  Simplified some C++ notation
-  Check the real code!
-
-lock_demo.cc
-  creates a lock_client, tells it where to connect
-
-lock_client::lock_client
-  creates rpcc, tells it where to connect
-  calls bind() to get server_nonce
-
-lock_client::stat
-  calls call(), proc #, arguments, &return
-
-rpcc::call1
-  msg: xid proc cn sn xid_rep args...
-  xid_rep_window_.front()?
-  update_xid_rep(xid)?
-
-rpcc::got_pdu
-
-rpcs::rpcs
-
-rpcs::dispatch
-  why the nonce check? what prob does this solve?
-  when could INPROGRESS occur?
-  is FORGOTTEN possible? how?
-    long delayed request
-    (rebooted server is dealt w/ separately)
-  what is the client nonce for?
-
-checkduplicate_and_update(cn, xid, xid_rep, &b, &sz)
-  must keep, for each cn, state about each xid.
-    done? b+sz if done.
-  if s[cn/xid] == INPROGRESS
-    INPROGRESS
-  if s[cn/xid] == DONE
-    DONE, return b and sz
-  if xid <= previous xid_rep
-    FORGOTTEN
-  else
-    s[cn/xid] = INPROGRESS
-    NEW
-
-  must also trim state
-    discard any cn/xid if xid <= xid_rep
-    must also free buf
-
-what must add_reply(cn, xid, b, sz) do?
-  checkduplicate_and_update already set s[cn/xid] = INPROGRESS
-  s[cn/xid] = DONE
-  remember b and sz.
-6.824 2012 Lecture 3: Threads
-
-Introduction
+Now: threads
   threads are a fundamental server structuring tool
   you'll use them a lot in the labs
   they can be tricky
 
 Thread = "thread of control"
   threads allow one program to (logically) do many things at once
-  a thread includes some per-thread state:
+  the threads share memory
+  each thread includes some per-thread state:
     program counter
     stack pointer
     register set
     stack
     maybe state in the o/s (e.g. what it is waiting for)
-  other state is shared by all threads in a program:
-    memory
-    file descriptors
 
-Example:
-  int x = 0;
-  f(){
-    int y = 0;
-    y = y + 1;
-    print x + y
-  }
-  main(){
-    create_thread(f);
-    create_thread(f);
-    ...;
-  }
+Example: suppose you want to send RPCs to many servers:
 
-Q: will the threads print 1 or 2? Why?
-Q: is there any way for one thread to r/w the other's y?
+  var reply1 int
+  var reply2 int
+  go func() {
+    reply1 = rpc to server A
+  }()
+  go func() {
+    reply2 = rpc to server B
+  }()
+
+Note:
+  go ... starts a new thread
+  go's argument is a function call
+  anonymous functions
+  when the function returns, the thread disappears
+  reply1 and reply2 are accessible in threads
 
 Why use threads?
   exploit several processors to run an application faster
   interleave different activities in a convenient way
     one thread computes while another waits for disk read
     interleave background spell-check w/ foreground editing
-    let one lock_server thread wait for lock while processing
-      other client requests in other threads
-  you can view the last three as merely a structuring convenience
+  you can view the last two as merely a structuring convenience
     so the programmer doesn't have to write the interleaved code
     but it's a big convenience!
 
-Pitfalls of multithreaded programming
-  races; example?
-    may be difficult to reproduce
-  deadlock; example?
-    better bug to have than race; you program stops when it happens
-  livelock; example?
-  bad performance; example?
+Problem: races
+  count := 0
+  go func() {
+    count++
+  }()
+  go func() {
+    count++
+  }()
+    
+Go mutexes (often called locks)
+  mu sync.Mutex
+  mu.Lock()
+  mu.Unlock()
+  code between Lock/Unlock often called "critical section"
+  defer mu.Unlock()
 
-At a minimum, a thread interface must support:
-  creating threads
-  mutual exclusion to avoid races
-  coordination to let threads wait for + signal events
+Problem: threads often need to wait for each other
+  Example: how to wait for those two RPCs to both finish?
 
-Pthread interface
-  standard interface, for C / UNIX
-  not unlike the one described in the paper
-  we use it in the labs
+Go channels
+  c := make(chan int)
+  c <- 1
+  x := <- c
+  <- c
+  receiving waits until somebody sends
+  sending waits until somebody receives
+    thus no harm if reader is slower than writer
 
-Interface
-  shortened names, real names are e.g. pthread_create, pthread_mutex_lock
-  threads
-    tid = create()
-    join(tid)
-  mutex
-    lock(m)
-    unlock(m)
-  condition variables
-    wait(cv, m)
-      caller must hold m
-      wait() releases m, re-acquires before return
-    signal(cv)
-      caller should hold m
-      wakes up one thread (or none if none waiting)
-    broadcast(cv)
-      caller should hold m
-      wakes up all threads waiting
-  other stuff
-    which we don't use.
+Channel example:
+  c1 := make(chan bool)
+  c2 := make(chan bool)
+  go func() { ...; c1 <- true } ()
+  go func() { ...; c2 <- true } ()
+  <- c1
+  <- c2
 
-Paper does a nice job teaching how to program with threads, in
-particular for servers (like the labs). Worth rereading the paper as
-you get more experience.
-
-Example: let's look at fifo.h
-  rpc system uses it for work queues
-  first walk through code
-
-Scoped locks
-  just thin wrapper around pthread mutex lock/unlock
-  helps you not have to remember to unlock
-  saves a bunch of typing
-    if(...){
-      ScopedLock sl(&m);
-      if(...)
-	return ...;  // sl.~ScopedLock releases mu
+Problem: Deadlock
+  go func() { mu1.Lock(); mu2.Lock(); ...
+  go func() { mu2.Lock(); mu1.Lock(); ...
+  Example:
+    transfer(a, b) {
+      a.lock()
+      b.lock()
       ...
-      // sl.~ScopedLock releases mu
     }
-
-What if we deleted the ScopedLock at start of enq?
-  at start of deq?
-
-Condition variables:
-  what if wait() was inside if(), not while()?
-  what if enq() called just before deq()'s wait?
-  what if we deleted signal at end of enq? at end of deq?
-  what if broadcast instead of signal?
-  what if while loop in enq just spun, no call to wait?
-
-What is the fifo's mutex protecting?
-  it makes code sequences atomic
-  specifically:
-    list<> operations (vs other operations, e.g. e->nxt=head;head=e)
-    enq's not-full check and push (vs another enq)
-    deq's not-empty check and pop (vs another deq)
-    deq's *e= and pop (vs another deq)
-    enq's full-check and wait (vs deq's signal)
-    deq's empty-check and wait (vs enq's signal)
-
-What if a thread acquires a lock, and acquires it again?
-  should the nested acquire succeed? 
-    after all, it's this thread that has the lock
-  why / why not?
-
-Deadlock
-  example:
-    rpc thread receiving a msg:
-      rpc library locks
-      app locks
-    app thread sending a msg:
-      app locks
-      rpc library locks
+    go func() { transfer("fred", "ivy") }
+    go func() { transfer("ivy", "fred") }
+  Distributed deadlock too:
+    server A handler():
+      a.Lock()
+      send RPC to server B
+    server B handler():
+      b.Lock()
+      send RPC to server A
+    you will face this in the labs!
   how to fix?
-    release one lock before acquiring the other
+    don't hold more than one lock
     or always acquire locks in the same order (e.g. for bank transfer)
   hard if locks are in different modules
-    shouldn't have to know about each others' internals
-
-killing a thread can be a mess
-  e.g. rpcs creates thread to wait for incoming requests
-    what happens to thread when you're done with an rpcs?
-  it might be holding a lock
-  it might need to clean up
-    e.g. free memory
-  a whole stack of calling functions might need to clean up
-  it might be hard to get its attention at all
-    waiting for a lock
-    sitting in wait() on a condition variable
-  best plan: set a flag asking it to clean itself up
-    problem: what if in wait() -- how do we know what to signal()?
-    answer: make sure you know where your threads wait
-      e.g. what if my thread is waiting in fifo.deq()?
+    requires modules to understand each others' internals
 
 Locking granularity
   one mutex for whole lock_server?
@@ -451,13 +265,51 @@ Locking granularity
     still need one mutex to protect table of locks
   danger of many locks---deadlock and races 
 
-Why not use pthread mutex directly for each lock_server lock?
-  acquire(lid){ pthread_mutex_lock(locks[lid]); }
+mutexes themselves are usually pretty cheap
+  much less than a microsecond if you don't have to wait
 
-pthread mutexes themselves are usually pretty cheap
-  if you don't need to wait
-  50 ns if this core was last to hold it
-  200 ns if two cores are constantly trading a lock
-  these seem to be spin-locks
-  blocking locks would be much slower -- they suspend the thread
-    but free up the CPU, good if lock held for a long time
+***
+
+let's look at today's handout -- rpc-handout.go
+  it's a toy RPC system
+  illustrates threads, mutexes, channels
+  it's a toy
+    assumes connection already open
+    only supports an integer arg, integer reply
+    doesn't deal with errors
+
+struct ToyClient
+  client RPC state 
+  mutex per ToyClient
+  connection to server (e.g. TCP socket)
+  xid -- unique ID per call, to match reply to caller
+  pending[] -- multiple threads may call, need to find them
+    chan on which caller is waiting
+
+Call
+  application calls reply := client.Call(procNum, arg)
+  procNum indicates what function to run on server
+  WriteRequest knows the format of an RPC msg
+    basically just the arguments turned into bits in a packet
+  Q: could we move "xid := tc.xid" outside the mutex?
+     after all, we are not changing anything
+  Q: do we need to write inside the mutex?
+  note: Go says you are responsible for preventing concurrent map ops
+    that's one reason the update to pending is locked
+
+Listener
+  runs as a background thread
+  not quite right that it may need to wait on chan for caller
+
+Q: what if reply comes back very quickly?
+   could Listener() see reply before pending[xid] entry exists?
+   or before caller is waiting for channel?
+
+Dispatcher
+  note that the Dispatcher echos the xid back to the client
+    so that Listener knows which Call to wake up
+  Q: why run the handler in a separate thread?
+
+main()
+  note registering handler in handlers[] 
+  what will the program print?

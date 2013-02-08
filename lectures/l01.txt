@@ -1,10 +1,9 @@
-6.824 2012 Lecture 1: Introduction and lab overview
+6.824 2013 Lecture 1: Introduction and lab overview
 
 6.824: Distributed Systems Engineering
 
 What is a distributed system?
-  multiple connected computers
-  cooperate to provide some service
+  multiple networked cooperating computers
   Examples: Internet E-Mail, Athena file server, Google MapReduce
 
 Why distribute?
@@ -19,43 +18,46 @@ But:
   Lamport: A distributed system is one in which the failure of a
     computer you didn't even know existed can render your own computer
     unusable.
-  don't distribute if a central system will work
+  advice: don't distribute if a central system will work
 
 Why take this course?
   interesting -- hard problems, non-obvious solutions
   active research area -- lots of progress + big unsolved problems
   used by real systems -- unlike 10 years ago
-    internet, clusters, multi-site, failures
+    driven by the rise of big Web sites
   hands-on -- you'll build a real system in the labs
 
 COURSE STRUCTURE
 
 http://pdos.csail.mit.edu/6.824
 
-Meetings: 1/2 lecture, 1/2 paper discussion (or lab help)
+Course components:
 
-Research papers -- case studies
-  must read papers before class
+Lectures about big ideas, papers, labs
+
+Readings: research papers as case studies
+  please read papers before class
     otherwise boring, and you can't pick it up by listening
   each paper has a question (see web site)
   submit answer before class, one or two paragraphs
 
 Mid-term quiz in class, and final exam
 
-Labs: build a real cluster file system, like Frangipani
-  Labs are due on Fridays
-  First lab is due next week
+Labs: build increasingly sophisticated fault-tolerant services
+  First lab is due on Monday
 
-Project: extend lab in any way you like.
-  teams of two
-  one-page report
+Project: design and build a distributed system of your choice
+  in the last month of the course
+  teams of two or three
+  project meetings with course staff
   demo in last class meeting
 
 Neha Narula is TA, office hours on Web.
 
+MAIN TOPICS
 
-Example: AFS
-  single shared file system, so users can cooperate
+Example:
+  a shared file system, so users can cooperate, like AFS
   lots of client computers
   [diagram: clients, network, vague set of servers] 
 
@@ -65,7 +67,7 @@ Topic: architecture
     Block server(s) -> FS logic in clients?
     Separate naming + file servers?
     Separate FS + block servers?
-  Single machine room in compus or unified wide area system?
+  Single machine room or unified wide area system?
     Wide-area dramatically more difficult.
   Client/server or peer-to-peer?
   Interact w/ performance, security, fault behavior.
@@ -77,27 +79,28 @@ Topic: implementation
   Most systems organize distribution with some structuring framework(s)
     RPC, RMI, DSM, MapReduce, &c
 
-  <chy> **MapReduce**  high level paradigm
-	
 Topic: performance
   Distribution can hurt: network b/w and latency bottlenecks
     Lots of tricks, e.g. caching, threaded servers
-  Distribution can help: parallelism
+  Distribution can help: parallelism, pick server near client
   Idea: scalable design
     Nx servers -> Nx total performance
   Need a way to divide the load by N
+    == divide the state by N
     Split by user
     Split by file name
+    "Sharding" or "partitioning"
   Rarely perfect -> only scales so far
+    Global operations, e.g. search
     Load imbalance
       One very active user
       One very popular file
       -> one server 100%, added servers mostly idle
       -> Nx servers -> 1x performance
-    Global operations, e.g. search
 
 Topic: fault tolerance
-  Can I use my files if server / network fails?
+  Can I use my files if there's a failure?
+    Some part of network, some set of servers
   Maybe: replicate the data on multiple servers
     Perhaps client sends every operation to both
     Maybe only needs to wait for one reply
@@ -106,178 +109,206 @@ Topic: fault tolerance
 
 Topic: consistency
   == contract w/ apps/users about meaning of operations
+    e.g. "read yields most recently written value"
     hard due to partial failure, replication/caching, concurrency
   Problem: keep replicas identical
     If one is down, it will miss operations
       Must be brought up to date after reboot
     If net is broken, *both* replicas maybe live, and see different ops
       Delete file, still visible via other replica
-  Problem: operations may appear to clients in different orders
+      "split brain" -- usually bad
+  Problem: clients may see updates in different orders
     Due to caching or replication
-    I make grades.txt unreadable, then TA write grades to it
-    What if the operations exec in different order to different replicas?
-  Problem: atomicity of multi-server operations
-    mv /users/x/f /users/y/f
-    Might an observer see no file at all?
-    Might a crash result in lost file?
+    I make grades.txt unreadable, then TA writes grades to it
+    What if the operations run in different order on different replicas?
   Consistency often hurts performance (communication, blocking)
     Many systems cut corners -- "relaxed consistency"
+    Shifts burden to applications
+
+LABS
+
+focus: fault tolerance and consistency -- central to distrib sys
+  lab 1: simple replicated lock server
+  labs 2/3/4: storage servers
+    progressively more sophisticated (tolerate more kinds of faults)
+    patterened after real systems, e.g. MongoDB
+    Lab 4 has core of a real-world design for 1000s of servers
+
+what you'll learn from the labs
+  easy to listen to lecture / read paper and think you understand
+  building forces you to really understand
+  you'll have to do some design yourself
+    we supply skeleton, requirements, and tests
+    but we leave you substantial scope to solve problems your own way
+  you'll get experience debugging distributed systems
+
+we've tried to ensure that the hard problems have to do w/ distrib sys
+  not e.g. fighting against language, libraries, &c
+  thus Go (type-safe, garbage collected, slick RPC library)
+  thus fairly simple services (locks, k/v store)
+
+what fault-tolerance properties might we want?
+  available
+  durable
+  consistent
+
+what kinds of faults might we want to tolerate?
+  network:
+    lost packets
+    duplicated packets
+    temporary network failure
+      server disconnected
+      network partitioned
+  server:
+    server crash+restart
+    server fails permanently
+    all servers fail simultaneously -- power/earthquake
+    bad case: crash mid-way through complex operation
+    bugs -- but not in this course
+    malice -- but not in this course
+  client fails
   
-Topic: security
-  Threats:
-    corrupt employees
-    targeted external attack
-    spammers collecting botnets
-  How does the server know that a request is from me?
-  Do I have to trust the system administrators?
-  What if server code has bugs? (one per 1000 lines...)
+tools for dealing with faults?
+  retry -- e.g. if pkt is lost, or server crash+restart
+  replicate -- e.g. if  one server or part of net has failed
+  replace -- for long-term health
 
-We want to understand the individual techniques, and how to combine them
+Lab 1 is not a very robust distributed system
+  but it will help you get up to speed on Go and distributed programming
+  and it will help you understand problems later labs will solve
 
-LAB: YET ANOTHER FILE SYSTEM (YFS)
+the lab 1 lock service
+  multiple clients
+  named locks
+  only one client at a time can hold a lock -- e.g. to edit grades file
+  Lock(lockname) -- returns true/false
+  Unlock(lockname) -- returns true/false
+  app code:
+    while Lock("grades") == false:
+      sleep a bit
+    ...
+    Unlock("grades")
+  diagram: clients, primary, backup, Lock, forward, &c
 
-Lab is inspired by Frangipani, a scalable distributed file system (see
-paper). Designed/built at a research lab, not a product. You will
-build a simplified version of Frangipani.
+fault-tolerance scheme: replication via "primary/backup"
+  replicate the service state
+    for each lock, locked or not
+  one copy on primary server, one on backup server
+  clients send operations to primary
+  primary forwards to backup so backup can update its state
+  primary replies to client after backup replies
+
+lab 1 "failure model": single fail-stop failure
+  ONLY failure: one server halts
+  NO network failures
+  NO re-start of servers
+  thus: no response means that the server has halted
+  thus: at least one of primary/backup guaranteed to be alive
+  fail-stop reasonable for tightly coupled primary+backup
+  fail-stop not a good model for biggish internet-based systems
+    due to network failures
+
+client Lock(l):
+  send msg to primary
+  if no response, send to backup
+  return server response
   
-Frangipani goals
-  scalable storage -- add disk servers
-  scalable file service -- add file servers
-  consistent -- much like single file server
-  adaptive -- shifts data to where it is being used
-  fault-tolerant -- server, network, and disk failures
+server Lock(l) handler:
+  if locked(l)
+    return false
+  else
+    forward to backup
+    return true
 
-Frangipani design
-  diagram:
-    client workstations
-    Frangipani servers
-    Petal servers
-    lock servers
-  Petal looks like a single huge disk
-    interface: put and get (pretty low-level)
-    replicates to tolerate any single server/disk failure
-    add petal servers to increase storage capacity and throughput
-  Frangipani file server
-    knows about file names, directories, inodes, &c
-    uses Petal for all storage
-    all Frangipani servers serve same file system
-      communicate only via Petal
-    Frangipani servers cache file/directory data
-      cache is write-back
-      can often operate w/o contacting Petal
-    add Frangipani servers to handle more client workstations
-  Lock servers
-    Frangipani servers use lock service to provide consistency
-      e.g., lock the directory when creating a file
-      locks also drive cache write-back to Petal
-    locks servers are replicated
-  No security beyond traditional file system security
-    intended for a cluster, not wide-area
+Q: does primary have to wait for reply from backup?
 
-This is a common architecture
-  many clients
-  many front ends to provide CPU to process client requests
-  shared back-end that *only* provides storage
-  front-ends independent, communicate indirectly via back-end storage
-  only storage back-end needs to be fault-tolerant
-    front-ends are "stateless", nothing lost if they crash
-  easier to provide fault-tolerance for storage than for general computation
+Q: what should primary do if no response from backup?
 
-When does Frangipani scale well?
-  lots of independent users
-  each user's Frangipani caches that user's files
-  Frangipani servers don't need to wait for each other for locks
-  so each added server doesn't slow down other servers => scalable
-  write-back caching means Petal isn't a bottleneck
+Q: what if primary gets Lock(a) / Lock(a) at same time from diff clients
+   primary processes them in some order (one wins, other loses)
+   forwards to backup
+   backup receives in the other order
+   is that OK?
 
-When might Frangipani *not* scale well?
-  i.e. when might we not be able to get more performance by adding servers?
-  if all clients are modifying the same set of files
-  if there's a single demanding user
+Q: how to ensure backup sees operations in same order as primary?
 
-YFS
-  Same basic structure as Frangipani, but single extent server
-    i.e. you don't have to implement Petal.
-  Diagram: many clients, one extent_server, multiple lock_servers
-  Client diagram:
-    app, kernel fuse, fuse.cc, yfs_client
-  Each program written in C++ and pthreads, our own RPC library
-    Next two lectures cover infrastructure in detail
+Q: is it OK that client might send same request to both primary and backup?
 
-Labs: build YFS incrementally
-  L1: simple lock server
-    threads, mutexes, condition variables
-    then at-most-once RPC
-  L2: extent_server, yfs_client, fuse
-    in-memory store for extent_server
-    basic yfs_client: create, lookup, readdir, write, read
-  L3: yfs_client + extent_server + lock_server
-    mkdir, unlink, and sharing/locks
-  L4: caching lock_server
-    add revocation to lock server
-  L5: caching extent_server
-    consistency using lock_server
-  L6: paxos library
-    agreement protocol (who is the master lock server?)
-  L7: fault tolerant lock server
-    replicated state machine using paxos
-  L8: your choice
-    e.g. distributed extent server for performance or fault tolerance
+Q: what happens if the primary fails just after forwarding to the backup?
+   service must act like a single copy!
+   this is what makes lab 1 interesting!
 
-Lab 1: simple lock server
+Q: what if primary is up but network isn't delivering msgs?
+   you do not have to cope with this scenario for Lab 1 (later...)
 
-what does a lock server do?
-  handles acquire and release RPCs from clients
-  supports multiple locks, each lock has a number
-  acquire(num):
-    if another client holds lock num, wait for release(num)
-    mark lock num as held
-    then server sends "OK" reply to client
-  release(num):
-    mark lock num as not held
-    wake up any waiting acquires
+you'll be writing client/server software
+  using Remote Procedure Call (RPC)
+  idea:
+    applications can just say
+      x = Lock("x")
+    RPC library turns that into messages w/ server
+  RPC usually a library that client/server application code use
+  client app       
+    stubs         srvr handlers
+     RPC      -->    RPC
+  client stub e.g. Lock(l):
+    put arguments in packet
+    send to server
+    wait for reply packet
+    extract return value from reply, return
+  server:
+    wait for next client request
+    extract arguments
+    call handler
+    put return value in reply packet
+    send reply pkt to client
+  server/net failure -> client gets no reply
 
-we supply you with an RPC library and some demo client/server code
-  you have to add locking RPCs -- acquire and release
+we give you lab 1 skeleton code -- let's have a look
+  handout (l01.go) is an abridged version of lab skeleton
 
-RPC library simplifies client/server communication
-  overall structure:
-    client app
-    client stubs
-    rpcc (one for each server client talks to)
-    RPC library
-    ... network
-    RPC library
-    rpcs (just one)
-    server handlers
+diagram of lab 1 s/w:
+  app
+  Clerk        primary        backup
+  RPC            RPC           RPC
+  net    -->     net    -->    net
+  (note multiple concurrent clients)
+
+lockmain.go
+  the client has to know how to contact primary and backup
+  "ports" -- network names
 
 client.go
-  new rpcc(dst) -- creates connection to server
-  each stub method (stat, acquire, release):
-    cl->call(...)
-    call() is part of RPC library
-    sends msg to server: procedure #, arguments
-    waits for reply
-  you need to fill in acquire(), release()
-    call cl->call()
-  (really lock_client.cc should be generated automatically)
-
-common.go
-  create rpcs (creates thread to listen for client msgs)
-  register lock_server's handler functions
-  you will have to register two new handlers
-  (really lock_smain.cc should be generated automatically)
+  struct Clerk
+    why an object:
+      client side needs to keep state
+      client may want more than one Clerk
+    add state for backup to detect duplicate
+    how servers are named
+  Lock()
+    application calls Lock; Lock returns yes/no
+    arguments; space for reply
+    call() sends, waits, fills in reply
+    srv, rpcname
+    call() knows how to send/recv lots of arg types
+    if error, maybe never got reply!!!
+    thus ok && reply.OK
+    you must fix to try primary, then backup
 
 server.go
-  handlers
-  you will have to add two new handlers
-  a table of locks (use C++ STL map class)
-    map<lockID> -> held or not held
-  AND (this is tomorrow's topic)
-    acquire() must *wait* for a held lock
-    release() must wake up waiting acquire()
-    both must avoid using table at the same time
-
-test_test.go
-   test the results.	
-
+  LockServer
+    why an object:
+      holds server's state
+      so you can have more than one in a process
+      Go basically demands it
+  Lock handler
+    go RPC library calls Lock() when RPC arrives
+    in a new thread
+    mutex
+    locks spring into life
+    fix Lock to forward RPC to the backup, wait for reply
+  StartServer
+    register named handlers -- so Call() can find them
+    create socket on which to listen for RPC requests
+    create thread (why?) to:
+      loop: connection, start Go library *thread*
