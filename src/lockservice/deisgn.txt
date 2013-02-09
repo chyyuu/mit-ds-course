@@ -1,0 +1,46 @@
+step1: basic lock and unlock rpc
+modifying client.go so that Unlock() is a copy of Lock(), but modified to send Unlock RPCs.
+modify server.go so that the Unlock() function unlocks the lock. 
+
+step2: take care the primary server be killed
+Modify client.go so that it first sends an RPC to the primary, and if the primary does not respond, it sends an RPC to the backup.
+Modify server.go so that the primary tells the backup about Lock and Unlock operations. Use RPC for this communication.
+
+general case
+C --> P
+	P handle
+		P--> B
+		     B got result
+		     P-->C
+
+killed case
+C ---> P(killed)
+       C<--ERR
+	      C--> B
+		   B check result
+		   B -->C	
+	
+step3: take care the primary server be dying
+CASE:  client sends to the primary, the primary forwards to the backup and then crashes, and the client re-sends the RPC to the backup -- which has now already seen the RPC
+
+general case
+C --> P
+	P handle
+		P--> B
+		     B got result
+		     P-->C
+
+dying case
+C ---> P(dying)
+       P(dying) handle
+       P(dying) --> B 
+       C<--
+	      C--> B
+		   B check result
+		   B -->C	
+
+
+NOTICE:
+ * each client application will only make one call to Clerk.Lock() or Clerk.Unlock() at a time. 
+ * there may be more than one client application, each with its own Clerk.
+ * Go RPC server framework starts a new thread for each received RPC request.
