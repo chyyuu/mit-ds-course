@@ -11,13 +11,14 @@ package lockservice
 // If it is held, it returns OK=false immediately.
 // 
 type LockArgs struct {
-  // Go's net/rpc requires that these field
-  // names start with upper case letters!
-  Lockname string  // lock name
+	// Go's net/rpc requires that these field
+	// names start with upper case letters!
+	Lockname string // lock name
+	Xid      int64  // next unique request #
 }
 
 type LockReply struct {
-  OK bool
+	OK bool
 }
 
 //
@@ -25,9 +26,23 @@ type LockReply struct {
 // It returns OK=false if the lock was not held.
 //
 type UnlockArgs struct {
-  Lockname string
+	Lockname string // lock name
+	Xid      int64  // next unique request #
 }
 
 type UnlockReply struct {
-  OK bool
+	OK bool
+}
+
+type InfoArgs struct {
+	// Go's net/rpc requires that these field
+	// names start with upper case letters!
+	Lockname string // lock name
+	Xid      int64  // next unique request #
+	Reply    bool   // the reply info
+	Status   bool   // the status of lock
+}
+
+type InfoReply struct {
+	OK bool
 }

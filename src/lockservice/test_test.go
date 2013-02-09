@@ -2,24 +2,26 @@ package lockservice
 
 import "testing"
 import "runtime"
-import "math/rand"
+
+//import "math/rand"
 import "os"
 import "strconv"
-import "time"
+
+//import "time"
 import "fmt"
 
 func tl(t *testing.T, ck *Clerk, lockname string, expected bool) {
-  x := ck.Lock(lockname)
-  if x != expected {
-    t.Fatalf("Lock(%v) returned %v; expected %v", lockname, x, expected)
-  }
+	x := ck.Lock(lockname)
+	if x != expected {
+		t.Fatalf("Lock(%v) returned %v; expected %v", lockname, x, expected)
+	}
 }
 
 func tu(t *testing.T, ck *Clerk, lockname string, expected bool) {
-  x := ck.Unlock(lockname)
-  if x != expected {
-    t.Fatalf("Unlock(%v) returned %v; expected %v", lockname, x, expected)
-  }
+	x := ck.Unlock(lockname)
+	if x != expected {
+		t.Fatalf("Unlock(%v) returned %v; expected %v", lockname, x, expected)
+	}
 }
 
 //
@@ -28,110 +30,112 @@ func tu(t *testing.T, ck *Clerk, lockname string, expected bool) {
 // AFS doesn't support UNIX-domain sockets.
 //
 func port(suffix string) string {
-  s := "/var/tmp/824-"
-  s += strconv.Itoa(os.Getuid()) + "/"
-  os.Mkdir(s, 0777)
-  s += strconv.Itoa(os.Getpid()) + "-"
-  s += suffix
-  return s
+	s := "/var/tmp/824-"
+	s += strconv.Itoa(os.Getuid()) + "/"
+	os.Mkdir(s, 0777)
+	s += strconv.Itoa(os.Getpid()) + "-"
+	s += suffix
+	return s
 }
 
+/*
 func TestBasic(t *testing.T) {
-  fmt.Printf("Test: Basic lock/unlock ...\n")
+	fmt.Printf("Test: Basic lock/unlock ...\n")
 
-  runtime.GOMAXPROCS(4)
+	runtime.GOMAXPROCS(4)
 
-  phost := port("p")
-  bhost := port("b")
-  p := StartServer(phost, bhost, true)  // primary
-  b := StartServer(phost, bhost, false) // backup
+	phost := port("p")
+	bhost := port("b")
+	p := StartServer(phost, bhost, true)  // primary
+	b := StartServer(phost, bhost, false) // backup
 
-  ck := MakeClerk(phost, bhost)
+	ck := MakeClerk(phost, bhost)
 
-  tl(t, ck, "a", true)
-  tu(t, ck, "a", true)
+	tl(t, ck, "a", true)
+	tu(t, ck, "a", true)
 
-  tl(t, ck, "a", true)
-  tl(t, ck, "b", true)
-  tu(t, ck, "a", true)
-  tu(t, ck, "b", true)
+	tl(t, ck, "a", true)
+	tl(t, ck, "b", true)
+	tu(t, ck, "a", true)
+	tu(t, ck, "b", true)
 
-  tl(t, ck, "a", true)
-  tl(t, ck, "a", false)
-  tu(t, ck, "a", true)
-  tu(t, ck, "a", false)
+	tl(t, ck, "a", true)
+	tl(t, ck, "a", false)
+	tu(t, ck, "a", true)
+	tu(t, ck, "a", false)
 
-  p.kill()
-  b.kill()
+	p.kill()
+	b.kill()
 
-  fmt.Printf("  ... Passed\n")
+	fmt.Printf("  ... Passed\n")
 }
 
 func TestPrimaryFail1(t *testing.T) {
-  fmt.Printf("Test: Primary failure ...\n")
-  runtime.GOMAXPROCS(4)
+	fmt.Printf("Test: Primary failure ...\n")
+	runtime.GOMAXPROCS(4)
 
-  phost := port("p")
-  bhost := port("b")
-  p := StartServer(phost, bhost, true)  // primary
-  b := StartServer(phost, bhost, false) // backup
+	phost := port("p")
+	bhost := port("b")
+	p := StartServer(phost, bhost, true)  // primary
+	b := StartServer(phost, bhost, false) // backup
 
-  ck := MakeClerk(phost, bhost)
+	ck := MakeClerk(phost, bhost)
 
-  tl(t, ck, "a", true)
+	tl(t, ck, "a", true)
 
-  tl(t, ck, "b", true)
-  tu(t, ck, "b", true)
+	tl(t, ck, "b", true)
+	tu(t, ck, "b", true)
 
-  tl(t, ck, "c", true)
-  tl(t, ck, "c", false)
+	tl(t, ck, "c", true)
+	tl(t, ck, "c", false)
 
-  tl(t, ck, "d", true)
-  tu(t, ck, "d", true)
-  tl(t, ck, "d", true)
+	tl(t, ck, "d", true)
+	tu(t, ck, "d", true)
+	tl(t, ck, "d", true)
 
-  p.kill()
-  
-  tl(t, ck, "a", false)
-  tu(t, ck, "a", true)
+	p.kill()
 
-  tu(t, ck, "b", false)
-  tl(t, ck, "b", true)
+	tl(t, ck, "a", false)
+	tu(t, ck, "a", true)
 
-  tu(t, ck, "c", true)
+	tu(t, ck, "b", false)
+	tl(t, ck, "b", true)
 
-  tu(t, ck, "d", true)
+	tu(t, ck, "c", true)
 
-  b.kill()
-  fmt.Printf("  ... Passed\n")
+	tu(t, ck, "d", true)
+
+	b.kill()
+	fmt.Printf("  ... Passed\n")
 }
-
+*/
 func TestPrimaryFail2(t *testing.T) {
-  fmt.Printf("Test: Primary failure just before reply #1 ...\n")
-  runtime.GOMAXPROCS(4)
+	fmt.Printf("Test: Primary failure just before reply #1 ...\n")
+	runtime.GOMAXPROCS(4)
 
-  phost := port("p")
-  bhost := port("b")
-  p := StartServer(phost, bhost, true)  // primary
-  b := StartServer(phost, bhost, false) // backup
+	phost := port("p")
+	bhost := port("b")
+	p := StartServer(phost, bhost, true)  // primary
+	b := StartServer(phost, bhost, false) // backup
 
-  ck1 := MakeClerk(phost, bhost)
-  ck2 := MakeClerk(phost, bhost)
+	ck1 := MakeClerk(phost, bhost)
+	ck2 := MakeClerk(phost, bhost)
 
-  tl(t, ck1, "a", true)
-  tl(t, ck1, "b", true)
+	tl(t, ck1, "a", true)
+	tl(t, ck1, "b", true)
 
-  p.dying = true
+	p.dying = true
+	//p.dying = false
+	tl(t, ck2, "c", true)
+	tl(t, ck1, "c", false)
+	tu(t, ck2, "c", true)
+	tl(t, ck1, "c", true)
 
-  tl(t, ck2, "c", true)
-  tl(t, ck1, "c", false)
-  tu(t, ck2, "c", true)
-  tl(t, ck1, "c", true)
-
-  b.kill()
-  fmt.Printf("  ... Passed\n")
+	b.kill()
+	fmt.Printf("  ... Passed\n")
 }
 
+/*
 func TestPrimaryFail3(t *testing.T) {
   fmt.Printf("Test: Primary failure just before reply #2 ...\n")
   runtime.GOMAXPROCS(4)
@@ -252,7 +256,7 @@ func TestBackupFail(t *testing.T) {
   tl(t, ck, "d", true)
 
   b.kill()
-  
+
   tl(t, ck, "a", false)
   tu(t, ck, "a", true)
 
@@ -398,3 +402,4 @@ func TestConcurrentCounts(t *testing.T) {
   b.kill()
   fmt.Printf("  ... Passed\n")
 }
+*/
