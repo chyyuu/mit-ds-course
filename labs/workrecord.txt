@@ -1,0 +1,10 @@
+lab1 hand out in Tue
+Wed~Fri: learn golang
+Fri~Sat: finish lab1
+The design idea is important, also should understand the goloang program.
+key:
+0 notice at-most-once mechanism in RPC process. and only kill Pri or Bak srv (only one , but not two all), and the killed pri srv can not handle the request. Dying pri srv could handle rqueest but not reply info to client.
+1 define xid(unique id) for client's request's seq number
+2 server should store the used(or seen) request(with unique id) and related reply result, then it can decide if the request(xid) has been handled before?
+3 Pri srv does the same thing as that of Bak srv. But when Pri srv finish the handling, it have to diliver a rpc call to Bak srv to ask Bak srv handle the same request from client. 
+
