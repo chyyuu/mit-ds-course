@@ -19,35 +19,23 @@ type LockServer struct {
 	backup     string // backup's port
 
 	// for each lock name, is it locked?
-	locks      map[string]bool
-	lockxids   map[string]int64 //record the seq num of lock/unlock require
-	lockreplys map[string]bool  //recode the lock/unlock reply
+	locks map[string]bool
+	xids  map[int64]bool //key: seq num, value: reply of the require with seq num
 }
 
 //
 // server Lock RPC handler.
-// B srv recv info from P srv
-func (ls *LockServer) Info(args *InfoArgs, reply *LockReply) error {
-	ls.locks[args.Lockname] = args.Status
-	ls.lockxids[args.Lockname] = args.Xid
-	ls.lockreplys[args.Lockname] = args.Reply
-	reply.OK = true
-	fmt.Printf("B srv recv info(%v)\n", args)
-	return nil
-}
-
 // you will have to modify this function
 //
 func (ls *LockServer) Lock(args *LockArgs, reply *LockReply) error {
 	ls.mu.Lock()
 	defer ls.mu.Unlock()
 
-	if ls.am_primary { // P srv process
-		if ls.lockxids[args.Lockname]+1 != args.Xid {
-			fmt.Printf("ls(%v): Lock: Error in xid, args(%v)\n", ls.am_primary, args)
-			return nil
-		}
-		ls.lockxids[args.Lockname] = args.Xid
+	_, isused := ls.xids[args.Xid]
+	if isused == true { //used xid
+		//fmt.Printf("ls(%v):Lock: used xid(%v)\n", ls.am_primary, args.Xid)
+		reply.OK = ls.xids[args.Xid]
+	} else {
 		locked, _ := ls.locks[args.Lockname]
 		//fmt.Printf("ls(%v): Lock before: Lock(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.locks[args.Lockname], reply.OK)
 		if locked {
@@ -56,40 +44,12 @@ func (ls *LockServer) Lock(args *LockArgs, reply *LockReply) error {
 			reply.OK = true
 			ls.locks[args.Lockname] = true
 		}
-		ls.lockreplys[args.Lockname] = reply.OK
-
-		fmt.Printf("ls(%v): Lock after: Lock(%v), xid(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.lockxids[args.Lockname], ls.locks[args.Lockname], reply.OK)
-		// send results to B srv
-		infoargs := &InfoArgs{}
-		infoargs.Lockname = args.Lockname
-		infoargs.Reply = reply.OK
-		infoargs.Xid = args.Xid
-		infoargs.Status = ls.locks[args.Lockname]
-		inforeply := &InfoReply{}
-		ok := call(ls.backup, "LockServer.Info", infoargs, &inforeply)
-		if ok == false {
-			fmt.Printf("ls(%v): send B srv lockinfo failed!!!!\n", ls.am_primary)
-		}
-
-	} else { // B srv process
-		if ls.lockxids[args.Lockname] == args.Xid { //P srv already process theses call
-			fmt.Printf("ls(%v): P srv already process lock, the result is %v\n", ls.am_primary, ls.locks[args.Lockname])
-			reply.OK = ls.lockreplys[args.Lockname]
-		} else if ls.lockxids[args.Lockname]+1 == args.Xid { // P srv is killed, B srv will do it
-			ls.lockxids[args.Lockname] = args.Xid
-			locked, _ := ls.locks[args.Lockname]
-			fmt.Printf("ls(%v): Lock before: Lock(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.locks[args.Lockname], reply.OK)
-			if locked {
-				reply.OK = false
-			} else {
-				reply.OK = true
-				ls.locks[args.Lockname] = true
-			}
-			ls.lockreplys[args.Lockname] = reply.OK
-
-			fmt.Printf("ls(%v): Lock after: Lock(%v), xid(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.lockxids[args.Lockname], ls.locks[args.Lockname], reply.OK)
-		} else {
-			fmt.Printf("ls(%v): Bsrv Lock: Error in xid, args(%v)!!!\n", ls.am_primary, args)
+		ls.xids[args.Xid] = reply.OK
+		//fmt.Printf("ls(%v): Lock after: Lock(%v), xid(%v), locked(%v)\n", ls.am_primary, args.Lockname, ls.xids[args.Xid], ls.locks[args.Lockname], reply.OK)
+		// call B srv
+		if ls.am_primary {
+			var breply LockReply
+			call(ls.backup, "LockServer.Lock", args, &breply)
 		}
 	}
 	return nil
@@ -104,8 +64,11 @@ func (ls *LockServer) Unlock(args *UnlockArgs, reply *UnlockReply) error {
 	ls.mu.Lock()
 	defer ls.mu.Unlock()
 
-	if ls.am_primary { // P srv process
-		ls.lockxids[args.Lockname] = args.Xid
+	_, isused := ls.xids[args.Xid]
+	if isused == true { //used xid
+		//fmt.Printf("ls(%v):Unlock: used xid(%v)\n", ls.am_primary, args.Xid)
+		reply.OK = ls.xids[args.Xid]
+	} else {
 		locked, _ := ls.locks[args.Lockname]
 		//fmt.Printf("ls(%v): Unlock before: Lock(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.locks[args.Lockname], reply.OK)
 		if locked {
@@ -114,38 +77,12 @@ func (ls *LockServer) Unlock(args *UnlockArgs, reply *UnlockReply) error {
 		} else {
 			reply.OK = false
 		}
-		ls.lockreplys[args.Lockname] = reply.OK
-		fmt.Printf("ls(%v): Unlock after: Lock(%v), xid()%v, locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.lockxids[args.Lockname], ls.locks[args.Lockname], reply.OK)
-		// send results to B srv
-		infoargs := &InfoArgs{}
-		infoargs.Lockname = args.Lockname
-		infoargs.Reply = reply.OK
-		infoargs.Xid = args.Xid
-		infoargs.Status = ls.locks[args.Lockname]
-		inforeply := &InfoReply{}
-		ok := call(ls.backup, "LockServer.Info", infoargs, &inforeply)
-		if ok == false {
-			fmt.Printf("ls(%v): P send B srv unlockinfo failed!!!!\n", ls.am_primary)
-		}
-		return nil
-	} else { //B srv process
-		if ls.lockxids[args.Lockname] == args.Xid { //P srv already process theses call
-			fmt.Printf("ls(%v): P srv already process lock, the result is %v\n", ls.am_primary, ls.locks[args.Lockname])
-			reply.OK = ls.lockreplys[args.Lockname]
-		} else if ls.lockxids[args.Lockname]+1 == args.Xid { // P srv is killed, B srv will do it
-			ls.lockxids[args.Lockname] = args.Xid
-			locked, _ := ls.locks[args.Lockname]
-			fmt.Printf("ls(%v): Unlock before: Lock(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.locks[args.Lockname], reply.OK)
-			if locked {
-				reply.OK = true
-				ls.locks[args.Lockname] = false
-			} else {
-				reply.OK = false
-			}
-			ls.lockreplys[args.Lockname] = reply.OK
-			fmt.Printf("ls(%v): Unlock after: Lock(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.locks[args.Lockname], reply.OK)
-		} else {
-			fmt.Printf("ls(%v): Bsrv UnLock: Error in xid, args(%v)!!!\n", ls.am_primary, args)
+		ls.xids[args.Xid] = reply.OK
+		//fmt.Printf("ls(%v): Unlock after: Lock(%v), xid(%v), locked(%v), reply(%v)\n", ls.am_primary, args.Lockname, ls.xids[args.Xid], ls.locks[args.Lockname], reply.OK)
+		// call B srv
+		if ls.am_primary {
+			var breply LockReply
+			call(ls.backup, "LockServer.Unlock", args, &breply)
 		}
 	}
 	return nil
@@ -159,7 +96,7 @@ func (ls *LockServer) Unlock(args *UnlockArgs, reply *UnlockReply) error {
 func (ls *LockServer) kill() {
 	ls.dead = true
 	ls.l.Close()
-	fmt.Printf("ls(%v): KILLed\n", ls.am_primary)
+	//fmt.Printf("ls(%v): KILLed\n", ls.am_primary)
 }
 
 //
@@ -188,10 +125,8 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
 	ls.backup = backup
 	ls.am_primary = am_primary
 	ls.locks = map[string]bool{}
-	ls.lockxids = map[string]int64{}
-	ls.lockreplys = map[string]bool{}
-
 	// Your initialization code here.
+	ls.xids = map[int64]bool{}
 
 	me := ""
 	if am_primary {
@@ -237,7 +172,7 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
 					deaf_conn := DeafConn{c: conn}
 
 					rpcs.ServeConn(deaf_conn)
-					fmt.Printf("ls(%v): DYING\n", ls.am_primary)
+					//fmt.Printf("ls(%v): DYING\n", ls.am_primary)
 					ls.dead = true
 				} else {
 					go rpcs.ServeConn(conn)

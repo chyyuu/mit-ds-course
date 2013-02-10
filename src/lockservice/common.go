@@ -33,16 +33,3 @@ type UnlockArgs struct {
 type UnlockReply struct {
 	OK bool
 }
-
-type InfoArgs struct {
-	// Go's net/rpc requires that these field
-	// names start with upper case letters!
-	Lockname string // lock name
-	Xid      int64  // next unique request #
-	Reply    bool   // the reply info
-	Status   bool   // the status of lock
-}
-
-type InfoReply struct {
-	OK bool
-}
