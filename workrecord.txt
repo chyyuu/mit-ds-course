@@ -2,7 +2,12 @@
 lab1 hand out in Tue
 Tue~Fri: learn golang
 Fri~Sat: finish lab1
-The design idea is important, also should understand the goloang program.
+
+
+The design idea is important, also should understand the goloang program. At first I made a mistake that let every lock contain a request seq num, and seq num is increased . In fact, the client should contian a request seq num, and the seq num could be rand (more easy to implementation)
+
+
+
 key:
 0 notice at-most-once mechanism in RPC process. and only kill Pri or Bak srv (only one , but not two all), and the killed pri srv can not handle the request. Dying pri srv could handle rqueest but not reply info to client.
 1 define xid(unique id) for client's request's seq number
