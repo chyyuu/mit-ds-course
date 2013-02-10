@@ -1,0 +1,104 @@
+HINT from lab1 doc
+======================
+step1: basic lock and unlock rpc
+modifying client.go so that Unlock() is a copy of Lock(), but modified to send Unlock RPCs.
+modify server.go so that the Unlock() function unlocks the lock. 
+
+step2: take care the primary server be killed
+Modify client.go so that it first sends an RPC to the primary, and if the primary does not respond, it sends an RPC to the backup.
+Modify server.go so that the primary tells the backup about Lock and Unlock operations. Use RPC for this communication.
+
+NOTICE
+==============
+ * each client application will only make one call to Clerk.Lock() or Clerk.Unlock() at a time. 
+ * there may be more than one client application, each with its own Clerk.
+ * Go RPC server framework starts a new thread for each received RPC request.
+
+Important Structure
+====================
+
+type [Lock/Unlock]Args struct {
+	Lockname string // lock name
+	Xid      int64  // next unique request #
+}
+
+type LockServer struct {
+	mu    sync.Mutex
+	l     net.Listener
+	dead  bool // for test_test.go
+	dying bool // for test_test.go
+
+	am_primary bool   // am I the primary?
+	backup     string // backup's port
+
+	// for each lock name, is it locked?
+	locks map[string]bool
+	xids  map[int64]bool //record the seq num which is used
+}
+
+type Clerk struct {
+	servers [2]string // primary port, backup port
+	// Your definitions here. 
+	xid int64 //record the seq num of lock/unlock require
+}
+
+Active Case
+================
+
+General Instance
+-----------------
+C--> P
+   P check the C's req's seq is used?
+     Y:
+       P-->C  // the req[seq] handle results
+     N:
+       P handle Lock/Unlock req
+       P store the handle results in P's map Xids[seq]
+       P--> B // use the same request from C
+   	 B check the P's req's seq is used?
+     	   Y:
+              B-->P  // the req[seq] handle results
+           N:
+	      B handle Lock/Unlock req
+	      B store the handle results in B's map Xids[seq]
+                B-->P //reply  P
+                   P-->C // reply C
+
+P killed Instance
+-----------------
+C ---> P(killed)  //killed means no response
+       C<--ERR
+	      C--> B
+         	 B check the C's req's seq is used?
+     	           Y:
+                      B-->C  // the req[seq] handle results
+                   N:
+	              B handle Lock/Unlock req
+	              B store the handle results in B's map Xids[seq]
+                      B-->C //reply  C
+	
+P dying Instance
+-------------------
+C ---> P(dying)   // dying means handled the request but no reply
+   P check the C's req's seq is used?
+     Y:
+       P-->C  // the req[seq] handle results
+     N:
+       P handle Lock/Unlock req
+       P store the handle results in P's map Xids[seq]
+       P--> B // use the same request from C
+   	 B check the P's req's seq is used?
+     	   Y:
+              B-->P  // the req[seq] handle results
+           N:
+	      B handle Lock/Unlock req
+	      B store the handle results in B's map Xids[seq]
+                B-->P //reply  P
+                  #### P-->C // NO reply C
+                    C<--ERR
+	               C--> B
+         	          B check the C's req's seq is used?
+     	                    Y:
+                               B-->C  // the req[seq] handle results
+                    
+
