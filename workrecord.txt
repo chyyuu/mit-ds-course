@@ -1,5 +1,6 @@
+2/5/2013~2/9/2013
 lab1 hand out in Tue
-Wed~Fri: learn golang
+Tue~Fri: learn golang
 Fri~Sat: finish lab1
 The design idea is important, also should understand the goloang program.
 key:
