@@ -513,7 +513,7 @@ func TestManyUnreliable(t *testing.T) {
   defer cleanup(pxa)
 
   for i := 0; i < npaxos; i++ {
-    pxh[i] = port("many", i)
+    pxh[i] = port("manyun", i)
   }
   for i := 0; i < npaxos; i++ {
     pxa[i] = Make(pxh, i, nil)

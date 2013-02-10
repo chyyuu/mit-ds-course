@@ -121,71 +121,73 @@ func (dc DeafConn) Read(p []byte) (n int, err error) {
 }
 
 func StartServer(primary string, backup string, am_primary bool) *LockServer {
-	ls := new(LockServer)
-	ls.backup = backup
-	ls.am_primary = am_primary
-	ls.locks = map[string]bool{}
-	// Your initialization code here.
-	ls.xids = map[int64]bool{}
+  ls := new(LockServer)
+  ls.backup = backup
+  ls.am_primary = am_primary
+  ls.locks = map[string]bool{}
 
-	me := ""
-	if am_primary {
-		me = primary
-	} else {
-		me = backup
-	}
+  // Your initialization code here.
+  ls.xids = map[int64]bool{}
 
-	// tell net/rpc about our RPC server and handlers.
-	rpcs := rpc.NewServer()
-	rpcs.Register(ls)
+  me := ""
+  if am_primary {
+    me = primary
+  } else {
+    me = backup
+  }
 
-	// prepare to receive connections from clients.
-	// change "unix" to "tcp" to use over a network.
-	os.Remove(me) // only needed for "unix"
-	l, e := net.Listen("unix", me)
-	if e != nil {
-		log.Fatal("listen error: ", e)
-	}
-	ls.l = l
+  // tell net/rpc about our RPC server and handlers.
+  rpcs := rpc.NewServer()
+  rpcs.Register(ls)
 
-	// please don't change any of the following code,
-	// or do anything to subvert it.
+  // prepare to receive connections from clients.
+  // change "unix" to "tcp" to use over a network.
+  os.Remove(me) // only needed for "unix"
+  l, e := net.Listen("unix", me);
+  if e != nil {
+    log.Fatal("listen error: ", e);
+  }
+  ls.l = l
 
-	// create a thread to accept RPC connections from clients.
-	go func() {
-		for ls.dead == false {
-			conn, err := ls.l.Accept()
-			if err == nil && ls.dead == false {
-				if ls.dying {
-					// process the request but force discard of reply.
+  // please don't change any of the following code,
+  // or do anything to subvert it.
 
-					// without this the connection is never closed,
-					// b/c ServeConn() is waiting for more requests.
-					go func() {
-						time.Sleep(2 * time.Second)
-						conn.Close()
-					}()
-					ls.l.Close()
+  // create a thread to accept RPC connections from clients.
+  go func() {
+    for ls.dead == false {
+      conn, err := ls.l.Accept()
+      if err == nil && ls.dead == false {
+        if ls.dying {
+          // process the request but force discard of reply.
 
-					// this object has the type ServeConn expects,
-					// but discards writes (i.e. discards the RPC reply).
-					deaf_conn := DeafConn{c: conn}
+          // without this the connection is never closed,
+          // b/c ServeConn() is waiting for more requests.
+          // test_test.go depends on this two seconds.
+          go func() {
+            time.Sleep(2 * time.Second)
+            conn.Close()
+          }()
+          ls.l.Close()
 
-					rpcs.ServeConn(deaf_conn)
-					//fmt.Printf("ls(%v): DYING\n", ls.am_primary)
-					ls.dead = true
-				} else {
-					go rpcs.ServeConn(conn)
-				}
-			} else if err == nil {
-				conn.Close()
-			}
-			if err != nil && ls.dead == false {
-				fmt.Printf("LockServer(%v) accept: %v\n", me, err.Error())
-				ls.kill()
-			}
-		}
-	}()
+          // this object has the type ServeConn expects,
+          // but discards writes (i.e. discards the RPC reply).
+          deaf_conn := DeafConn{c : conn}
 
-	return ls
+          rpcs.ServeConn(deaf_conn)
+
+          ls.dead = true
+        } else {
+          go rpcs.ServeConn(conn)
+        }
+      } else if err == nil {
+        conn.Close()
+      }
+      if err != nil && ls.dead == false {
+        fmt.Printf("LockServer(%v) accept: %v\n", me, err.Error())
+        ls.kill()
+      }
+    }
+  }()
+
+  return ls
 }

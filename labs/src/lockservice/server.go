@@ -125,9 +125,9 @@ func StartServer(primary string, backup string, am_primary bool) *LockServer {
         if ls.dying {
           // process the request but force discard of reply.
 
-
           // without this the connection is never closed,
           // b/c ServeConn() is waiting for more requests.
+          // test_test.go depends on this two seconds.
           go func() {
             time.Sleep(2 * time.Second)
             conn.Close()

@@ -228,6 +228,84 @@ func TestPrimaryFail6(t *testing.T) {
   fmt.Printf("  ... Passed\n")
 }
 
+func TestPrimaryFail7(t *testing.T) {
+  fmt.Printf("Test: Primary failure just before reply #6 ...\n")
+  runtime.GOMAXPROCS(4)
+
+  phost := port("p")
+  bhost := port("b")
+  p := StartServer(phost, bhost, true)  // primary
+  b := StartServer(phost, bhost, false) // backup
+
+  ck1 := MakeClerk(phost, bhost)
+  ck2 := MakeClerk(phost, bhost)
+
+  tl(t, ck1, "a", true)
+  tu(t, ck1, "a", true)
+  tu(t, ck2, "a", false)
+  tl(t, ck1, "b", true)
+
+  p.dying = true
+
+  ch := make(chan bool)
+  go func() {
+    ok := false
+    defer func() { ch <- ok }()
+    tu(t, ck2, "b", true) // 2 second delay until retry
+    ok = true
+  }()
+  time.Sleep(1 * time.Second)
+  tl(t, ck1, "b", true)
+
+  ok := <- ch
+  if ok == false {
+    t.Fatalf("re-sent Unlock did not return true")
+  }
+
+  tu(t, ck1, "b", true)
+
+  b.kill()
+  fmt.Printf("  ... Passed\n")
+}
+
+func TestPrimaryFail8(t *testing.T) {
+  fmt.Printf("Test: Primary failure just before reply #7 ...\n")
+  runtime.GOMAXPROCS(4)
+
+  phost := port("p")
+  bhost := port("b")
+  p := StartServer(phost, bhost, true)  // primary
+  b := StartServer(phost, bhost, false) // backup
+
+  ck1 := MakeClerk(phost, bhost)
+  ck2 := MakeClerk(phost, bhost)
+
+  tl(t, ck1, "a", true)
+  tu(t, ck1, "a", true)
+
+  p.dying = true
+
+  ch := make(chan bool)
+  go func() {
+    ok := false
+    defer func() { ch <- ok }()
+    tu(t, ck2, "a", false) // 2 second delay until retry
+    ok = true
+  }()
+  time.Sleep(1 * time.Second)
+  tl(t, ck1, "a", true)
+
+  ok := <- ch
+  if ok == false {
+    t.Fatalf("re-sent Unlock did not return false")
+  }
+
+  tu(t, ck1, "a", true)
+
+  b.kill()
+  fmt.Printf("  ... Passed\n")
+}
+
 func TestBackupFail(t *testing.T) {
   fmt.Printf("Test: Backup failure ...\n")
   runtime.GOMAXPROCS(4)

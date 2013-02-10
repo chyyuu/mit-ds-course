@@ -7,6 +7,9 @@ package main
 // ./lockd -b a b &
 // ./lockc -l a b lx
 // ./lockc -u a b lx
+//
+// on Athena, use /tmp/myname-a and /tmp/myname-b
+// instead of a and b.
 
 import "time"
 import "lockservice"
