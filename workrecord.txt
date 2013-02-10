@@ -1,3 +1,10 @@
+lecture 1
+听了Robert Morris的6.824第一堂课，不用ppt，没有教材，拿着两页纸开讲，强调实践。佩服！
+
+lecture2
+先讲了RPC，以及at-least-once的缺点，at-most-once的好处，然后讲thread，以golang为例，介绍了golang中的goroutine, channel, sync.Mutex的情况。期间学生提了不少问题，课题气氛比较活跃。课程中花了近 40 mins的时间用在golang上，结合看golang的代码，确实比clang简洁不少。
+
+
 2/5/2013~2/9/2013
 lab1 hand out in Tue
 Tue~Fri: learn golang
