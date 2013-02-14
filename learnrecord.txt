@@ -1,7 +1,9 @@
 lecture 1
+------------
 听了Robert Morris的6.824第一堂课，不用ppt，没有教材，拿着两页纸开讲，强调实践。佩服！
 
 lecture2
+------------
 先讲了RPC，以及at-least-once的缺点，at-most-once的好处，然后讲thread，以golang为例，介绍了golang中的goroutine, channel, sync.Mutex的情况。期间学生提了不少问题，课题气氛比较活跃。课程中花了近 40 mins的时间用在golang上，结合看golang的代码，确实比clang简洁不少。
 
 
@@ -10,6 +12,11 @@ lab1 hand out in Tue
 Tue~Fri: learn golang
 Fri~Sat: finish lab1
 
+$ git clone http://am.lcs.mit.edu/6.824-2013/golabs-class.git 6.824
+$ cd 6.824
+$ ls
+src
+$ 
 
 The design idea is important, also should understand the goloang program. At first I made a mistake that let every lock contain a request seq num, and seq num is increased . In fact, the client should contian a request seq num, and the seq num could be rand (more easy to implementation)
 
@@ -21,3 +28,11 @@ key:
 2 server should store the used(or seen) request(with unique id) and related reply result, then it can decide if the request(xid) has been handled before?
 3 Pri srv does the same thing as that of Bak srv. But when Pri srv finish the handling, it have to diliver a rpc call to Bak srv to ask Bak srv handle the same request from client. 
 
+I write a design.txt for lab1
+
+lecture3
+-------------
+talk lab2 info, and I missed this part. :(     (~60 mins)
+then talk the paper (http://pdos.csail.mit.edu/6.824/papers/bressoud-hypervisor.pdf), should read paper first, then I can better understand what RTM said  (~35 mins)
+student have several questions.
+Lab 2 Part A Due: Feb 15, 5:00pm  :(
