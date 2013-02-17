@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0053)http://blog.csdn.net/duguteng/article/details/7414592 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>vim 中Taglist的安装和使用 - duguteng的专栏 - 博客频道 - CSDN.NET</title>
+
+<meta name="description" content="将vim 改造成功能强大的IDE系列之二『插件介绍』Taglist是vim的一个插件，提供源代码符号的结构化视图。效果图：（直接使用了别人的图片。在我机器上也差不多～）『下载和安装』         1）从http://www.vim.org/scripts/script.php?script_id=273下载安装包，也可以从http://vim-taglist.sou">
+<script type="text/javascript" async="" src="./vim 中Taglist的安装和使用 _files/ga.js"></script><script src="./vim 中Taglist的安装和使用 _files/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/ad.js"></script>
+<link rel="Stylesheet" type="text/css" href="./vim 中Taglist的安装和使用 _files/style.css">
+<link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/duguteng/rss/list">
+<link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+<link type="text/css" rel="stylesheet" href="./vim 中Taglist的安装和使用 _files/nobg.css">
+<link type="text/css" rel="stylesheet" href="./vim 中Taglist的安装和使用 _files/style(1).css"></head>
+<body>
+<script src="./vim 中Taglist的安装和使用 _files/pub_topnav_2011.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./vim 中Taglist的安装和使用 _files/navtop_2012.css">
+<div class="nav_top_2011">
+<p><span style="color:red;">您还未登录！</span>|<a href="https://passport.csdn.net/account/login" target="_top">登录</a>|<a href="https://passport.csdn.net/account/register" target="_top">注册</a>|<a href="https://passport.csdn.net/help/faq" target="_blank">帮助</a></p><ul>
+<li><a href="http://www.csdn.net/" target="_blank">首页</a></li>
+<li><a href="http://news.csdn.net/" target="_blank">业界</a></li>
+<li><a href="http://mobile.csdn.net/" target="_blank">移动</a></li>
+<li><a href="http://cloud.csdn.net/" target="_blank">云计算</a></li>
+<li><a href="http://sd.csdn.net/" target="_blank">研发</a></li>
+<li><a href="http://bbs.csdn.net/" target="_blank">论坛</a></li>
+<li><a href="http://blog.csdn.net/" target="_blank">博客</a></li>
+<li><a href="http://download.csdn.net/" target="_blank">下载</a></li>
+<li class="more"><h2 id="topnav_btnmore" onclick="showNavMore(this)"><a href="javascript:void(0);">更多</a></h2>
+<div id="topnav_hidlist">
+<iframe name="nav_frm" src="about:blank" width="92" height="178" scrolling="no" frameborder="no"></iframe>
+</div>
+</li>
+</ul>
+</div>
+
+
+<div id="container">
+<div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h1><a href="http://blog.csdn.net/duguteng">duguteng的专栏</a></h1>
+            <h2>和所有计算机爱好者分享和学习Computer Science!</h2>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg"></div>
+    <div class="navigator">
+        <ul>
+            <li id="btnContents"><a href="http://blog.csdn.net/duguteng?viewmode=contents"><span><img src="./vim 中Taglist的安装和使用 _files/ico_list.gif">目录视图</span></a></li>
+            <li id="btnView"><a href="http://blog.csdn.net/duguteng?viewmode=list"><span><img src="./vim 中Taglist的安装和使用 _files/ico_summary.gif">摘要视图</span></a></li>
+            <li id="btnRss"><a href="http://blog.csdn.net/duguteng/rss/list"><span><img src="./vim 中Taglist的安装和使用 _files/ico_rss.gif">订阅</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "duguteng";
+    var blog_address = "http://blog.csdn.net/duguteng";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";
+</script>
+        
+<div id="body">
+<div id="main">
+<div class="main">
+<div class="notice"> 
+
+<a href="http://surveies.csdn.net/survey/comein/546" target="_blank">
+<font color="blue">CSDN客服工作问卷调查   </font></a>
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/8572108" target="_blank"><font color="red">社区专家谈 12306</font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://bbs.csdn.net/topics/390366069" target="_blank"><font color="red">CSDN社区“海外程序员经验谈”活动正式上线 
+</font></a>
+
+<br>
+
+
+
+
+
+<a href="http://vote.blog.csdn.net/details/blogstar" target="_blank">
+<font color="red">2012CSDN博客之星火热出炉！ </font></a>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnstudent/article/details/8077932" target="_blank">
+<font color="red">2013年全国百所高校巡讲讲师招募  </font></a>
+
+
+</div><div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Original"></span>
+    <h3>
+        <span class="link_title"><a href="./vim 中Taglist的安装和使用 _files/vim 中Taglist的安装和使用 .html">
+        vim 中Taglist的安装和使用
+        </a></span>
+    </h3>
+</div>
+
+        
+    <div class="article_manage">
+        <span class="link_categories">
+        分类：
+            <a href="http://blog.csdn.net/duguteng/article/category/1113152">vim</a> 
+        </span>
+    <span class="link_postdate">2012-03-31 10:30</span>
+    <span class="link_view" title="阅读次数">774人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/duguteng/article/details/7414592#comments">评论</a>(0)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;vim 中Taglist的安装和使用&#39;,&#39;7414592&#39;);return false;" title="收藏">收藏</a></span>
+    <span class="link_report"><a href="http://blog.csdn.net/duguteng/article/details/7414592#report" onclick="javascript:report(7414592,2);return false;" title="举报">举报</a></span>
+    
+</div>
+
+
+    
+<div id="article_content" class="article_content">
+
+<p><span style="font-size:12px">将vim 改造成功能强大的IDE系列之二</span></p>
+<p><span style="font-size:16px"><strong>『插件介绍』</strong></span></p>
+<p><span style="font-size:10px">Taglist是vim的一个插件，提供源代码符号的结构化视图。</span></p>
+<p><span style="font-size:10px">效果图：（直接使用了别人的图片。在我机器上也差不多～）</span></p>
+<p><img src="./vim 中Taglist的安装和使用 _files/0_1311670443NNLo.gif" alt="" height="449" width="723"></p>
+<p></p>
+<p><span style="font-size:16px"><strong>『下载和安装』</strong></span></p>
+<p><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1）从<a href="http://www.vim.org/scripts/script.php?script_id=273">http://www.vim.org/scripts/script.php?script_id=273</a>下载安装包，也可以从<a href="http://vim-taglist.sourceforge.net/index.html">http://vim-taglist.sourceforge.net/index.html</a>下载。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; &nbsp; &nbsp; 2）进入~/.vim目录，将Taglist安装包解压，解压后会在~/.vim目录中生成几个新子目录，如plugin和doc（安装其它插件时，可能还会新建autoload等其它目录）。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; &nbsp; &nbsp; 3）进入~/.vim/doc目录，在Vim下运行"helptags ."命令。此步骤是将doc下的帮助文档加入到Vim的帮助主题中，这样我们就可以通过在Vim中运行“help taglist.txt”查看taglist帮助。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; &nbsp; &nbsp; 4）打开配置文件~/.vimrc，加入以下几行：</span></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 1175px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_1" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_1" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>let&nbsp;</span><span class="attribute">Tlist_Show_One_File</span><span>=</span><span class="attribute-value">1</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"不同时显示多个文件的tag，只显示当前文件的&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class=""><span>let&nbsp;<span class="attribute">Tlist_Exit_OnlyWindow</span><span>=</span><span class="attribute-value">1</span><span>&nbsp;&nbsp;&nbsp;"如果taglist窗口是最后一个窗口，则退出vim&nbsp;&nbsp;&nbsp;</span></span></li><li class="alt"><span>let&nbsp;<span class="attribute">Tlist_Ctags_Cmd</span><span>=</span><span class="attribute-value">"/usr/bin/ctags"</span><span>&nbsp;"将taglist与ctags关联&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="html" style="display: none; ">let Tlist_Show_One_File=1     "不同时显示多个文件的tag，只显示当前文件的  
+let Tlist_Exit_OnlyWindow=1   "如果taglist窗口是最后一个窗口，则退出vim 
+let Tlist_Ctags_Cmd="/usr/bin/ctags" "将taglist与ctags关联</pre>
+<p></p>
+<p><span style="font-size:10px">到此，安装已经完成。</span></p>
+<p><span style="font-size:12px"></span></p>
+<p><span style="font-size:12px"></span></p>
+<p><span style="font-size:16px"><strong>『基本功能使用方法』</strong></span></p>
+<p><span style="font-size:10px">在Vim命令行下运行":Tlist"就可以打开Taglist窗口，再次运行":Tlist"则关闭。</span></p>
+<p><span style="font-size:10px">左右窗口切换Ctrl+ww</span></p>
+<p><span style="font-size:10px"></span></p>
+<p><span style="font-size:10px"><strong><span>在</span><span>taglist</span></strong><span><strong>窗口中</strong>，可以使用下面的快捷键：</span></span></p>
+<br>
+<div style="padding-right:5.4pt; padding-left:5.4pt; background:#e6e6e6 0% 50%; padding-bottom:4px; width:95%; padding-top:4px; border:windowtext 0.5pt solid">
+<div><span style="font-size:10px; color:#0000ff">&lt;CR&gt; </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 跳到光标下tag所定义的位置，用鼠标双击此tag功能也一样<br>
+</span><span style="font-size:10px; color:#0000ff">o&nbsp;&nbsp;</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在一个新打开的窗口中显示光标下tag<br>
+</span><span style="font-size:10px; color:#0000ff">&lt;Space&gt; </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 显示光标下tag的原型定义<br>
+</span><span style="font-size:10px; color:#0000ff">u</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 更新taglist窗口中的tag<br>
+</span><span style="font-size:10px; color:#0000ff">s</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 更改排序方式，在按名字排序和按出现顺序排序间切换<br>
+</span><span style="font-size:10px; color:#0000ff">x</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; taglist窗口放大和缩小，方便查看较长的tag<br>
+</span><span style="font-size:10px; color:#0000ff">+</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 打开一个折叠，同zo<br>
+</span><span style="font-size:10px; color:#0000ff">- </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 将tag折叠起来，同zc<br>
+</span><span style="font-size:10px; color:#0000ff">* </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 打开所有的折叠，同zR<br>
+</span><span style="font-size:10px; color:#0000ff">= </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 将所有tag折叠起来，同zM<br>
+</span><span style="font-size:10px; color:#0000ff">[[ </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 跳到前一个文件<br>
+</span><span style="font-size:10px; color:#0000ff">]] </span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 跳到后一个文件<br>
+</span><span style="font-size:10px; color:#0000ff">q&nbsp;&nbsp;</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 关闭taglist窗口<br>
+</span><span style="font-size:10px; color:#0000ff">&lt;F1&gt;&nbsp;&nbsp;&nbsp;</span><span style="font-size:10px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 显示帮助</span></div>
+</div>
+<p><span style="font-size:10px">但是！这些大部分可以被鼠标取代！！快捷键是浮云～～</span></p>
+<p><span style="font-size:12px"><strong>提示：</strong></span></p>
+<p><span style="font-size:12px">如果鼠标在Vim 里面点击无效，请在~/.vimrc下加入这句话：</span></p>
+<p><span class="tag"></span></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 1886px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_2" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_2" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=2&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>set&nbsp;</span><span class="attribute">mouse</span><span>=</span><span class="attribute-value">a</span><span>&nbsp;&nbsp;"&nbsp;always&nbsp;use&nbsp;mouse&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="html" style="display: none; ">set mouse=a  " always use mouse</pre>
+<p></p>
+<p><span style="font-size:16px"><strong>『常用配置选项』</strong></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px; color:blue">- Tlist_Ctags_Cmd</span><span style="font-size:10px"><span>选项用于指定你的</span><span>Exuberant ctags</span><span>程序的位置，如果它没在你</span><span>PATH</span><span>变量所定义的路径中，需要使用此选项设置一下；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果你不想同时显示多个文件中的</span><span>tag</span><span>，设置</span></span><span style="font-size:10px; color:blue">Tlist_Show_One_File</span><span style="font-size:10px"><span>为</span><span>1</span><span>。缺省为显示多个文件中的</span><span>tag</span><span>；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>设置</span></span><span style="font-size:10px; color:blue">Tlist_Sort_Type</span><span style="font-size:10px"><span>为</span><span>”name”</span><span>可以使</span><span>taglist</span><span>以</span><span>tag</span><span>名字进行排序，缺省是按</span><span>tag</span><span>在文件中出现的顺序进行排序。按</span><span>tag</span><span>出现的范围（即所属的</span><span>namespace</span><span>或</span><span>class</span><span>）排序，已经加入</span><span>taglist</span><span>的</span><span>TODO
+ List</span><span>，但尚未支持；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果你在想</span><span>taglist</span><span>窗口是最后一个窗口时退出</span><span>VIM</span><span>，设置</span></span><span style="font-size:10px; color:blue">Tlist_Exit_OnlyWindow</span><span style="font-size:10px"><span>为１；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果你想</span><span>taglist</span><span>窗口出现在右侧，设置</span></span><span style="font-size:10px; color:blue">Tlist_Use_Right_Window</span><span style="font-size:10px"><span>为１。缺省显示在左侧。</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>在</span><span>gvim</span><span>中，如果你想显示</span><span>taglist</span><span>菜单，设置</span></span><span style="font-size:10px; color:blue">Tlist_Show_Menu</span><span style="font-size:10px"><span>为１。你可以使用</span></span><span style="font-size:10px; color:blue">Tlist_Max_Submenu_Items</span><span style="font-size:10px"><span>和</span></span><span style="font-size:10px; color:blue">Tlist_Max_Tag_Length</span><span style="font-size:10px"><span>来控制菜单条目数和所显示</span><span>tag</span><span>名字的长度；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>缺省情况下，在双击一个</span><span>tag</span><span>时，才会跳到该</span><span>tag</span><span>定义的位置，如果你想单击</span><span>tag</span><span>就跳转，设置</span></span><span style="font-size:10px; color:blue">Tlist_Use_SingleClick</span><span style="font-size:10px"><span>为１；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果你想在启动</span><span>VIM</span><span>后，自动打开</span><span>taglist</span><span>窗口，设置</span></span><span style="font-size:10px; color:blue">Tlist_Auto_Open</span><span style="font-size:10px"><span>为</span><span>1</span><span>；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果你希望在选择了</span><span>tag</span><span>后自动关闭</span><span>taglist</span><span>窗口，设置</span></span><span style="font-size:10px; color:blue">Tlist_Close_On_Select</span><span style="font-size:10px"><span>为</span><span>1</span><span>；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>当同时显示多个文件中的</span><span>tag</span><span>时，设置</span></span><span style="font-size:10px; color:blue">Tlist_File_Fold_Auto_Close</span><span style="font-size:10px"><span>为１，可使</span><span>taglist</span><span>只显示当前文件</span><span>tag</span><span>，其它文件的</span><span>tag</span><span>都被折叠起来。</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>在使用</span><span>:TlistToggle</span><span>打开</span><span>taglist</span><span>窗口时，如果希望输入焦点在</span><span>taglist</span><span>窗口中，设置</span></span><span style="font-size:10px; color:blue">Tlist_GainFocus_On_ToggleOpen</span><span style="font-size:10px"><span>为</span><span>1</span><span>；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px"><span>-
+</span><span>如果希望</span><span>taglist</span><span>始终解析文件中的</span><span>tag</span><span>，不管</span><span>taglist</span><span>窗口有没有打开，设置</span></span><span style="font-size:10px; color:blue">Tlist_Process_File_Always</span><span style="font-size:10px"><span>为</span><span>1</span><span>；</span></span></p>
+<p style="background-color:rgb(192,192,192)"><span style="font-size:10px; color:blue">- Tlist_WinHeight</span><span style="font-size:10px"><span>和</span></span><span style="font-size:10px; color:blue">Tlist_WinWidth</span><span style="font-size:10px"><span>可以设置</span><span>taglist</span><span>窗口的高度和宽度。</span></span><span style="font-size:10px; color:blue">Tlist_Use_Horiz_Window</span><span style="font-size:10px"><span>为１设置</span><span>taglist</span><span>窗口横向显示；</span></span></p>
+<p><span style="font-size:12px"><br>
+</span></p>
+<p><span style="font-size:12px">使用方法：在~/.vimrc文件中，用类似上文提到的格式加入要设置的选项。</span></p>
+<p><span style="font-size:12px">比如，设置单击tag就跳到tag定义的位置，就在文件中加入这句话：</span></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7414592#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 2452px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_3" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_3" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=3&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>let&nbsp;</span><span class="attribute">Tlist_Use_SingleClick</span><span>=</span><span class="attribute-value">1</span><span>&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="html" style="display: none; ">let Tlist_Use_SingleClick=1</pre>
+<p></p>
+<p><span style="font-size:16px"><strong>『阅读说明』</strong></span></p>
+<p><span style="font-size:10px">&nbsp;&nbsp;&nbsp; 1）Vim存在多个配置文件vimrc，比如/etc/vimrc，此文件影响整个系统的Vim。还有~/.vimrc，此文件只影响本用户的Vim。而且~/.vimrc文件中的配置会覆盖/etc/vimrc中的配置。这里我们只修改~/.vimrc文件。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 2）Vim的插件（plugin）安装在Vim的runtimepath目录下，你可以在Vim命令行下运行"set rtp“命令查看。这里我们选择安装在~/.vim目录，没有就创建一个。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 3）当本文说”在Vim命令行下运行cmdxx命令“时，意思是指在Vim的命令行模式下运行cmdxx命令，即在Vim的正常模式下通过输入冒号"："进入命令行模式，然后紧接着输入命令cmdxx。在后文描述中都会省略冒号"："输入。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 4）如果没有说明“在Vim命令行下运行某命令”，则是在shell中执行该命令。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 5）如果命令中间被空白符间隔或有与正文容易混淆的字符，我会用双引号将命令与正文区分。所以读者在实际操作时，不要输入命令最前面和最后面引号。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 6）本文关于组合快捷键的描述，形如a-b形式的快捷键表示同时按下a键和b键，而形如"a-b c"形式的快捷键，则表示先同时按下a键和b键，然后放开ab键，再按下c键。</span></p>
+<p><span style="font-size:10px">&nbsp;&nbsp;&nbsp; 7） 本人使用的系统是Ubunt 11.10 ，Vim版本是Vi IMproved 7.3</span></p>
+<br>
+<br>
+<span><span></span></span>
+
+</div>
+<div class="share_buttons" id="sharePanel"><span>分享到：</span> <a name="sina" class="share_sina" title="分享到新浪微博"></a><a name="qq" class="share_qq" title="分享到腾讯微博"></a></div>
+<!--192.168.1.237-->
+<div class="article_next_prev">
+    <li class="prev_article"><span>上一篇：</span><a href="http://blog.csdn.net/duguteng/article/details/7412652">vim 中Ctags的安装和使用</a></li>
+    <li class="next_article"><span>下一篇：</span><a href="http://blog.csdn.net/duguteng/article/details/7417181">vim 中OmniCppComplete的安装和使用</a></li>
+</div>
+
+
+    
+</div>
+<div id="ad_cen"><iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 774px; height: 2px; " src="./vim 中Taglist的安装和使用 _files/ad(1).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(4, 'ad_cen');
+</script>
+<div id="comment_title" class="panel_head">查看评论<a name="comments"></a></div>
+<div id="comment_list"><br>&nbsp;&nbsp;暂无评论<br><br><div class="clear"></div></div>
+<div id="comment_bar"></div>
+<div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:csdn.showLogin(function (dat) {js_logined(dat.data.userName);});">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fduguteng%2Farticle%2Fdetails%2F7414592">[注册]</a></div></div>
+<div class="announce">* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+<script type="text/javascript">
+    var fileName = '7414592';
+    var commentscount = 0;
+    var islock = false
+</script>
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/comment.js"></script>
+<div id="ad_bot"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 774px; height: 170px; " src="./vim 中Taglist的安装和使用 _files/ad(2).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(5, 'ad_bot');
+</script>
+<div id="report_dialog"></div>
+
+<div id="d-top" style="display: none; ">
+<a id="d-top-a" href="http://blog.csdn.net/duguteng/article/details/7414592#" title="回到顶部">
+<img src="./vim 中Taglist的安装和使用 _files/top.png" alt="TOP"></a>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var d_top=$('#d-top');
+        document.onscroll=function(){
+            var scrTop=(document.body.scrollTop||document.documentElement.scrollTop);
+            if(scrTop>500){
+                d_top.show();
+            }else{
+                d_top.hide();
+            }
+        }
+        $('#d-top-a').click(function(){
+            scrollTo(0,0);
+            this.blur();
+            return false;
+        });
+    });
+</script>
+
+
+
+<div class="clear"></div>
+</div>
+</div>
+
+<div id="side">
+<div class="side">
+<div id="panel_Profile" class="panel">
+    <ul class="panel_head"><span>个人资料</span></ul>
+    <ul class="panel_body profile">
+        <div id="blog_userface">
+            <a href="http://my.csdn.net/duguteng" target="_blank">
+            <img src="./vim 中Taglist的安装和使用 _files/1_duguteng.jpg" title="访问我的空间" style="max-width:90%">
+            </a>
+            <br>
+            <span><a href="http://my.csdn.net/duguteng" class="user_name" target="_blank">duguteng</a></span>
+        </div>
+<div class="interact">
+<!--<a href="#" class="attented" title="已关注"></a>-->
+<a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+<a href="javascript:void(0);" class="letter" onclick="loginto(1)" title="[发私信]"></a>
+</div>
+        <div id="blog_medal">
+        <div id="bms_box"><a href="http://medal.blog.csdn.net/allmedal.aspx" target="_blank"><img src="./vim 中Taglist的安装和使用 _files/holdon_s2.gif" onmouseover="m_over_m(this,0)" onmouseout="m_out_m()" alt=""></a></div></div>
+        <ul id="blog_rank">
+            <li>访问：<span>17676次</span></li>
+            <li>积分：<span>372分</span></li>
+            <li>排名：<span>千里之外</span></li>
+        </ul>
+        <ul id="blog_statistics">
+            <li>原创：<span>17篇</span></li>
+            <li>转载：<span>25篇</span></li>
+            <li>译文：<span>0篇</span></li>
+            <li>评论：<span>4条</span></li>
+        </ul>
+    </ul>
+</div>
+<script type="text/javascript">
+    var _blogger = 'duguteng';
+</script>
+
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>文章分类</span></ul>
+    <ul class="panel_body">
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/914199">ubuntu</a><span>(17)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/914200">linux内核</a><span>(2)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/929955">C 语言</a><span>(14)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/1113152">vim</a><span>(5)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/1253728">系统性能优化</a><span>(1)</span>
+        </li>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+    <ul class="panel_head"><span>文章存档</span></ul>
+    <ul class="panel_body">
+        <div id="archive_list"><li><a href="http://blog.csdn.net/duguteng/article/month/2012/10">2012年10月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/08">2012年08月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/07">2012年07月</a><span>(10)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/05">2012年05月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/04">2012年04月</a><span>(1)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/duguteng/article/month/2012/03">2012年03月</a><span>(11)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/02">2012年02月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2011/12">2011年12月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2011/11">2011年11月</a><span>(3)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>阅读排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7412652" title="vim 中Ctags的安装和使用">vim 中Ctags的安装和使用</a><span>(4994)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7726536" title="linux下svn不能连接上windows服务器：SSL handshake failed: SSL 错误：在证书中检测到违规的密钥用法">linux下svn不能连接上windows服务器：SSL handshake failed: SSL 错误：在证书中检测到违规的密钥用法</a><span>(1464)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417181" title="vim 中OmniCppComplete的安装和使用">vim 中OmniCppComplete的安装和使用</a><span>(1397)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417264" title="vim 中SuperTab的安装和使用">vim 中SuperTab的安装和使用</a><span>(1231)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7706986" title="Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）">Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）</a><span>(939)</span>
+        </li>
+        <li>
+            <a href="./vim 中Taglist的安装和使用 _files/vim 中Taglist的安装和使用 .html" title="vim 中Taglist的安装和使用">vim 中Taglist的安装和使用</a><span>(774)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417276" title="vim 中Winmanager，NERDTree和MiniBufExplorer安装使用">vim 中Winmanager，NERDTree和MiniBufExplorer安装使用</a><span>(720)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7774092" title="Foo 是什么意思">Foo 是什么意思</a><span>(657)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7014310" title="ubuntu下用命令将源设置为中科大源">ubuntu下用命令将源设置为中科大源</a><span>(503)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7272596" title="JOS 内核启动过程">JOS 内核启动过程</a><span>(323)</span>
+        </li>
+    </ul>
+</div>
+<div id="hotarticls2" class="panel">
+    <ul class="panel_head"><span>评论排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7412652" title="vim 中Ctags的安装和使用">vim 中Ctags的安装和使用</a><span>(3)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417181" title="vim 中OmniCppComplete的安装和使用">vim 中OmniCppComplete的安装和使用</a><span>(1)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/8056321" title="系统性能分析的一些文章">系统性能分析的一些文章</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7706986" title="Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）">Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7558114" title="Ubuntu 下运行 Shell 脚本时显示 &quot;declare not found&quot; 的问题">Ubuntu 下运行 Shell 脚本时显示 "declare not found" 的问题</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7552774" title="x86中断向量表">x86中断向量表</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7552766" title="DOS功能调用">DOS功能调用</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7546825" title="linux 汇编 hello world + 调试">linux 汇编 hello world + 调试</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7546716" title="linux 汇编——hello world！">linux 汇编——hello world！</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7472011" title="C语言运算符优先级详细列表">C语言运算符优先级详细列表</a><span>(0)</span>
+        </li>
+    </ul>
+</div>
+<div id="homepageArticles" class="panel">
+    <ul class="panel_head"><span>推荐文章</span></ul>
+    <ul class="panel_body" id="ad_commend">
+    <iframe id="ad_frm_2" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 195px; height: 186px; " src="./vim 中Taglist的安装和使用 _files/ad.html"></iframe></ul>
+</div>
+<script type="text/javascript">
+    new Ad(12, 'ad_commend');
+</script><div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/hubi0952" class="user_name">hubi</a>:
+好！！！！
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7417181#comments">vim 中OmniCppComplete的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/mafeichao" class="user_name">mafeichao</a>:
+这里有一个不错的补充http://www.cnblogs.com/xkfz007/articles/...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/einkarl" class="user_name">einkarl</a>:
+文章深入浅出，难得这么好的指南文章，多些楼主！
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/wslong" class="user_name">wslong</a>:
+文章总结得真好，正好今天在同学影响下用了下ctags。通过你的文章更深入了解了这个技术。向你学习！
+    </p>
+    </li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+
+<div class="clear"></div>
+</div>
+
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/newblog.min.js"></script>
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/showblogmedal.ashx"></script>
+
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/publib_footer.js"></script><link rel="stylesheet" type="text/css" href="./vim 中Taglist的安装和使用 _files/pub_footer_2012.css"><div class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd>京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>北京创新乐知信息技术有限公司 版权所有</dd><dd>世纪乐知(北京)网络技术有限公司 提供技术支持</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd><img src="./vim 中Taglist的安装和使用 _files/ico_email.gif" alt="" title=""> 联系邮箱：webmaster(at)csdn.net</dd><dd>Copyright © 1999-2012, CSDN.NET, All Rights Reserved&nbsp;<a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./vim 中Taglist的安装和使用 _files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div><script type="text/javascript" charset="utf-8" src="./vim 中Taglist的安装和使用 _files/tracking.js"></script>
+
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./vim 中Taglist的安装和使用 _files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./vim 中Taglist的安装和使用 _files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./vim 中Taglist的安装和使用 _files/msg.popup.js"></script>
+
+
+</div>
+
+</body></html>

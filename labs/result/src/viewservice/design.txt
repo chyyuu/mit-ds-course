@@ -1,0 +1,52 @@
+AR1FQZUY2JC8E9TBU09Z77943L5AWEE6
+
+lab2a design
+
+NOTICE:
+
+Condition:
+----------------
+when the viewservice first starts, it should accept any server at all as the first primary. The backup in a view can be any server (other than the primary), or can be altogether missing if no server is available.
+
+An idle server (neither primary nor backup) should send Pings with an argument of zero.
+
+Each key/value server should send a Ping RPC once per PingInterval (see viewservice/common.go). The view service replies to the Ping with a description of the current view. The acknowledgment rule prevents the view service from getting more than one view ahead of the key/value servers. 
+
+Test
+------------
+1 viewserver wait for ack of previous view before starting the next one?
+
+struct
+
+1 Test: First primary ...
+
+2 Test: First backup ...
+
+3 Test: Backup takes over if primary fails ...
+
+The view service proceeds to a new view when either it hasn't received a Ping from the primary or backup for DeadPings PingIntervals, or if there is no backup and there's an idle server (a server that's been Pinging but is neither the primary nor the backup). But the view service must not change views until the primary from the current view acknowledges that it is operating in the current view (by sending a Ping with the current view number). If the view service has not yet received an acknowledgment for the current view from the primary of the current view, the view service should not change views even if it thinks that the primary or backup has died.
+
+  // in ping rpc
+       ping[srv]-- 
+      
+  // in tick
+       if ( ping[srv] <-5)  then srv dead
+          if srv is pri then back srv = pri
+  
+4 Test: Restarted server becomes backup ...
+  //
+
+5 Test: Idle third server becomes backup if primary fails ...
+  // An idle server (neither primary nor backup) should send Pings with an argument of zero.
+
+6 Test: Restarted primary treated as dead ...
+  // kill and immediately restart the primary -- does viewservice
+  // conclude primary is down even though it's pinging?
+  
+7 Test: Viewserver waits for primary to ack view ...
+  // does viewserver wait for ack of previous view before
+  // starting the next one?
+
+8 Test: Uninitialized server can't become primary ...
+  // if old servers die, check that a new (uninitialized) server
+  // cannot take over.

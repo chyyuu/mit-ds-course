@@ -1,0 +1,437 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0052)http://www.vim.org/scripts/script.php?script_id=2390 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <link rel="Stylesheet" type="text/css" href="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/style.css">
+  <title>CSApprox - Make gvim-only colorschemes work transparently in terminal vim : vim online</title>
+  
+  <meta name="KEYWORDS" content="Vim, Vi IMproved, text editor, home, documentation, tips, scripts, news">
+  <link rel="shortcut icon" type="image/x-icon" href="http://www.vim.org/images/vim_shortcut.ico">
+</head>
+
+<body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" bgcolor="#ffffff"> 
+
+<!-- HEADER, SPONSOR IMAGE, VIM IMAGE AND BOOK AD -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+  <tbody><tr>
+    <td colspan="4" class="lightbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  </tr>
+  <tr>
+  <td class="lightbg">&nbsp;&nbsp;&nbsp;</td>
+  <td class="lightbg" align="left"><a href="http://www.vim.org/sponsor/index.php"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/sponsorvim.gif" alt="sponsor Vim development" border="0"></a></td>
+    <td class="lightbg" align="center"><a href="http://www.vim.org/index.php"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/vim_header.gif" border="0" alt="Vim logo"></a></td>
+    <td class="lightbg" align="right"><a href="http://iccf-holland.org/click5.html"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/buyhelplearn.gif" alt="Vim Book Ad" border="0"></a></td>
+  </tr>
+  <tr>
+    <td colspan="4" class="lightbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  </tr>
+  <tr>
+    <td colspan="4" class="darkbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="10" alt=""></td>
+  </tr>
+</tbody></table>
+<!-- THE PAGE BODY: BETWEEN HEADER AND FOOTER -->
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+  <colgroup><col width="180">
+  <col width="1">
+
+  </colgroup><tbody><tr valign="top">
+    <td class="sidebar">
+      <table width="180" cellpadding="4" cellspacing="0" border="0">
+        <tbody><tr valign="top">
+          <td class="sidebar">
+
+<!-- INCLUDE THE PAGE NAVIGATION -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+    <tbody><tr>
+        <td><small>not logged in (<a href="http://www.vim.org/login.php">login</a>)</small></td>
+    </tr>
+    <tr><td>
+<small>&nbsp;</small>
+<form action="http://www.google.com/cse" id="cse-search-box">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-3005259998294962:bvyni59kjr1">
+    <input type="hidden" name="ie" value="ISO-8859-1">
+    <input type="text" name="q" size="20" style="background-image: url(http://www.google.com/cse/intl/en/images/google_custom_search_watermark.gif); background-color: rgb(255, 255, 255); background-position: 0% 50%; background-repeat: no-repeat no-repeat; ">
+    <br>
+    <input type="submit" name="sa" value="Search">
+  </div>
+<input name="siteurl" type="hidden" value="www.vim.org/scripts/script.php?script_id=2390"><input name="ref" type="hidden" value=""><input name="ss" type="hidden" value=""></form>
+<script src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/plusone.js" gapi_processed="true"></script><script type="text/javascript" src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/brand"></script>
+    </td></tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="1"></td>
+    </tr>
+    <tr>
+        <td class="darkbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" height="3"></td>
+    </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="2"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/index.php">Home</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/search.php">Advanced search</a></td>
+        </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/about.php">About Vim</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/community.php">Community</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/news/news.php">News</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/sponsor/index.php">Sponsoring</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/trivia.php">Trivia</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/docs.php">Documentation</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader download"><a href="http://www.vim.org/download.php">Download</a></td>
+        </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/scripts/index.php">Scripts</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/tips/index.php">Tips</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/account/index.php">My Account</a></td>
+        </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/huh.php">Site Help</a></td>
+        </tr>
+</tbody></table>
+<br>
+<div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial; " id="___plusone_0"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px; " tabindex="0" vspace="0" width="100%" id="I0_1361074739146" name="I0_1361074739146" src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/fastbutton.html" allowtransparency="true" data-gapiattached="true" title="+1"></iframe></div>
+
+            <table width="172" cellpadding="0" cellspacing="0" border="0">
+              <tbody><tr><td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" alt="" border="0" width="1" height="8"></td></tr>
+              <tr><td class="darkbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="3" alt=""></td></tr>
+            </tbody></table>
+            <br>
+
+<!-- INCLUDE THE PAGE SIDEBAR TEXT -->
+&nbsp;
+
+          </td>
+        </tr>
+      </tbody></table>
+    </td>
+
+    <td class="darkbg"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="1" border="0" alt=""><br></td>
+    <td>
+      <table width="100%" cellpadding="10" cellspacing="0" border="0" bordercolor="red">
+        <tbody><tr>
+          <td valign="top">
+
+<span class="txth1">CSApprox : Make gvim-only colorschemes work transparently in terminal vim</span> 
+
+<br>
+<br>
+
+<!-- karma table -->
+<table cellpadding="4" cellspacing="0" border="1" bordercolor="#000066">
+<tbody><tr>
+  <td class="lightbg"><b>&nbsp;script karma&nbsp;</b></td>
+  <td>
+    Rating <b>861/262</b>,
+    Downloaded by 12160    &nbsp;
+    <div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial; " id="___plusone_1"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px; " tabindex="0" vspace="0" width="100%" id="I1_1361074739149" name="I1_1361074739149" src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/fastbutton(1).html" allowtransparency="true" data-gapiattached="true" title="+1"></iframe></div>
+  </td>
+  <td class="lightbg">
+  <b>&nbsp;Comments, bugs, improvements&nbsp;</b>
+  </td>
+  <td>
+    <a href="http://vim.wikia.com/wiki/Script:2390">Vim wiki</a>
+  </td>  
+</tr>
+</tbody></table>
+<p>
+
+<table cellspacing="0" cellpadding="0" border="0">
+<tbody><tr><td class="prompt">created by</td></tr>
+<tr><td><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">script type</td></tr>
+<tr><td>utility</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">description</td></tr>
+<tr><td>CSApprox.vim
+<br>
+<br>============
+<br>DESCRIPTION
+<br>============
+<br>
+<br>It's hard to find colorschemes for terminal Vim.&nbsp;&nbsp;Most colorschemes are
+<br>written to only support GVim, and don't work at all in terminal Vim.
+<br>
+<br>This plugin makes GVim-only colorschemes Just Work in terminal Vim, as long
+<br>as the terminal supports 88 or 256 colors - and most do these days.&nbsp;&nbsp;This
+<br>usually requires no user interaction (but see the help for what to do if
+<br>things don't Just Work).&nbsp;&nbsp;After getting this plugin happily installed, any
+<br>time you use :colorscheme it will do its magic and make the colorscheme Just
+<br>Work.
+<br>
+<br>Whenever you change colorschemes using the :colorscheme command this script
+<br>will be executed.&nbsp;&nbsp;It will take the colors that the scheme specified for use
+<br>in the GUI and use an approximation algorithm to try to gracefully degrade
+<br>them to the closest color available in your terminal.&nbsp;&nbsp;If you are running in
+<br>a GUI or if your terminal doesn't support 88 or 256 colors, no changes are
+<br>made.&nbsp;&nbsp;Also, no changes will be made if the colorscheme seems to have been
+<br>high color already.
+<br>
+<br>If for some reason this transparent method isn't suitable to you (for instance
+<br>if your environment can't be configured to meet the |csapprox-requirements|,
+<br>or you need to work in Vim 6), another option is also available: using the
+<br>|:CSApproxSnapshot| command to create a new GUI/88-/256-color terminal
+<br>colorscheme.&nbsp;&nbsp;To use this command, a user would generally start GVim, choose a
+<br>colorscheme that sets up the desired colors, and then use |:CSApproxSnapshot|
+<br>to create a new colorscheme based on those colors that works in high color
+<br>terminals.&nbsp;&nbsp;This method is more flexible than the transparent mode and works
+<br>in more places, but also requires more user intervention, and makes it harder
+<br>to deal with colorschemes being updated and such.
+<br>
+<br>======
+<br>NOTES
+<br>======
+<br>
+<br>Ideally, this plugin should require absolutely no configuration, but you may
+<br>need some tweaking to make sure vim realizes that your terminal supports more
+<br>than 16 colors.&nbsp;&nbsp;Also, konsole and Eterm users will want to make sure that
+<br>this plugin realizes that the terminal does not use colors that are exactly
+<br>xterm-compatible; they will want to skim through the help articles
+<br>|csapprox-palettes| and |csapprox-configuration| for a better end result.
+<br>
+<br>==============
+<br>SCREENSHOTS
+<br>==============
+<br>
+<br>Some quick side-by-side screenshots can be found at
+<br><a target="_blank" href="http://www.cs.drexel.edu/~mjw452/CSApprox/">http://www.cs.drexel.edu/~mjw452/CSApprox/</a></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">install details</td></tr>
+<tr><td>Install like most other vim scripts:
+<br>mkdir ~/.vim
+<br>cd ~/.vim
+<br>unzip /path/to/CSApprox.zip
+<br>vim -c 'helptags ~/.vim/doc'</td></tr>
+<tr><td>&nbsp;</td></tr>
+</tbody></table>
+
+<span class="txth2">script versions</span> (<a href="http://www.vim.org/scripts/add_script_version.php?script_id=2390">upload new version</a>)
+</p><p>
+Click on the package to download.
+</p><p>
+
+<table cellspacing="2" cellpadding="4" border="0" width="100%">
+<tbody><tr class="tableheader">
+        <th valign="top">package</th>
+    <th valign="top">script version</th>
+    <th valign="top">date</th>
+    <th valign="top">Vim version</th>
+    <th valign="top">user</th>
+    <th valign="top">release notes</th>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=18594">CSApprox.zip</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>4.00</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2012-09-14</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Fix CSApprox to not fail in vim 7.3 if not +gui, now that vim behaves properly even without +gui
+<br>
+<br>Provide the :CSApprox command to re-run CSApprox's approximation algorithm even if the colorscheme hasn't changed - useful for when the user has tweaked some colors manually.
+<br>
+<br>Better handling for the inverse (aka reverse) attribute for terminals that actually support it - and add the g:CSApprox_fake_reverse config variable to allow switching back to the old behavior for terminals that don't support real reverse video.
+<br>
+<br>Fix an issue where CSApprox would unconditionally leave 'background' set to "light" - now it will leave 'background' unchanged when it runs.
+<br>
+<br>Change the handling for Konsole to use the xterm palette by for KDE versions &gt;= 2.2.0 - Konsole itself was changed to drop its old, slightly incompatible palette in KDE 2.2.0
+<br>
+<br>Fix a minor issue where running vim in recovery mode with -r would result in a complaint from CSApprox that the terminal didn't have enough colors even when it did.
+<br>
+<br>Fix an issue where, even if CSApprox had been disabled by setting g:CSApprox_loaded, a CSApprox error message could still be displayed.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10336">CSApprox.zip</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.50</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2009-04-02</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="roweven" valign="top" width="2000">Fix a major regression that prevented the Eterm and Konsole colors from being correctly snapshotted
+<br>
+<br>Fix a related bug causing incorrect terminal colors after calling :CSApproxSnapshot
+<br>
+<br>Fix a bug causing black to be used instead of dark grey
+<br>
+<br>Have snapshots calculate g:colors_name programmatically
+<br>
+<br>Introduce many tweaks for better speed
+<br>
+<br>Clarify some things at :help csapprox-terminal-example
+<br>
+<br>Default to using our own list of rgb.txt colors rather than searching, for performance.&nbsp;&nbsp;Add a new variable, g:CSApprox_use_showrgb, which forces us to try finding the colors using the "showrgb" program instead, and fall back on our own list if it isn't available
+<br>
+<br>Remove g:CSApprox_extra_rgb_txt_dirs - not needed in light of the above change</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9891">CSApprox.zip</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.05</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2009-01-31</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Fix a harmless "Undefined variable" error in :CSApproxSnapshot
+<br>
+<br>Fix a behavioral bug when dumping out colors defined external to the scheme.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9849">CSApprox.zip</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.00</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2009-01-22</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="roweven" valign="top" width="2000">Update the docs for better info on :CSApproxSnapshot
+<br>
+<br>Allow snapshotted schemes to work on Vim 6, and work properly in Konsole and Eterm (thanks David Majnemer!)
+<br>
+<br>Fix a bug causing a syntax error when using GVim while CSApprox was loaded.&nbsp;&nbsp;(thanks again, David Majnemer!)</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9666">CSApprox.zip</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>2.00</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-12-14</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Add a hooks system, allowing users to specify a command to run, either before or after the approximation algorithm is run, for all schemes or one specific one.
+<br>
+<br>Also rewrite :CSApproxSnapshot to be more maintainable and less of a hack, and fix several bugs that it contained.
+<br></td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9525">CSApprox.zip</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>1.50</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-11-19</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="roweven" valign="top" width="2000">Add :CSApproxSnapshot for writing out a colorscheme file representing the current colors that will work in gvim, 88 color vim, or 256 color vim, even without +gui.&nbsp;&nbsp;See :help :CSApproxSnapshot</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9406">CSApprox.zip</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>1.10</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-10-28</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Distribute an rgb.txt along with CSApprox, so that CSApprox can still be used on distributions where no rgb.txt is provided with the X server (like Ubuntu Intrepid Ibex).&nbsp;&nbsp;Thanks to Penn Su for finding this!</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9308">CSApprox.zip</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>1.00</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-10-05</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13145">Matt Wozniski</a></i></td>
+    <td class="roweven" valign="top" width="2000">Initial upload</td>
+</tr>
+</tbody></table>
+ip: ##
+<!-- finish off the framework -->
+          </p></td>
+        </tr>
+      </tbody></table>
+    </td>
+
+  </tr>
+</tbody></table>
+
+<!-- END OF THE PAGE BODY: BETWEEN HEADER AND FOOTER -->
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+  <tbody><tr><td colspan="4"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="5" alt=""></td></tr>
+  <tr><td colspan="4" bgcolor="#000000"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" height="2" width="1" alt=""></td></tr>
+  <tr><td colspan="4"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="5" alt=""></td></tr>
+  <tr>
+    <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="5" height="1" alt=""></td>
+
+    <td align="left" valign="top"><small>
+      If you have questions or remarks about this site, visit the
+      <a href="http://vimonline.sf.net/">vimonline development</a> pages.
+      Please use this site responsibly.
+      <br> 
+      
+      Questions about <a href="http://www.vim.org/about.php">Vim</a> should go
+      to the <a href="http://www.vim.org/maillist.php">maillist</a>.
+      Help Bram <a href="http://iccf-holland.org/">help Uganda</a>.
+      </small>
+	&nbsp;
+	&nbsp;
+
+	<!-- Start of StatCounter Code -->
+	<script type="text/javascript" language="javascript">
+	var sc_project=1417324; 
+	var sc_invisible=1; 
+	var sc_partition=11; 
+	var sc_security="d41633bc"; 
+	</script>
+
+	<script type="text/javascript" language="javascript" src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/counter.js"></script><noscript>&lt;a href="http://www.statcounter.com/" target="_blank"&gt;&lt;img  src="http://c12.statcounter.com/counter.php?sc_project=1417324&amp;java=0&amp;security=d41633bc&amp;invisible=0" alt="free tracking" border="0"&gt;&lt;/a&gt; </noscript>
+	<!-- End of StatCounter Code -->
+          </td>
+
+    <td align="right" valign="top">
+      		<a href="http://sourceforge.net/projects/vim" rel="nofollow"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/sflogo.php" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+    </td>
+
+    <td><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="5" height="1" alt=""></td>
+  </tr>
+
+    
+  <tr><td colspan="4"><img src="./CSApprox - Make gvim-only colorschemes work transparently in terminal vim   vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  
+  </tr>
+</tbody></table>
+
+<!-- for Google +1 button -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+
+
+
+</body></html>

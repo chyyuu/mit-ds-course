@@ -1,0 +1,23 @@
+body{font-size:12px;}
+*{margin:0;padding:0;}img{border:none}li{list-style:none}
+.blogpop{width:390px;margin:10px auto}
+img{border:none}li{list-style:none}
+.blogpop a,.blogpop a:link,.blogpop a:visited{color:#000;text-decoration:none}.blogpop a:hover{text-decoration:underline}
+
+.blogpophd{height:36px;position:relative}
+.blogpophd span{display:block;height:36px;float:left;}
+.blogpophd .l{width:139px;float:left;overflow:hidden;text-indent:-999em;background:url(http://blog.51cto.com/image/blog_top/hdtit.gif) no-repeat}
+.blogpophd .r{ float:right;width:8px;background:url(http://blog.51cto.com/image/blog_top/pophdr.gif) no-repeat}
+.blogpophdbgx{ background:url(http://blog.51cto.com/image/blog_top/popbgx.jpg) repeat-x;width:243px;height:36px;position:absolute;top:0;left:139px}
+.blogpophd .pophdtxt{left:150px;width:190px;color:#828282;padding:10px 0 0 10px;font-size:14px}
+.pophdtxt a:link,.pophdtxt a:visited{color:#828282}
+.blogpophd .poptool{right:10px;padding:12px 0 0;position:absolute;top:0}
+
+.blogpopMain{border:2px solid #2668b7;border-top:none;height:158px; width:385px;font-family:Microsoft YaHei;background-color:#FFFFFF;border-bottom:2px solid #2668b7;}
+.blogpopMain .l{float:left;width:105px;text-align:center;margin:18px 15px 0 14px;display:inline}
+.blogpopMain .l a{display:block}
+.blogpopMain .l img{margin:0 0 4px}
+.blogpopMain .r{float:left;width:240px;}
+.blogpopMain h4{color:#2365b4;font:700 16px/1em SimHei;border-bottom:1px dashed #d3d3d3;padding:20px 0 6px}
+.blogpopMain h4 a,.blogpopMain h4 a:link,.blogpopMain h4 a:visited{color:#2365b4;}
+.blogpopMain .r li{line-height:26px;font-size:14px;background:url(http://blog.51cto.com/image/blog_top/dian.gif) no-repeat 2px 50%;padding-left:10px; text-align:left} 

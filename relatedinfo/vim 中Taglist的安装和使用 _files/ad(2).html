@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)http://blog.csdn.net/common/ad.html?t=5&containerId=ad_bot&frmId=ad_frm_1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>CSDN Ad</title>
+    <style type="text/css">
+    body { margin:0px; padding:0px;}
+    </style>
+</head>
+<body>
+<div id="div1"><style>
+.blog_behind_ad{clear:both; display:block; *display:inline-block;}
+.blog_behind_ad:after{content:"."; display:block; height:0; clear:both; visibility:hidden;}
+
+.blog_ad{position:relative; float:left; width:47%; margin:0 1% 0 1%; padding:1px; border:solid 1px #d7cbc1; background:#fff; color:#000; list-style:none; font-size:12px; line-height:20px;}
+.blog_ad #scrollDiv{padding:0 8px;}
+.blog_ad #scrollDiv2{padding:0 8px;}
+.blog_ad a{color:#47381c; text-decoration:none;}
+.blog_ad a:hover{text-decoration:underline;}
+.blog_ad *{margin:0; padding:0; list-style:none;}
+.blog_ad h5{height:24px; padding:0 5px; background:#E0DBD3; color:#47381c; font-size:12px; line-height:24px;}
+.blog_ad h5 a{color:#47381c;}
+.blog_ad ul{height:120px; overflow:hidden; margin:10px 5px;}
+.blog_ad li{padding:0 0 0 17px; background:url(http://csdnimg.cn/www/images/point_tui.gif) no-repeat left 3px;}
+.blog_ad #btn1,.blog_ad #btn12{position:absolute; right:30px; bottom:10px; width:15px; height:15px; border:none; background:#5d5d5d; color:#fff; font-size:11px; line-height:15px; cursor:pointer; text-align:center;}
+.blog_ad #btn2,.blog_ad #btn22{position:absolute; right:10px; bottom:10px; width:15px; height:15px; border:none; background:#5d5d5d; color:#fff; font-size:11px; line-height:15px; cursor:pointer; text-align:center;}
+
+#recommended li{ background-image:url(http://csdnimg.cn/www/images/point_pin.gif);}
+</style>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="ad.js"></script>
+<script type="text/javascript" src="jquery.scroll.js"></script>
+<script type="text/javascript" src="AreaCounter.js"></script>
+
+<script type="text/javascript">
+new PongoAd(7,'marqueebox0');
+setTimeout(function () {
+	$("#scrollDiv").Scroll({ line: 6, speed: 1, timer: 6000, left: "btn1", right: "btn2" });
+	$("#scrollDiv2").Scroll({ line: 6, speed: 1, timer: 6000 });
+}, 5000);
+</script>
+<div class="blog_behind_ad">
+<div class="blog_ad">
+<h5>专区推荐内容</h5>
+<div id="scrollDiv">
+<script type="text/javascript" src="articleget.ashx"></script>
+</div>
+<button id="btn1">&lt;&lt;</button>
+<button id="btn2">&gt;&gt;</button>
+</div>
+<div id="recommended" class="blog_ad">
+<h5><a href="http://job.csdn.net/" target="_blank">更多招聘职位</a><a href="http://passport.pongo.cn/user/bizlogon" style="float:right;*margin-top:-18px;" target="_blank">我公司职位也要出现在这里</a></h5>
+<div id="scrollDiv2">
+<ul id="marqueebox0">
+</ul>
+</div>
+</div>
+</div></div><script type="text/javascript" async="" src="GetAdForCallBack"></script>
+<script type="text/javascript">
+    window.onload = function () {
+
+        //这种给广告区域赋值的方式，对于有些JS广告不能完美的显示
+        //top.document.getElementById('ad_bot').innerHTML = document.getElementById('div1').innerHTML;
+
+        var h = document.body.offsetHeight + 2;
+        setTimeout(function () {
+            if (h > 800) h = document.getElementById('div1').offsetHeight + 4;
+            top.document.getElementById('ad_frm_1').style.height = h + 'px';
+        }, 100);        
+    };
+</script>
+
+
+</body></html>

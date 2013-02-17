@@ -1,0 +1,1 @@
+document.write('<style type="text/css">.icon_01{background:url(http://blog.51cto.com/active/no1/images/bks_icon_01.gif) no-repeat 13px 0;padding:1px 0 1px 35px}</style>');document.write('<div class="icon_01"><a href="http://blog.51cto.com/active/no1/ing.html" target="_blank">距离博客No.1争夺赛结束还有 <span style="color:#f00">4</span> 天 </a></div>');

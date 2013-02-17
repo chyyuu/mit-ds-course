@@ -1,0 +1,1244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0048)http://jianshusoft.blog.51cto.com/2380869/841042 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
+
+
+<title>vim中多标签和多窗口的使用 - 木又寸的技术博客 - 51CTO技术博客</title>
+<meta name="description" content="&#160;1、打开多个窗口打开多个窗口的命令以下几个：横向切割窗口:new+窗口名(保存后就是文件名)&#160;:split+窗口名，也可以简写为:sp+窗口名纵向切割窗口名:vsplit+窗口名，也可以简写为：vsp+窗口名&#160;&amp;nbs..">
+<meta name="keywords" content="vim中多标签和多窗口的使用">
+<meta http-equiv="Cache-Control" content="private">
+<!--<base href="http://jianshusoft.blog.51cto.com/">--><base href=".">
+<script src="./vim中多标签和多窗口的使用_files/def.js"></script>
+<script language="javascript" src="./vim中多标签和多窗口的使用_files/message.js" type="text/javascript"></script>
+<script language="javascript" src="./vim中多标签和多窗口的使用_files/user_comment.js" type="text/javascript"></script>
+<script language="javascript" src="./vim中多标签和多窗口的使用_files/base2.js" type="text/javascript"></script>
+<script language="javascript" src="./vim中多标签和多窗口的使用_files/dialog_utf8.js" type="text/javascript"></script>
+<link href="./vim中多标签和多窗口的使用_files/31.css" rel="stylesheet" type="text/css">
+<link rel="alternate" href="http://jianshusoft.blog.51cto.com/rss.php?uid=2380869" type="application/rss+xml" title="RSS 2.0">
+<link rel="edituri" type="application/rsd+xml" title="rsd" href="http://jianshusoft.blog.51cto.com/xmlrpc.php?rsd=1">
+<link href="./vim中多标签和多窗口的使用_files/header_master_top.css" rel="stylesheet" type="text/css">
+<link href="./vim中多标签和多窗口的使用_files/base.css" rel="stylesheet" type="text/css">
+<script src="./vim中多标签和多窗口的使用_files/poptop.js"></script>
+<style type="text/css">
+	.mainNav li a{display:inline-block}
+</style>
+<script>
+var myid = "";
+function add_flink(){
+	if(myid==""){
+
+        var refurlk = "http://jianshusoft.blog.51cto.com/2380869/841042";
+
+				//commentSubmit("",refurlk);
+				location.href="http://home.51cto.com/index.php?reback="+encodeURIComponent(encodeURIComponent(refurlk));
+				return false;
+	}else{
+      		var url='/mod/edit_flink.php?type=addflink&uid=2380869&flink=http://jianshusoft.blog.51cto.com';
+		var ajax = InitAjax1();
+		ajax.open("GET", url, true);
+		ajax.onreadystatechange = function() {
+			if (ajax.readyState == 4 && ajax.status == 200) {
+				if(ajax.responseText==""){
+					alert("添加成功。");
+				}
+				if(ajax.responseText=="1"){
+				alert("链接指向自己。");
+				}
+				if(ajax.responseText=="2"){
+				alert("友情链接已存在。")
+				}
+			}
+		}
+		ajax.send(null);
+	}
+
+
+
+}
+function sendmessage(){
+
+	var refurlk = "http://jianshusoft.blog.51cto.com/2380869/841042";
+
+	if(myid){
+		return true;
+	}else{
+		commentSubmit("",refurlk);
+		return false;
+	}
+}
+function copylink(ourl){
+	if(!ourl){
+		var clipBoardContent = "http://jianshusoft.blog.51cto.com";
+	}else{
+		var clipBoardContent = ourl;
+	}
+	window.clipboardData.setData("Text",clipBoardContent);
+	alert("复制成功!");
+	return false;
+}
+function correctPNG() {
+if (document.getElementById('blog_touxian'))
+{
+var img = document.getElementById('blog_touxian');
+      var imgName = img.src.toUpperCase()
+      var imgID = (img.id) ? "id='" + img.id + "' " : ""
+      var imgClass = (img.className) ? "class='" + img.className + "' " : ""
+      var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' "
+      var imgStyle = "display:inline-block;" + img.style.cssText
+      if (img.align == "left") imgStyle = "float:left;" + imgStyle
+      if (img.align == "right") imgStyle = "float:right;" + imgStyle
+      if (img.parentElement.href) imgStyle = "cursor:hand;" + imgStyle
+      var strNewHTML = "<span " + imgID + imgClass + imgTitle
+         + " style=\"" + "width:" + img.width + "px; height:" + img.height + "px;" + imgStyle + ";"
+         + "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader"
+         + "(src=\'" + img.src + "\', sizingMethod='scale');\"></span>" ;
+      img.outerHTML = strNewHTML;
+}
+}
+//window.attachEvent("onload", correctPNG);
+window.onload=correctPNG;
+
+function copy(){
+var text=document.getElementById("txtUser").value;
+if(copy2Clipboard(text)!=false){ 
+alert("复制成功了！ "); 
+} 
+}
+function copy2Clipboard(txt){ 
+if(window.clipboardData){ 
+window.clipboardData.clearData(); 
+window.clipboardData.setData("Text",txt); 
+}else if(navigator.userAgent.indexOf("Opera")!=-1){ 
+window.location=txt; 
+}else if(window.netscape){ 
+try{ 
+netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); 
+} 
+catch(e){ 
+alert("您使用的浏览器不支持此复制功能，请使用Ctrl+C或鼠标右键。"); 
+return false; 
+} 
+var clip=Components.classes['@mozilla.org/widget/clipboard;1'].createInstance(Components.interfaces.nsIClipboard); 
+if(!clip)return; 
+var trans=Components.classes['@mozilla.org/widget/transferable;1'].createInstance(Components.interfaces.nsITransferable); 
+if(!trans)return; 
+trans.addDataFlavor('text/unicode'); 
+var str=new Object(); 
+var len=new Object(); 
+var str=Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString); 
+var copytext=txt;str.data=copytext; 
+trans.setTransferData("text/unicode",str,copytext.length*2); 
+var clipid=Components.interfaces.nsIClipboard; 
+if(!clip)return false; 
+clip.setData(trans,null,clipid.kGlobalClipboard); 
+return true;
+} 
+}
+
+function mod_close(){
+  document.getElementById('mod_tg').style.display="none";
+}
+
+function match_invite(uid) {
+    var url='/mod/match_invite.php';
+	var ajax = InitAjax();
+    var re = 'uid=' + uid;
+	ajax.open("POST", url, true);
+    ajax.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	ajax.send(re);
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState == 4 && ajax.status == 200) {
+            if(ajax.responseText == 1){
+                alert("邀请信息已经发送成功。");
+            } else if(ajax.responseText=="-1"){
+                alert("邀请失败，请稍候再试。");
+            } else if(ajax.responseText=="2"){
+                alert("该用户已经报名了。")
+            }
+        }
+    }
+}
+
+</script>
+<style type="text/css">
+/*
+.artContent img {max-width:450px !important;}
+.showContent img{max-width:650px!important;}
+*/
+
+.artContent img{max-width: 450px; width:expression(this.width > 450 ? "450px" : this.width)}
+/*
+.showContent img{max-width: 450px; width:expression(this.width > 650 ? "650px" : this.width)}
+*/
+
+
+</style>
+<script src="./vim中多标签和多窗口的使用_files/logger.js"></script><link href="./vim中多标签和多窗口的使用_files/bdsstyle.css" rel="stylesheet" type="text/css"></head>
+
+<body><iframe style="display: none; " frameborder="0"></iframe><div id="bdshare_s"><iframe id="bdsIfr" style="position:absolute;display:none;z-index:9999;" frameborder="0"></iframe><div id="bdshare_l" style="display: none; "><div id="bdshare_l_c"><h6>分享到</h6><ul><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_mshare mshare">一键分享</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_qzone qqkj">QQ空间</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_tsina xlwb">新浪微博</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_baidu bdsc">百度搜藏</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_renren rrw">人人网</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_tqq txwb">腾讯微博</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_bdxc bdxc">百度相册</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_kaixin001 kxw">开心网</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_tqf txpy">腾讯朋友</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_tieba bdtb">百度贴吧</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_douban db">豆瓣网</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_tsohu shwb">搜狐微博</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_bdhome bdhome">百度新首页</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_sqq sqq">QQ好友</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_thx thx">和讯微博</a></li><li><a href="http://jianshusoft.blog.51cto.com/#" class="bds_more">更多...</a></li></ul><p><a href="http://jianshusoft.blog.51cto.com/#" class="goWebsite">百度分享</a></p></div></div></div>
+
+<div id="home_top">
+<div class="top_nav" style="width:990px;">
+<div class="left" style="margin-top:10px; width:440px;"><a href="http://blog.51cto.com/" target="_blank"><img src="./vim中多标签和多窗口的使用_files/head_blog_sibebar_logo.gif" align="absmiddle" style="margin-top:-4px;"></a><a target="_blank" href="http://www.51cto.com/">51CTO首页</a><img height="25" align="absmiddle" width="16" src="./vim中多标签和多窗口的使用_files/top_bg_xian.gif" style="margin-top:-4px;"><a href="http://blog.51cto.com/" target="_blank">51CTO博客</a><img height="25" align="absmiddle" width="16" src="./vim中多标签和多窗口的使用_files/top_bg_xian.gif" style="margin-top:-4px;"><a href="http://home.51cto.com/?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042">我的博客</a><img height="25" align="absmiddle" width="16" src="./vim中多标签和多窗口的使用_files/top_bg_xian.gif" style="margin-top:-4px;">
+
+<a target="_blank" href="http://blog.51cto.com/search.php">搜索</a>
+<a href="javascript:void(0);" style="color: rgb(255, 0, 0); text-decoration: underline; " id="showMessagerDim">每日博报</a>
+</div>
+
+<div class="right" style="width:550px;">
+<div class="more"><img height="16" align="absmiddle" width="27" src="./vim中多标签和多窗口的使用_files/top_shequ.gif">社区：<a target="_blank" href="http://bbs.51cto.com/">论坛</a><a target="_blank" href="http://blog.51cto.com/">博客</a><a target="_blank" href="http://down.51cto.com/">下载</a><a target="_blank" href="http://book.51cto.com/">读书</a><a href="javascript:viod(0);" onmouseout="popupClose()" onmouseover="show(3,this)">更多<img align="absmiddle" style="padding-left: 4px;" src="./vim中多标签和多窗口的使用_files/nav_ico1.gif"></a>            </div>            <span id="login_status"><div class="login" style="padding-top:8px; text-align:right;"><a href="http://home.51cto.com/index.php?s=/Home/index" style="background:none"><img style="margin-top:-3px" id="dia" align="absmiddle" width="20" title="今天领无忧币了吗？" src="./vim中多标签和多窗口的使用_files/dia.gif"></a><a href="http://home.51cto.com/?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042" target="_self">登录</a><a href="http://ucenter.51cto.com/reg_01.php?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042" target="_self">注册</a></div></span>                </div>    <div id="tgimg" style="z-index: 1; height: 200px; position: absolute; width: 200px; left: 1200px; top: 35px; "><a href="http://home.51cto.com/activity/index.php?s=/Indextt/index" target="_blank"><img style="" src="./vim中多标签和多窗口的使用_files/tg.png"></a></div></div></div>
+
+
+
+<div class="subMenu3" id="s3" onmouseover="popupNoClose()" onmouseout="popupClose()">
+<ul>
+<li><a href="http://home.51cto.com/" target="_blank">家园</a></li>
+<li><a href="http://t.51cto.com/" target="_blank">微博</a></li>
+<li><a href="http://blog.51cto.com/" target="_blank">博客</a></li>
+<li><a href="http://bbs.51cto.com/" target="_blank">论坛</a></li>
+<li><a href="http://down.51cto.com/" target="_blank">下载</a></li>
+<li><a href="http://selftest.51cto.com/" target="_blank">自测</a></li>
+<li><a href="http://doctor.51cto.com/" target="_blank">门诊</a></li>
+<li><a href="http://blog.51cto.com/newsletter/" target="_blank">周刊</a></li>
+<li><a href="http://book.51cto.com/" target="_blank">读书</a></li>
+<li><a href="http://g.51cto.com/" target="_blank">技术圈</a></li>
+<li><a href="http://zhidao.51cto.com/" target="_blank">知道</a></li>
+</ul>
+</div>
+<!--简导航end-->
+
+
+
+<div class="headerBox">
+<div class="header">
+<div class="header_l">
+<div class="logo_blogname">
+
+
+<div class="blogLogo">
+<a href="http://blog.51cto.com/blogcommend" target="_blank"><img src="./vim中多标签和多窗口的使用_files/blogLogo01.png" width="161px;" height="70px;"></a>
+</div>
+
+
+<div class="blogName">
+<a href="http://jianshusoft.blog.51cto.com/"><h1>木又寸的技术博客</h1></a>
+</div>
+</div><!--logo_blogname end-->
+<div class="blogLink">
+
+<a href="http://jianshusoft.blog.51cto.com/">http://jianshusoft.blog.51cto.com</a> <input id="txtUser" type="hidden" size="32" value="http://jianshusoft.blog.51cto.com">   <a href="javascript:void(0);" onclick="copy();">【复制】</a> <a href="http://jianshusoft.blog.51cto.com/rss.php?uid=2380869" target="_blank"></a><a href="http://jianshusoft.blog.51cto.com/rss.php?uid=2380869" target="_blank">【订阅】</a>
+
+</div>
+
+
+
+</div><!--header_l end-->
+<div class="header_r">
+<div class="blogInfo"><span><a href="http://jianshusoft.blog.51cto.com/2380869/o" title="察看dogegg250所有原创文章">原创</a>:57</span><span><a href="http://jianshusoft.blog.51cto.com/2380869/t" title="察看dogegg250所有翻译文章">翻译</a>:0</span><span><a href="http://jianshusoft.blog.51cto.com/2380869/c" title="察看dogegg250所有转载文章">转载</a>:62</span></div>
+<div class="blogNav"><a href="http://jianshusoft.blog.51cto.com/">博 客</a>|<a href="http://jianshusoft.blog.51cto.com/pic/">图库</a>|<a href="http://jianshusoft.blog.51cto.com/addblog.php">写博文</a>|<a href="http://51ctoblog.blog.51cto.com/all/26414/4" target="_blank">帮 助</a></div>
+</div>
+</div>
+<!--header end-->
+</div><!--headerBox end-->
+<div class="mainNav">
+<span class="mainNavT"></span>
+<ul>
+<li><a href="http://jianshusoft.blog.51cto.com/#">首页</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-1">其它</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-2">Java</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-3">C#</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-4">数据库</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-5">C/C++</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-6">Linux</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-7">算法</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-8">OOAD</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-9">成品</a></li>|<li><a href="http://jianshusoft.blog.51cto.com/2380869/d-10">Hadoop</a></li>
+</ul>
+<span class="mainNavB"></span>
+</div>
+<!--mainNav end-->
+
+<script type="text/javascript" src="./vim中多标签和多窗口的使用_files/jquery-1.7.1.min.js"></script>
+<!--[if IE 6]>
+  <script type="text/javascript" src="http://images.watchstor.com/newhomes/png.js"></script>
+  <script>
+    DD_belatedPNG.fix('img,input,ul,li, .get-box, div, .add, .sub, .ui-slider-handle, .footer-chopper');
+  </script>
+<![endif]-->
+<script type="text/javascript" src="./vim中多标签和多窗口的使用_files/index.php" charset="utf-8"></script>
+<link type="text/css" rel="stylesheet" href="./vim中多标签和多窗口的使用_files/fck_editorarea.css">
+<script type="text/javascript">
+/**
+ * 回复评论需要用的js
+ * 2012-5-14
+ * by:chengtao
+ */
+ jQuery(function(){
+	blogpost.init();//初始化博客回复功能
+ })
+ /**
+  * 处理博文评论功能优化
+  */
+ blogpost={
+	abstruct_list:null,
+	init:function(){
+		blogpost.bind();//绑定一些时间
+		this.abstruct_list=new Array();//初始化保存评论信息的数组
+	},
+	/**
+	 * 博客回复需要绑定的一些事件
+	 */
+	bind:function(){
+		/**
+		 * 点击回复的事件
+		 */
+		jQuery('.repost').live('click',function(){
+			blogpost.repost(jQuery(this).attr('user_name'),jQuery(this).attr('parentid'));
+			return false;
+		});
+		/**
+		 * 点击楼层进行翻页且找到锚点
+		 */
+		jQuery('.anchor_page').live('click',function(){
+			var parentid = $(this).attr('parentid');
+			var tid=$(this).attr('tid');
+			$.get('/comments.php?tid='+tid+'&parentid='+parentid,function(data){
+				$('#artcomment').html(data);
+				window.location.hash=''+parentid;
+			})
+			return false;
+		}),
+		jQuery('.anchor_page').live('mouseover',function(){
+			var parentid = $(this).attr('parentid');
+			if(!blogpost.abstruct_list[parentid]){
+				var this_t = $(this);
+				$.get('/comments.php?cid='+parentid,function(data,textStatus){
+					blogpost.abstruct_list[parentid]=data;
+					this_t.attr('title',this_t.text()+':'+ blogpost.abstruct_list[parentid]);
+				});
+			}else{
+				$(this).attr('title',$(this).text()+':'+blogpost.abstruct_list[parentid]);
+			}
+		})
+	},
+	/**
+	 * @param user_name 用户名
+	 * @param parentid  父评论id
+	 */
+	repost:function(user_name,parentid){
+		window.location.hash='comment';
+		jQuery('#parentid').val(parentid);
+		jQuery('#commentcontent').val('回复 '+user_name+":\n").focus();
+		if(!$.browser.mozilla){
+			var elem = jQuery('#commentcontent')[0];		
+			var caretPos = elem.value.length;
+			if (elem.createTextRange) {
+				var range = elem.createTextRange();
+				range.move('character', caretPos);
+				range.select();
+			}else{
+				elem.setSelectionRange(caretPos, caretPos);	
+			}
+		}
+	},
+	/**
+	 * 发送完毕之后清理表单数据 不是ajax可能用不到
+	 */
+	clean:function(){
+		
+	}
+ }
+</script>
+
+
+
+<script type="text/javascript">
+jQuery(function() {
+	jQuery('#favourdiv').mouseover(function(){
+		if(jQuery(this).attr('className') == 'support01')
+		{
+			jQuery(this).attr('className', "support02");
+			jQuery(this).html('+1人');
+			jQuery(this).attr('title', "赞一个，我支持TA");
+		}
+		else if(jQuery(this).attr('className') == 'support03')
+		{
+			jQuery(this).attr('title', "你已经赞了这篇博文！");
+		}
+		
+	});
+	jQuery('#favourdiv').mouseout(function(){
+		if(jQuery(this).attr('className') == 'support02')
+		{
+			jQuery(this).attr('className', "support01");
+			jQuery(this).html("0人");
+		}
+	});
+	jQuery('.blog_match_yq').click(function(){
+		var wind_uid = '';
+		if(!wind_uid){
+			alert("请先登录！");
+			return false;
+		}
+		jQuery.ajax({
+			   type: "POST",
+			   url:"/contest2012/index.php?mod=sendmsg",
+			   dataType: "html",
+			   data: "vuid=" + 2380869,
+			   success: function(data) {
+					if(data == 0)
+					{
+						alert("查无此人！");
+						return false;
+					}else if(data == 1){
+						alert("请先登录！");
+						return false;
+					}else if(data == 2){
+						alert("不能邀请自己！");
+						return false;
+					}else if(data == 22){  
+						alert("邀请信息已发出！");
+						return false;
+					}
+			   }
+		  });
+	});
+	jQuery('#favourdiv').click(function(){
+			jQuery.ajax({
+			   type: "POST",
+			   url:"/mod/favour.php",
+			   dataType: "html",
+			   data: "tid=" + 841042,
+			   success: function(data) {
+					if(data == 0)
+					{
+						alert("您还未登录或者已过期，请重新登录");
+						location.href = "http://home.51cto.com/index.php?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042";
+						return false;
+					}
+					else if(data == '-1')
+					{
+						alert("参数传递错误！");
+						return false;
+					}
+					else if(data == '-2')
+					{
+						alert("该博文已被删除或者不存在！");
+						return false;
+					}
+					else if(data == '-3')
+					{
+						alert("您已经赞过了！");
+						return false;
+					}
+					else if(data == '-4')
+					{
+						alert("赞操作失败！");
+						return false;
+					}
+					else
+					{  
+						//alert("操作成功，你已经赞了这篇博文！");
+						jQuery('#favourdiv').attr('className', "support03");
+
+						var num = 0 + 1 + "人";
+						jQuery('#favourdiv').html(num);
+						jQuery('#favourer').html(data);
+						return false;
+					}
+			   }
+		  });
+	})
+
+
+})
+</script>
+
+
+
+
+<style type="text/css">
+.m_sharelinks{ 
+	line-height:36px; 
+	text-align:left; 
+	padding-left:20px; 
+	background:url(http://img1.51cto.com/images/share/ico_lb.gif) no-repeat left center;
+	float:left; 
+	width:600px; 
+	height:36px;
+}
+.m_sharelinks a{ margin-left:10px;}
+.m_sharebtn{ height:50px; width:726px; margin:0 auto;}
+.m_sharebtn01{width:520px; float:left;}
+.weibo_51cto{ background:url(http://img1.51cto.com/images/share/ico_mweibo.gif) no-repeat center center; display:block; width:33px; height:33px; float:left; margin:3px 3px 0 0;cursor:pointer;}
+.shareMored {
+    line-height: 36px;
+	float:right; 
+	text-align:right; 
+	width:100px; 
+	height:36px;
+}
+
+.showContent {
+	margin:20px 15px 8px;
+}
+.userImage img {
+    text-align: center;
+	border:0;
+	padding:0;
+}
+.photo_links{ line-height:30px; padding-top:5px; font-size:13px;width:170px; margin:0 auto;}
+.photo_links_blue{ text-align:center;}
+.photo_links_blue a:link,.photo_links_blue a:visited,.photo_links_blue a:hover,.photo_links_blue a:active{ color:#015F91; text-decoration: underline;}
+.photo_links_red{ text-align:left;}
+.photo_links_red a:link,.photo_links_red a:visited,.photo_links_red a:hover,.photo_links_red a:active{ color:#fc4343; text-decoration:underline;}
+.photo_links_red02{ text-align:center;}
+</style>
+<script language="JavaScript" type="text/javascript" src="./vim中多标签和多窗口的使用_files/group.js"></script>
+<div id="add_sys_type_div" style="width:600px;border:1px #58B0DD solid; background-color:#FFF; position:absolute;left:30%;top:300px;display:none;z-index:255"></div>
+<div id="add_sys_type_divs" style="width:550px;border:1px #58B0DD solid; background-color:#FFF; position:absolute;left:30%;top:300px;display:none;z-index:255"></div>
+
+
+
+<div class="blogMain">
+<div class="blogLeft">
+
+
+<div class="box moduleUser">
+<div class="title">
+<h2><strong>dogegg250</strong> 的BLOG  </h2>
+</div>
+<div class="modCon">
+
+<div class="userImage" style="margin: 10px auto 5px;text-align: center;width: 130px;border: 1px solid #D4D4D4;">
+	<table width="100%" cellpadding="0" cellspacing="0">
+		<tbody><tr>
+			<td valign="middle" align="center" height="130"><script src="./vim中多标签和多窗口的使用_files/userface.php"></script><img src="./vim中多标签和多窗口的使用_files/avatar.php" id="userface"></td>
+		</tr>
+	</tbody></table>
+</div>
+<div class="photo_links">
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="crumbs">
+<a href="http://home.51cto.com/index.php?s=/space/2380869#message" class="writeMessage" target="_blank">写留言</a><a href="http://g.51cto.com/addgroup.php?uid=" class="inCircle" target="_blank">邀请进圈子</a><a href="http://home.51cto.com/index.php?s=/Notify/write/uid/2380869" class="message" target="_blank">发消息</a> <a href="http://jianshusoft.blog.51cto.com/" onclick="add_flink(2380869);return false" class="joinLinks">加友情链接</a><a href="http://home.51cto.com/index.php?s=/space/2380869" class="joinFriends" target="_blank">进家园 加好友</a>
+</div>
+
+<div style="width:239px;height:64px;display:none;">
+
+
+<div style="float:left;"><p style="padding:15px 0 0 28px; line-height:20px;">2012年度IT博客大赛<br><a target="_blank" href="http://blog.51cto.com/contest2012/#top10000" style="color:#F00; text-decoration:underline;">十大杰出IT博客诞生</a></p></div>
+<div style="float:right;"><a target="_blank" href="http://blog.51cto.com/contest2012/"><img width="57" height="27" src="./vim中多标签和多窗口的使用_files/blog_match_endlook.jpg" style="margin:23px 20px 0 0;"></a></div>
+<!-- <div style="float:left;"><p style="padding:15px 0 0 28px; line-height:20px;">星光评委正在评选<br><a target="_blank" href="http://blog.51cto.com/contest2012/index.php?mod=userlist_sec" style="color:#F00; text-decoration:underline;">2012年度IT博客大赛50强</a></p></div>
+<div style="float:right;"><img class="blog_match_yq" width="57" height="27" src="http://img1.51cto.com/images/blog_match_invite.jpg" style="margin:23px 20px 0 0;"></div> -->
+
+
+
+<div class="clear"></div>
+</div>
+
+
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div>
+
+
+<div class="infoList box">
+<div class="title">
+<h2>博客统计信息</h2>
+</div>
+<div class="modCon">
+<p>
+<span class="infoListHead"><a href="http://blog.51cto.com/blogcommend" target="_blank" class="operlink"><b>51CTO推荐博客</b></a> <br></span>
+用户名：dogegg250<br>
+文章数：120<br>
+评论数：24<br>
+访问量：88984<br>
+无忧币：681<br>
+<a href="http://51ctoblog.blog.51cto.com/26414/5591" target="_blank">博客积分</a>：1302<br>
+<a href="http://51ctoblog.blog.51cto.com/26414/5591" target="_blank">博客等级</a>：5<br>
+注册日期：2010-11-05<br>
+<script src="./vim中多标签和多窗口的使用_files/blogno1countdown.php"></script><style type="text/css">.icon_01{background:url(http://blog.51cto.com/active/no1/images/bks_icon_01.gif) no-repeat 13px 0;padding:1px 0 1px 35px}</style></p><div class="icon_01"><a href="http://blog.51cto.com/active/no1/ing.html" target="_blank">距离博客No.1争夺赛结束还有 <span style="color:#f00">4</span> 天 </a></div> 
+<p></p>
+</div>
+<span class="modBot"></span>
+</div>
+
+
+<div class="hotArt box">
+<div class="title">
+<h2>热门文章</h2>
+</div>
+<div class="modCon">
+<ul>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/766007">正则表达式-不包含某个字符串</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/766947">H2介绍 – Java嵌入式数据库</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/774979">hbase条件查询</a></li>
+<li><a href="./vim中多标签和多窗口的使用_files/vim中多标签和多窗口的使用.html">vim中多标签和多窗口的使用</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/643988">.NET 4.0 WinForm无法引用System...</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/695169">SoftReference和WeakReference</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/824575">SQLite header and source versio..</a></li>
+<li><a href="http://jianshusoft.blog.51cto.com/2380869/660824">小议Servlet接收post和get混合提..</a></li>
+
+</ul>
+</div>
+<span class="modBot"></span>
+</div>
+<div class="search box">
+<div class="title"><h2>搜索BLOG文章</h2></div>
+<div class="modCon">
+<form method="post" action="http://jianshusoft.blog.51cto.com/search.php?" tabindex="99">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="authorid" value="2380869">
+<input type="hidden" name="sch_area" value="S">
+<input type="text" value="" name="keyword" class="searchInput">
+<input type="submit" value="搜 索" class="searchBtn">
+</form>
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div>
+
+
+<div class="myHome box">
+<div class="title"><h2 class="fl">我的技术圈(<a href="http://jianshusoft.blog.51cto.com/mygroup.php" target="_blank"><b>1</b></a>)</h2>
+<a href="http://home.51cto.com/apps/group/index.php?s=/Index/index/" class="fr" target="_blank">更多&gt;&gt;</a></div>
+<div class="modCon">
+<ul>
+
+<li><a href="http://g.51cto.com/renli" target="_blank">IT人力</a>&nbsp;&nbsp;
+
+
+</li>
+
+</ul>
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div>
+
+
+<div class="box recentGuests">
+<div class="title">
+<h2>最近访客</h2>
+</div>
+<div class="modCon">
+<ul>
+
+<li><a href="http://3475473.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(1).php"></a>
+<p><a href="http://3475473.blog.51cto.com/">__fLO..</a></p>
+
+</li><li><a href="http://zhangner.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(2).php"></a>
+<p><a href="http://zhangner.blog.51cto.com/">zhangner</a></p>
+
+</li><li><a href="http://4327371.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(3).php"></a>
+<p><a href="http://4327371.blog.51cto.com/">32033658</a></p>
+
+</li><li><a href="http://4849310.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(4).php"></a>
+<p><a href="http://4849310.blog.51cto.com/">weiwu..</a></p>
+
+</li><li><a href="http://gdin2010.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(5).php"></a>
+<p><a href="http://gdin2010.blog.51cto.com/">gdin2010</a></p>
+
+</li><li><a href="http://167669.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(6).php"></a>
+<p><a href="http://167669.blog.51cto.com/">farme..</a></p>
+
+</li><li><a href="http://6095219.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(7).php"></a>
+<p><a href="http://6095219.blog.51cto.com/">jeffr..</a></p>
+
+</li><li><a href="http://4825677.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(8).php"></a>
+<p><a href="http://4825677.blog.51cto.com/">fang_..</a></p>
+
+</li><li><a href="http://5069063.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(9).php"></a>
+<p><a href="http://5069063.blog.51cto.com/">lw200803</a></p>
+
+</li><li><a href="http://6218082.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(10).php"></a>
+<p><a href="http://6218082.blog.51cto.com/">bluecll</a></p>
+
+</li><li><a href="http://1561960.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(11).php"></a>
+<p><a href="http://1561960.blog.51cto.com/">fly931</a></p>
+
+</li><li><a href="http://linuxguest.blog.51cto.com/"><img src="./vim中多标签和多窗口的使用_files/avatar(12).php"></a>
+<p><a href="http://linuxguest.blog.51cto.com/">fengh..</a></p>
+
+</li></ul>
+<span class="clear"></span>
+</div>
+<span class="modBot"></span>
+</div>
+
+
+<div class="newComments box">
+<div class="title">
+<h2>最新评论 
+
+</h2>
+
+
+
+</div>
+<div class="modCon">
+<ul>
+
+<li><a href="http://jlyh225.blog.51cto.com/" class="operlink" target="_blank"><b>gogo106</b></a>：<a href="http://jianshusoft.blog.51cto.com/2380869/774979" target="_blank">您这是已知单列值的情况。请问：如..</a></li>
+
+<li><a href="http://jlyh225.blog.51cto.com/" class="operlink" target="_blank"><b>gogo106</b></a>：<a href="http://jianshusoft.blog.51cto.com/2380869/774979" target="_blank">您这是已知胆裂值的情况。请问：如..</a></li>
+
+<li><a href="http://sophone.blog.51cto.com/" class="operlink" target="_blank"><b>sophone</b></a>：<a href="http://jianshusoft.blog.51cto.com/2380869/824575" target="_blank">我是把/usr/lib/i386-linux-gnu下的..</a></li>
+
+<li><a href="http://6147823.blog.51cto.com/" class="operlink" target="_blank"><b>神偷520</b></a>：<a href="http://jianshusoft.blog.51cto.com/2380869/620918" target="_blank">如果台阶数为100的时候，就会出现超..</a></li>
+
+<li>[匿名]liyulongmen：<a href="http://jianshusoft.blog.51cto.com/2380869/841419" target="_blank">有关《《程序员的自我修养》中关于..</a></li>
+
+
+</ul>
+</div>
+<span class="modBot"></span>
+</div>
+
+
+<div class="hotBlogArt box">
+<div class="title">
+  <h2 class="fl">51CTO推荐博文</h2>
+  <a href="http://blog.51cto.com/artcommend" class="fr">更多&gt;&gt;</a></div>
+<div class="modCon">
+<ul>
+<li><a href="http://legend2011.blog.51cto.com/3018495/1131629" title="MyBatis中的N+1问题——MyBatis学习笔记之十四" target="_blank">MyBatis中的N+1问题——MyBatis学..</a></li>
+<li><a href="http://kevinfan.blog.51cto.com/1037293/1130987" title="Silverlight动态设置WCF服务Endpoint" target="_blank">Silverlight动态设置WCF服务Endpoint</a></li>
+<li><a href="http://cnn237111.blog.51cto.com/2359144/1130502" title="使用Ant打包工具" target="_blank">使用Ant打包工具</a></li>
+<li><a href="http://oldboy.blog.51cto.com/2561410/1130667" title="MySQL数据库常用基本命令应用分享02" target="_blank">MySQL数据库常用基本命令应用分享02</a></li>
+<li><a href="http://lifenlun163.blog.51cto.com/5159500/1130133" title="tomcat简单安装及总结" target="_blank">tomcat简单安装及总结</a></li>
+<li><a href="http://srsunbing.blog.51cto.com/3221858/1130337" title="更新语句的效率比较（merge into ）" target="_blank">更新语句的效率比较（merge into ）</a></li>
+<li><a href="http://danni505.blog.51cto.com/15547/1130084" title="Oracle数据库通过定义TYPE及Member对象来实现日志信息的分级管理" target="_blank">Oracle数据库通过定义TYPE及Membe..</a></li>
+<li><a href="http://yangjunfeng.blog.51cto.com/539796/1130277" title=" ORA-30036故障处理思路" target="_blank"> ORA-30036故障处理思路</a></li>
+<li><a href="http://oldboy.blog.51cto.com/2561410/1130120" title="MySQL数据库常用基本命令应用分享01" target="_blank">MySQL数据库常用基本命令应用分享01</a></li>
+<li><a href="http://hcymysql.blog.51cto.com/5223301/1129629" title="为某XXX手机公司删除重复数据优化一例" target="_blank">为某XXX手机公司删除重复数据优化..</a></li>
+<li><a href="http://imsiren.blog.51cto.com/1152188/1129651" title="PHP内核研究 静态变量" target="_blank">PHP内核研究 静态变量</a></li>
+
+</ul>
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div>
+
+
+<div class="friendLink box">
+<div class="title">
+  <h2>友情链接</h2>
+</div>
+<div class="modCon">
+<ul>
+
+<li><a href="http://51ctoblog.blog.51cto.com/" title="51CTO博客开发" target="_blank">51CTO博客开发</a></li>
+
+</ul>
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div>
+
+
+
+</div>
+<!--left end-->
+
+<script type="text/javascript">
+    var favor_url = "http://jianshusoft.blog.51cto.com/2380869/841042";
+    var favor_title = "vim中多标签和多窗口的使用";
+    var favor_fuid = "2380869";
+</script>
+<script type="text/javascript" src="./vim中多标签和多窗口的使用_files/favorbox.js"></script>
+<div class="blogRight">
+	<div class="artShow box">
+   	  <div class="share" id="share">
+
+    <div class="shareItem">
+		<div class="m_sharelinks"><a target="_blank" href="http://cnrdn.com/LNa5" style="color:blue;">2013大数据技术峰会值得你参与！</a><a target="_blank" href="http://51ctotopic.blog.51cto.com/2009463/1129576" style="color:blue;">过年就是过钱，这个春节你打算花多少？</a><a target="_blank" href="http://blog.51cto.com/contest2012/" style="color:red;">2012年度IT博客大赛精彩回顾</a></div>
+		<p class="shareMored"><a href="http://jianshusoft.blog.51cto.com/all/2380869">博主的更多文章&gt;&gt;</a></p>
+	</div>
+      </div>
+       <div class="modCon">
+   	  <div class="showBox" style="margin:0 0 10px;">
+      <div class="line_hd_r"></div>
+      <div class="art_tj">
+
+      </div>
+    		<div class="showHead">
+    		  <div class="showTitleBOx" style="text-align:center">
+              <div class="showTitle">
+
+	 		<img src="./vim中多标签和多窗口的使用_files/artType02.jpg">
+
+
+    		    vim中多标签和多窗口的使用
+                </div>
+  		    </div>
+   		    <span class="artTime">2012-04-22 09:55:04</span></div><!--showHead end-->
+    <div class="showTags">标签：<a href="http://blog.51cto.com/tagindex.php?keyword=%B4%B0%BF%DA" target="_blank" class="operlink">窗口</a> <a href="http://blog.51cto.com/tagindex.php?keyword=vim" target="_blank" class="operlink">vim</a> <a href="http://blog.51cto.com/tagindex.php?keyword=%B1%EA%C7%A9" target="_blank" class="operlink">标签</a>
+
+	</div>
+
+
+            <!--正文 begin-->
+    		<div class="showContent">
+    		  <p>&nbsp;1、打开多个窗口</p>
+<div>打开多个窗口的命令以下几个：</div>
+<div>横向切割窗口</div>
+<div>:new+窗口名(保存后就是文件名)&nbsp;</div>
+<div>:split+窗口名，也可以简写为:sp+窗口名</div>
+<div>纵向切割窗口名</div>
+<div>:vsplit+窗口名，也可以简写为：vsp+窗口名</div>
+<div>&nbsp;</div>
+<div>
+<div>&nbsp; &nbsp; vim -o file1 file2 ... &nbsp;#水平打开多窗口，</div>
+<div>&nbsp; &nbsp; vim -O file1 file2 ... &nbsp;#垂直打开多窗口,</div>
+<div>&nbsp; &nbsp; vim -d file1 file2 ... &nbsp;#垂直打开多窗口,并且进行比较</div>
+<div>&nbsp; &nbsp; vimdiff file1 file2 .. &nbsp;#等同于上一句</div>
+</div>
+<div>&nbsp;</div>
+<div>2、关闭多窗口</div>
+<div>可以用：q!，也可以使用：close，最后一个窗口不能使用close关闭。使用close只是暂时关闭窗口，其内容还在缓存中，只有使用q!、w!或x才能真能退出。</div>
+<div>
+<div>&nbsp;关闭窗口</div>
+<div>&nbsp; &nbsp; &nbsp;q &nbsp;或 close &nbsp; #关闭当前窗口</div>
+<div>&nbsp; &nbsp; &nbsp;only &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#保留当前窗口，关闭其它所有窗口</div>
+<div>&nbsp; &nbsp; &nbsp;qall(qa) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#退出所有窗口</div>
+<div>&nbsp; &nbsp; &nbsp;wall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#保存所有窗口</div>
+</div>
+<div>3、窗口切换</div>
+<div>:ctrl+w+j/k，通过j/k可以上下切换，或者:ctrl+w加上下左右键，还可以通过快速双击ctrl+w依次切换窗口。</div>
+<div>4、窗口大小调整</div>
+<div>纵向调整</div>
+<div>:ctrl+w + 纵向扩大（行数增加）</div>
+<div>:ctrl+w - 纵向缩小 （行数减少）</div>
+<div>:res(ize) num &nbsp;例如：:res 5，显示行数调整为5行</div>
+<div>:res(ize)+num 把当前窗口高度增加num行</div>
+<div>:res(ize)-num 把当前窗口高度减少num行</div>
+<div>横向调整</div>
+<div>:vertical res(ize) num 指定当前窗口为num列</div>
+<div>:vertical res(ize)+num 把当前窗口增加num列</div>
+<div>:vertical res(ize)-num 把当前窗口减少num列</div>
+<div>5、给窗口重命名</div>
+<div>:f file</div>
+<div>6、vi打开多文件</div>
+<div>vi a b c</div>
+<div>:n 跳至下一个文件，也可以直接指定要跳的文件，如:n c，可以直接跳到c文件</div>
+<div>:e# 回到刚才编辑的文件</div>
+<div>7、文件浏览</div>
+<div>:Ex 开启目录浏览器，可以浏览当前目录下的所有文件，并可以选择</div>
+<div>:Sex 水平分割当前窗口，并在一个窗口中开启目录浏览器</div>
+<div>:ls 显示当前buffer情况</div>
+<div>8、vi与shell切换</div>
+<div>:shell 可以在不关闭vi的情况下切换到shell命令行</div>
+<div>:exit 从shell回到vi</div>
+<div>9. 多标签</div>
+<div>直接在编辑的时候输入：</div>
+<div>vim -p 要编辑的文件名</div>
+<div>如vim -p * 就是编辑当前目录的所有文件</div>
+<div>多个标签间进行切换时向右切换gt，向左切换用gT</div>
+<div>在编辑的时候想增加一个标签就可以:tabnew filename</div>
+<div>:tabc &nbsp; &nbsp; &nbsp; 关闭当前的tab</div>
+<div>:tabo &nbsp; &nbsp; &nbsp; 关闭所有其他的tab</div>
+<div>:tabs &nbsp; &nbsp; &nbsp; 查看所有打开的tab</div>
+<div>:tabp &nbsp; &nbsp; &nbsp;前一个</div>
+<div>:tabn &nbsp; &nbsp; &nbsp;后一个<br>
+其它操作&nbsp;http://vimcdoc.sourceforge.net/doc/tabpage.html</div>
+    		</div><!--正文 end-->
+<script type="text/javascript">
+	var kevent = 'onabort|onblur|onchange|onclick|ondblclick|onerror|onfocus|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onselect|onsubmit|onunload';
+	var aevent = kevent.split('|');
+
+	jQuery('.showContent img').each(function(){
+		var nimg = this;
+		jQuery.each(aevent, function(i, n){
+			if (n!='onload') {
+				jQuery(nimg).attr(n, '');
+			} else {
+				if (jQuery(nimg).attr(n) != 'if(this.width>650) this.width=650;') {
+					jQuery(nimg).attr(n, '');
+				}
+			}
+		});
+	});
+</script>
+<script type="text/javascript" charset="utf-8">
+var encodetitle = encodeURI('一篇很棒的博文分享给大家：《vim中多标签和多窗口的使用》');
+
+function show51share(){
+
+	window.open('http://t.51cto.com/index.php?m=share&url=http://jianshusoft.blog.51cto.com/2380869/841042&type=l&count=&relateUid=&appkey=3843950324&title=' + encodetitle);
+}
+</script>		
+<div class="m_sharebtn">
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	  <tbody><tr>
+		<td width="11%" height="43" align="center" valign="middle"><img src="./vim中多标签和多窗口的使用_files/ssk.png" alt="分享至"></td>
+		<td width="77%" align="left" valign="top">
+			<div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare" data="{&#39;wbuid&#39;:1706976420}">
+				<a class="bds_tsina" title="分享到新浪微博" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_qzone" title="分享到QQ空间" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_tqq" title="分享到腾讯微博" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_baidu" title="分享到百度搜藏" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_renren" title="分享到人人网" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_qq" title="分享到QQ收藏" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_douban" title="分享到豆瓣网" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_hi" title="分享到百度空间" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<a class="bds_msn" title="分享到MSN" href="http://jianshusoft.blog.51cto.com/#"></a>
+				<em title="分享到51CTO微博" class="weibo_51cto" onmouseout="this.style.backgroundImage=&#39;url(http://img1.51cto.com/images/share/ico_mweibo.gif)&#39;" onmouseover="this.style.backgroundImage=&#39;url(http://img1.51cto.com/images/share/ico_mweibob.gif)&#39;" onclick="show51share();"></em>
+				<span class="bds_more">更多</span>
+				
+				<a class="shareCount" href="http://jianshusoft.blog.51cto.com/#" title="累计分享1次">1</a>
+			</div>
+	<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=559183" src="./vim中多标签和多窗口的使用_files/bds_s_v2.js"></script>
+	<script type="text/javascript" id="bdshell_js" src="./vim中多标签和多窗口的使用_files/shell_v2.js"></script>
+	<script type="text/javascript">
+		var bds_config = {'wbUid':1706976420};
+		var bds_config = {'bdPic':'http://blog.51cto.com/attachment/201212/113635914.jpg'};
+		document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?t=" + new Date().getHours();
+	</script>
+	<!-- Baidu Button END --></td>
+		<td width="12%" align="right" valign="middle"><a href="javascript:favorBox('open');" title="一键收藏，随时查看，分享好友！"><img src="./vim中多标签和多窗口的使用_files/favorite_add_small.gif" border="0" alt="一键收藏，随时查看，分享好友！"></a></td>
+	  </tr>
+	</tbody></table>
+
+</div>			
+    		<div class="showBottom">
+            <!--<div class="reviews"><span class="fl" style="cursor:pointer;"><a onclick="openFavoulist();" id="favourer"></a>
+
+            </span><div id="favourdiv" class="support01">0人</div>
+              <span class="fl">了这篇文章</span></div>-->
+              <table width="720" border="0" cellspacing="0" cellpadding="0">
+  <tbody><tr>
+    <td align="right"><img src="./vim中多标签和多窗口的使用_files/icon01.png" width="15" height="16"> <span style="cursor:pointer;"><a onclick="openFavoulist();" id="favourer"></a></span></td>
+    <td width="70" align="left"><div style="line-height:28px;" id="favourdiv" class="support01">0人</div></td>
+    <td width="60" align="left">了这篇文章</td>
+  </tr>
+</tbody></table>
+
+
+
+
+            <div class="showType">类别：<a href="http://jianshusoft.blog.51cto.com/2380869/d-5" class="operlink">C/C++</a>┆<a class="operlink" onclick="javascript:joingroups(841042,&#39;jianshusoft&#39;);return false;">技术圈</a>(<script src="./vim中多标签和多窗口的使用_files/joingroup.php"></script>0)┆阅读(<script src="./vim中多标签和多窗口的使用_files/header.php"></script>1867)┆评论(<script>document.write(replies)</script>0)
+
+┆
+
+	<a href="http://jianshusoft.blog.51cto.com/#" onclick="javascript:dfanologin(&#39;http://home.51cto.com/index.php?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042&#39;);return false;" class="operlink">
+
+推送到技术圈</a>┆<a href="http://jianshusoft.blog.51cto.com/">返回首页</a></div>
+            <div class="prevNext">
+
+			上一篇 <a href="http://jianshusoft.blog.51cto.com/2380869/841038" class="operlink" title="线程局部存储(TLS)">线程局部存储(TLS)</a>
+
+
+			下一篇 <a href="http://jianshusoft.blog.51cto.com/2380869/841419" class="operlink" title="《程序员的自我修养》中关于加锁不能保证线程安全的一个错误">《程序员的自我修养》中关于加锁不能保证线程..</a>
+
+
+            </div>
+
+            </div>
+
+	  </div><!--showBottom end-->
+      </div><!--modCon-->
+    <span class="modBot"></span>
+    </div><!--artShow end-->
+    <span class="blank"></span>
+
+
+    <div class="relatedArt box">
+    <div class="title" name="zhuanti" id="zhuanti"><h2>相关文章</h2></div>
+    <div class="modCon">
+<ul>
+
+<li><a href="http://gotajuly.blog.51cto.com/2771348/536657" title="vim学习（2）-移动命令" target="_blank">vim学习（2）-移动命令</a></li>
+
+
+<li><a href="http://activethink.blog.51cto.com/390764/239578" title="在VIM中如何用ctags给c++代码打tags:omnicppcomplete" target="_blank">在VIM中如何用ctags给c++代码打tags:omnicpp..</a></li>
+
+
+<li><a href="http://liuyu.blog.51cto.com/183345/324958" title="SCRT VIM 中文乱码" target="_blank">SCRT VIM 中文乱码</a></li>
+
+
+<li><a href="http://qingzhu.blog.51cto.com/1626839/549858" title="Vim文本编辑器" target="_blank">Vim文本编辑器</a></li>
+
+
+<li><a href="http://feiniao.blog.51cto.com/680395/345983" title="vi与vim编辑器命令 (四）" target="_blank">vi与vim编辑器命令 (四）</a></li>
+
+
+<li><a href="http://daisy8867.blog.51cto.com/1043582/562066" title="用vim编写C/C++程序" target="_blank">用vim编写C/C++程序</a></li>
+
+
+<li><a href="http://ncowboy.blog.51cto.com/36000/340752" title="WIN7下面安装VIM" target="_blank">WIN7下面安装VIM</a></li>
+
+
+<li><a href="http://scottlinn.blog.51cto.com/829656/492582" title="强大的文本编辑器-VIM" target="_blank">强大的文本编辑器-VIM</a></li>
+
+
+
+</ul>
+
+
+
+<span class="blank6"></span>
+</div><!--modCon end-->
+<span class="modBot"></span>
+</div><!--相关文章 end-->
+
+<div class="relatedArt box">
+<a href="http://wot.51cto.com/bigdata2013/index.html" target="_blank"><img src="./vim中多标签和多窗口的使用_files/1_1359533223.jpg"></a>
+</div>
+
+
+<div class="artComm box">
+    <div class="title"><a name="replay"></a><h2>文章评论</h2></div>
+    <div class="modCon" id="artcomment">
+		<div>  &nbsp;</div><div>  &nbsp;</div>
+    </div><!--modCon-->
+        <span class="modBot"></span>
+</div><!--commBox end-->
+<a href="" id="com_top_top"></a>
+<form action="http://jianshusoft.blog.51cto.com/comment.php?" method="post" name="form1" id="form1" onsubmit="return commentSubmit(this,&quot;&quot;);">
+<span class="blank1"></span>
+<div class="box writeComm">
+<a name="comment"></a>
+<input type="hidden" name="action" value="comment">
+<input id="commenttid" type="hidden" name="tid" value="841042">
+<input type="hidden" name="com_count_ajax" id="com_count_ajax" value="1">
+
+ <div class="title">
+	<h2 class="fl">发表评论&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+	<span class="fl"><a class="mred" target="_blank" href="http://lizi0322.blog.51cto.com/2632811/1126216">一起来说说：那些年，我们玩过的操作系统</a></span>
+	<style type="text/css">
+		a.mred:link{ color:#ff0000; text-decoration:underline;}
+		a.mred:visited{color:#ff0000;}
+		a.mred:hover{color:#ff0000;}
+		a.mred:active{color:#ff0000;}
+	</style>
+</div>
+ <div class="modCon">
+ <div class="commForm">
+<dl>
+<dt>昵&nbsp;&nbsp;称：</dt>
+<dd>
+
+<input type="text" id="commentusername" name="username" value="" class="commInput fl"><span><a href="http://home.51cto.com/index.php?reback=http%253A%252F%252Fjianshusoft.blog.51cto.com%252F2380869%252F841042" style="text-decoration:underline">登录</a>&nbsp;&nbsp;<a href="http://ucenter.51cto.com/reg_01.php?reback=http://blog.51cto.com" target="_blank" style="text-decoration: underline;">快速注册</a></span>
+
+
+
+</dd>
+</dl>
+
+
+
+<dl id="commentyanzheng">
+
+
+<dt>验证码：</dt>
+<dd><input class="code" type="text" value="" id="commentauthnum" name="authnum" onclick="displaysecunum();">
+
+  <img width="78" class="fl" height="29" id="secunum" onclick="refimg()" style="display:none;"><p class="fl"><span style="display:none;" id="spanfont">点击图片可刷新验证码</span><span style="display:inline;" id="clickfont">请点击后输入验证码</span><span class="pl5"><a href="http://51ctoblog.blog.51cto.com/26414/5591" target="_blank" style="text-decoration: underline;">博客过2级，无需填写验证码</a></span></p></dd>
+</dl>
+<dl>
+<dt>内&nbsp;&nbsp;容：</dt>
+<dd>
+<textarea class="writeCommCon f12" id="commentcontent" name="content"></textarea>
+</dd>
+</dl>
+</div>
+<div class="writeCommBot">
+  <input type="hidden" name="parentid" value="" id="parentid">
+  <input class="commBtn fl" name="submit" type="button" id="commentsubmit" value="" onclick="commentSubmitend2()">
+
+ <p class="fl" style="display:none;"><input class="fl" type="checkbox" name="favour" id="favour" checked="" value="1"><span class="fl">同时赞一个</span></p>
+
+</div>
+<span class="blank"></span>
+</div><!--modCon-->
+<span class="modBot"></span>
+</div>
+</form>
+
+<iframe id="iframe1" name="iframe1" width="0" height="0"></iframe>
+<!--发表评论 end-->
+</div>
+</div>
+<script language="javascript">
+	function refimg(){
+		var randval = Math.random();
+		document.getElementById("secunum").src="/seccode.php?rnum="+randval;
+	}
+	function displaysecunum()
+	{
+		var displaystr = document.getElementById("secunum").style.display;
+		if(displaystr == 'none')
+		{
+			refimg();
+			document.getElementById("clickfont").style.display = 'none';
+			document.getElementById("secunum").style.display = 'inline';
+			document.getElementById("spanfont").style.display = 'inline';
+		}
+	}
+
+	function showMsn(){
+		document.getElementById("c02").style.display = "none";
+		document.getElementById("c01").style.display = "block";
+		document.getElementById("share").style.height = "83px";
+		document.getElementById("share").style.background = "none";
+	}
+	function showBBS(){
+		document.getElementById("c01").style.display = "none";
+		document.getElementById("c02").style.display = "block";
+		document.getElementById("share").style.height = "83px";
+		document.getElementById("share").style.background = "none";
+	}
+
+	//资源页面，分享按钮
+	function copyShareUrl(title){
+
+		if (window.clipboardData){
+
+			if(document.getElementById("c01").style.display == 'block')
+			{
+				copy = "推荐：" + title + "http://jianshusoft.blog.51cto.com/2380869/841042";
+				var alertText = "复制成功，你可以粘贴到MSN或QQ中发给好友。";
+			}
+			else
+			{
+				copy = "[url=" + "http://jianshusoft.blog.51cto.com/2380869/841042" + "][u]" + title + "[/u][/url]";
+				var alertText = "复制成功，你可以粘贴到论坛分享给坛友。";
+			}
+			window.clipboardData.clearData();
+			window.clipboardData.setData("Text", copy);
+			alert(alertText);
+		}
+		else if (window.netscape){
+			alert("您使用的浏览器不支持此复制功能，请使用Ctrl+C或鼠标右键。");
+			if(document.getElementById("c01").style.display == 'block')
+			{
+				document.getElementById("shareTextQM").value = "推荐：" + title + "http://jianshusoft.blog.51cto.com/2380869/841042";
+				document.getElementById("shareTextQM").select();
+			}
+			else
+			{
+				document.getElementById("shareTextBBS").value = "[url=" + "http://jianshusoft.blog.51cto.com/2380869/841042" + "][u]" + title + "[/u][/url]";
+                document.getElementById("shareTextBBS").select();
+			}
+		}
+		return false;
+	}
+	function select_login(){
+		document.getElementById('fixed').style.display='';
+	}
+	function commentcheck()
+	{
+		if(document.form1.content.value == "")
+		{
+			alert("评论内容为空!");
+			document.form1.content.focus();
+			return false;
+		}
+	}
+	function changename(){
+
+	var memberid=0;
+	memberid="";
+
+	if(document.getElementById('commentniming').checked){
+		document.getElementById('commentusername').disabled=false;
+		document.getElementById('commentusername').value='';
+		document.getElementById("indexhidden").style.display="none";
+		document.getElementById("commentindex").value='';
+		document.getElementById("commentyanzheng").style.display="";
+	}else{
+		document.getElementById('commentusername').disabled=true;
+		document.getElementById('commentusername').value="";
+		document.getElementById("indexhidden").style.display="";
+		document.getElementById("commentindex").value="http://.blog.51cto.com";
+		if(memberid>8)
+		{
+			document.getElementById("commentyanzheng").style.display="none";
+		}
+	}
+	}
+	function openFavoulist()
+	{
+		window.open ('http://blog.51cto.com/mod/favourlist.php?tid=841042','newwindow','height=300,width=500,top=400,left=400,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no,z-look=yes');
+	}
+
+	var e_zti = document.getElementById('zti');//有专题锚点
+	var maodian = window.location.href;//锚点
+	if (e_zti) {
+		e_zti.href= (/[#]+/.test(maodian)) ? maodian : maodian + "#zhuanti";
+	}
+</script>
+<script src="./vim中多标签和多窗口的使用_files/jquery-1.7.1.min.js"></script>
+<script src="./vim中多标签和多窗口的使用_files/jquery.cookie.js"></script>
+<script src="./vim中多标签和多窗口的使用_files/jquery.messager.js"></script>
+<link href="./vim中多标签和多窗口的使用_files/blog_top.css" rel="stylesheet" type="text/css">
+<script src="./vim中多标签和多窗口的使用_files/blog_top_list.php" type="text/javascript" language="javascript"></script>
+<style>
+.backToTop {
+    display: none;
+	WIDTH: 45px;
+	height:45px;
+	BOTTOM: 20px;
+     position: fixed;
+    _position: absolute;
+    right: 140px;
+    bottom: 10px;
+    _bottom: "auto";
+    cursor: pointer;
+    opacity: .6;
+    filter: Alpha(opacity=60);
+	text-indent:-9999px;
+}
+.tops { background:url(/images/tops.jpg) no-repeat center center; }
+</style>
+<script type="text/javascript">
+(function() {
+    var backToTopTxt = "返回顶部", backToTopEle = $('<div class="backToTop tops"></div>').appendTo($("body"))
+        .text(backToTopTxt).attr("title", backToTopTxt).click(function() {
+            $("html, body").animate({ scrollTop: 0 }, 520);
+    }), backToTopFun = function() {
+        var st = $(document).scrollTop(), winh = $(window).height();
+        (st > 0)? backToTopEle.show(): backToTopEle.hide();    
+        //IE6下的定位
+        if (!window.XMLHttpRequest) {
+            backToTopEle.css("top", st + winh - 60);    
+        }
+    };
+    $(window).bind("scroll", backToTopFun);
+    $(function() { backToTopFun(); });
+})();
+</script><div class="backToTop tops" title="返回顶部" style="display: block; ">返回顶部</div>
+
+
+
+
+
+
+<div class="clear"></div>
+<!-- <script>
+jQuery(function(){
+	var html= "<div id=\"sogou_se_tgbar\" style=\"text-align:center;margin:0px auto 2px auto;clear:both;background:url(http://home.51cto.com/public/images/notice/sogou_se_tgbar_bg_final1.gif) repeat-x;width:950px;color:#000;font-size:13px;height:36px;z-index:21474836471\"><div style=\"float:left;cursor:pointer;width:910px;text-align:center;border-left:solid #efbf00 1px;height:32px; line-height:32px;txt-align:center;\"><span style=\"\">	<a href=\"http://51ctoblog.blog.51cto.com/26414/1093282\">【新年祝福征集】51CTO社区年底嘉年华活动正在征集博主祝福语，祝福以红包的形式随机的赠送给访问51CTO的网友 点此送祝福>></a></span></div><div onclick=\"document.getElementById('sogou_se_tgbar').style.display = 'none';\" style=\"float:right;width:20px;cursor:pointer;height:28px;padding:4px 8px 0px 8px;border-right:solid #efbf00 1px\"><img style=\"border:none;margin:4px 0px 0px 0px;\" src=\"http://home.51cto.com/public/images/notice/sogou_se_tgbar_close_final1.gif\"></div></div>"
+	jQuery('body').prepend(html);
+})
+</script> -->
+
+<div id="footer">
+  <div id="innerFooter">
+	<center>
+		<small>
+			Copyright By 51CTO.COM 版权所有<br><br>
+			<a href="http://blog.51cto.com/" target="_blank"><img src="./vim中多标签和多窗口的使用_files/copyright.jpg"></a>
+	  </small>
+	</center>
+  </div>
+</div>
+<script src="./vim中多标签和多窗口的使用_files/index(1).php" charset="utf-8"></script>
+<div style="display:none">
+<script src="./vim中多标签和多窗口的使用_files/count.js"></script><script src="./vim中多标签和多窗口的使用_files/count.php"></script>
+
+<iframe frameborder="0" scrolling="no" width="0" height="0" src="./vim中多标签和多窗口的使用_files/pageview.html"></iframe>
+</div>
+<div style="display:none;"><script src="./vim中多标签和多窗口的使用_files/stat.php" language="JavaScript"></script><script src="./vim中多标签和多窗口的使用_files/cnzz_core.php" charset="utf-8" type="text/javascript"></script><a href="http://www.cnzz.com/stat/website.php?web_id=4274540" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./vim中多标签和多窗口的使用_files/pic.gif"></a><div>
+
+
+</div></div></body></html>

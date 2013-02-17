@@ -1,0 +1,7 @@
+.hotArt li,.newComments li,.hotBlogArt li,.hotBlog li,.myHome li,.myLink li,.relatedArt li,.share li,.recentGuests li,.friendLink li,.artList li,.artType li{list-style-type:none}
+.relatedArt ul li{width:350px!important}
+.showContent li{margin-left:20px}
+.modCon{clear:both}
+.artList ul{clear:both}
+.blank1{height:1px;overflow:hidden;clear:both;}
+.notice .modCon,.myMod .modCon{word-wrap:break-word;word-break:normal}

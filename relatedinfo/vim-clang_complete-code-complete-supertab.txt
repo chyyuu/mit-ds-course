@@ -1,0 +1,38 @@
+vim clang_complete code complete supertab
+clang_complete 是一个非常强大的vim补齐插件，它直接分析c c++语法补齐，触发的字符为::, ., -> 就可以自动补齐，主动处罚的是C-x C-u
+安装的过程很简单
+sudo apt-get install clang
+sudo apt-get install llvm
+然后下载插件
+http://www.vim.org/scripts/script.php?script_id=3302
+在vimrc中添加
+" clang_complete
+ let g:clang_complete_auto = 1 
+let g:clang_complete_copen = 1 
+let g:clang_auto_user_options='path, ~/.clang_complete'
+在当前工程目录中可以指定搜索目录中，创建.clang_complete文件，我的当前写入的内容是
+-I/usr/include/c++/4.6 -I/usr/include/c++/4.6/i686-linux-gnu/. -I/usr/include/c++/4.6/backward -I/usr/lib/gcc/i686-linux-gnu/4.6/include -I/usr/local/include -I/usr/lib/gcc/i686-linux-gnu/4.6/include-fixed -I/usr/include/i386-linux-gnu -I/usr/include/
+如果不写，则使用默认目录
+
+为了加快补齐速度，可以这样做，创建pch.h 头文件，比如我的写的是
+#include <iostream>
+#include <vector>
+#include <string>
+里面指定所有需要补齐的依赖头文件，然后编译
+ydx@ubuntu:~/ydx/test$ clang -x c++-header ./pch.h -fno-exceptions -fnu-runtime -o ./pch.pch  -I/usr/include/c++/4.6 -I/usr/include/c++/4.6/i686-linux-gnu/. -I/usr/include/c++/4.6/backward -I/usr/lib/gcc/i686-linux-gnu/4.6/include -I/usr/local/include -I/usr/lib/gcc/i686-linux-gnu/4.6/include-fixed -I/usr/include/i386-linux-gnu -I/usr/include/
+这样就可以大大加快速度，并且如果安装的有问题，这种方法也是可以工作的。
+
+下面是两个非常好的介绍网站，如果有问题可以参考：
+http://www.pleee.com/archives/426.html
+https://github.com/Rip-Rip/clang_complete/wiki
+下面这篇讲OmniCppComplete也很好用，也可以补齐标准库
+http://vim.wikia.com/wiki/C%2B%2B_code_completion
+
+思考：
+clang_complete虽然很方便，但是对与有些比较长的函数名，是否也可以很方便的补齐。
+对与c++，使用的时候一般都会带上namespace，问题不严重，但是对于c，最好还是搭配其他的补齐工具。
+
+code_complete是另一个非常好用的complete插件，对相关的头文件做tags，然后就可以不起任意的function了，里面的很多功能相对于c.vim来说重复了。
+http://www.vim.org/scripts/script.php?script_id=1764 
+
+vim一个让人不爽的地方就是在insert模式下不能方便的移动光标，别人一般都是esc，然后移动光标。

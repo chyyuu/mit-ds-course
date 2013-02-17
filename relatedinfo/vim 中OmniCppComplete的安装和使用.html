@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0053)http://blog.csdn.net/duguteng/article/details/7417181 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>vim 中OmniCppComplete的安装和使用 - duguteng的专栏 - 博客频道 - CSDN.NET</title>
+
+<meta name="description" content="将vim 改造成功能强大的IDE系列之三『插件介绍』onmicppcompete功能：命名空间(namespace),类(class),结构(struct)和联合(union)补全函数属性成员和返回值类型补全this指针成员补全C/C++类型转换(cast)对象补全类型定义(typedef)和匿名类型(anonymous types)补全按理说可以显示函数原">
+<script type="text/javascript" async="" src="./vim 中OmniCppComplete的安装和使用_files/ga.js"></script><script src="./vim 中OmniCppComplete的安装和使用_files/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/ad.js"></script>
+<link rel="Stylesheet" type="text/css" href="./vim 中OmniCppComplete的安装和使用_files/style.css">
+<link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/duguteng/rss/list">
+<link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+<link type="text/css" rel="stylesheet" href="./vim 中OmniCppComplete的安装和使用_files/nobg.css">
+<link type="text/css" rel="stylesheet" href="./vim 中OmniCppComplete的安装和使用_files/style(1).css"></head>
+<body>
+<script src="./vim 中OmniCppComplete的安装和使用_files/pub_topnav_2011.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./vim 中OmniCppComplete的安装和使用_files/navtop_2012.css">
+<div class="nav_top_2011">
+<p><span style="color:red;">您还未登录！</span>|<a href="https://passport.csdn.net/account/login" target="_top">登录</a>|<a href="https://passport.csdn.net/account/register" target="_top">注册</a>|<a href="https://passport.csdn.net/help/faq" target="_blank">帮助</a></p><ul>
+<li><a href="http://www.csdn.net/" target="_blank">首页</a></li>
+<li><a href="http://news.csdn.net/" target="_blank">业界</a></li>
+<li><a href="http://mobile.csdn.net/" target="_blank">移动</a></li>
+<li><a href="http://cloud.csdn.net/" target="_blank">云计算</a></li>
+<li><a href="http://sd.csdn.net/" target="_blank">研发</a></li>
+<li><a href="http://bbs.csdn.net/" target="_blank">论坛</a></li>
+<li><a href="http://blog.csdn.net/" target="_blank">博客</a></li>
+<li><a href="http://download.csdn.net/" target="_blank">下载</a></li>
+<li class="more"><h2 id="topnav_btnmore" onclick="showNavMore(this)"><a href="javascript:void(0);">更多</a></h2>
+<div id="topnav_hidlist">
+<iframe name="nav_frm" src="about:blank" width="92" height="178" scrolling="no" frameborder="no"></iframe>
+</div>
+</li>
+</ul>
+</div>
+
+
+<div id="container">
+<div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h1><a href="http://blog.csdn.net/duguteng">duguteng的专栏</a></h1>
+            <h2>和所有计算机爱好者分享和学习Computer Science!</h2>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg"></div>
+    <div class="navigator">
+        <ul>
+            <li id="btnContents"><a href="http://blog.csdn.net/duguteng?viewmode=contents"><span><img src="./vim 中OmniCppComplete的安装和使用_files/ico_list.gif">目录视图</span></a></li>
+            <li id="btnView"><a href="http://blog.csdn.net/duguteng?viewmode=list"><span><img src="./vim 中OmniCppComplete的安装和使用_files/ico_summary.gif">摘要视图</span></a></li>
+            <li id="btnRss"><a href="http://blog.csdn.net/duguteng/rss/list"><span><img src="./vim 中OmniCppComplete的安装和使用_files/ico_rss.gif">订阅</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "duguteng";
+    var blog_address = "http://blog.csdn.net/duguteng";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";
+</script>
+        
+<div id="body">
+<div id="main">
+<div class="main">
+<div class="notice"> 
+
+<a href="http://surveies.csdn.net/survey/comein/546" target="_blank">
+<font color="blue">CSDN客服工作问卷调查   </font></a>
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/8572108" target="_blank"><font color="red">社区专家谈 12306</font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://bbs.csdn.net/topics/390366069" target="_blank"><font color="red">CSDN社区“海外程序员经验谈”活动正式上线 
+</font></a>
+
+<br>
+
+
+
+
+
+<a href="http://vote.blog.csdn.net/details/blogstar" target="_blank">
+<font color="red">2012CSDN博客之星火热出炉！ </font></a>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnstudent/article/details/8077932" target="_blank">
+<font color="red">2013年全国百所高校巡讲讲师招募  </font></a>
+
+
+</div><div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Original"></span>
+    <h3>
+        <span class="link_title"><a href="./vim 中OmniCppComplete的安装和使用_files/vim 中OmniCppComplete的安装和使用.html">
+        vim 中OmniCppComplete的安装和使用
+        </a></span>
+    </h3>
+</div>
+
+        
+    <div class="article_manage">
+        <span class="link_categories">
+        分类：
+            <a href="http://blog.csdn.net/duguteng/article/category/1113152">vim</a> 
+        </span>
+    <span class="link_postdate">2012-03-31 21:33</span>
+    <span class="link_view" title="阅读次数">1397人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/duguteng/article/details/7417181#comments">评论</a>(1)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;vim 中OmniCppComplete的安装和使用&#39;,&#39;7417181&#39;);return false;" title="收藏">收藏</a></span>
+    <span class="link_report"><a href="http://blog.csdn.net/duguteng/article/details/7417181#report" onclick="javascript:report(7417181,2);return false;" title="举报">举报</a></span>
+    
+</div>
+
+
+    
+<div style="clear:both"></div><div style="border:solid 1px #ccc; background:#eee; float:left; min-width:200px;padding:4px 10px;"><p style="text-align:right;margin:0;"><span style="float:left;">目录<a href="http://blog.csdn.net/duguteng/article/details/7417181#" title="系统根据文章中H1到H6标签自动生成文章目录">(?)</a></span><a href="http://blog.csdn.net/duguteng/article/details/7417181#" onclick="javascript:return openct(this);" title="展开">[+]</a></p><ol style="display:none;margin-left:14px;padding-left:14px;line-height:160%;"><li><a href="http://blog.csdn.net/duguteng/article/details/7417181#t0">符号名称</a></li><li><a href="http://blog.csdn.net/duguteng/article/details/7417181#t1">符号类型</a></li><li><a href="http://blog.csdn.net/duguteng/article/details/7417181#t2">访问控制</a></li><li><a href="http://blog.csdn.net/duguteng/article/details/7417181#t3">符号定义所在域</a></li><li><a href="http://blog.csdn.net/duguteng/article/details/7417181#t4">常用配置选项</a></li></ol></div><div style="clear:both"></div><div id="article_content" class="article_content">
+
+<p><span style="font-size:12px">将vim 改造成功能强大的IDE系列之三</span></p>
+<p><span style="font-size:12px"><span style="font-size:16px"><strong>『插件介绍』</strong></span><br>
+</span></p>
+<p></p>
+<p>onmicppcompete功能：</p>
+<div class="xcmd" style="background-color:rgb(192,192,192)">
+<ul>
+<li>命名空间(namespace),类(class),结构(struct)和联合(union)补全</li><li>函数属性成员和返回值类型补全</li><li>"this"指针成员补全</li><li>C/C++类型转换(cast)对象补全</li><li>类型定义(typedef)和匿名类型(anonymous types)补全</li></ul>
+</div>
+<p>按理说可以显示函数原型，但是我的不可以，不知道为什么？<br>
+</p>
+<p>有图有真相：</p>
+<p><img src="./vim 中OmniCppComplete的安装和使用_files/0_1311671051mzF8.gif" alt=""><br>
+</p>
+<p><br>
+</p>
+<p><span style="font-size:16px"><strong>『下载和安装』</strong></span><br>
+</p>
+<p>从<a href="http://www.vim.org/scripts/script.php?script_id=1520">http://www.vim.org/scripts/script.php?script_id=1520</a>下载安装包后。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;1）进入~/.vim目录，将安装版解压缩</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;2）进入~/.vim/doc目录，在Vim命令行下运行"helptags .”</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;3）在~/.vimrc中加入以下几行：</p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 1514px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_1" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_1" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>set&nbsp;nocp&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class=""><span>filetype&nbsp;plugin&nbsp;on&nbsp;&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="html" style="display: none; ">set nocp  
+filetype plugin on </pre><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4）启动Vim后使用以下命令为Vim添加omnicppcomplete帮助信息
+<p></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 1662px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_2" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_2" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=2&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>:helptags&nbsp;~/.vimrc/doc&nbsp;&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="html" style="display: none; ">:helptags ~/.vimrc/doc </pre>&nbsp;&nbsp;&nbsp;&nbsp; 5）使用ctags生成标签库<br>
+对于C++代码，需要在~/.ctags 中加入下面几个选项（去除中文）：
+<p></p>
+<p></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 1793px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_3" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_3" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=3&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>--c++</span><span class="attribute">-kinds</span><span>=+p&nbsp;:&nbsp;为标签添加函数原型(prototype)信息&nbsp;&nbsp;</span></span></li><li class=""><span><span class="attribute">--fields</span><span>=+iaS&nbsp;:&nbsp;为标签添加继承信息(inheritance)，访问控制(access)信息，函数特征(function&nbsp;Signature,如参数表或原型等)&nbsp;&nbsp;</span></span></li><li class="alt"><span><span class="attribute">--extra</span><span>=+q&nbsp;:&nbsp;为类成员标签添加类标识&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="html" style="display: none; ">    --c++-kinds=+p : 为标签添加函数原型(prototype)信息
+    --fields=+iaS : 为标签添加继承信息(inheritance)，访问控制(access)信息，函数特征(function Signature,如参数表或原型等)
+    --extra=+q : 为类成员标签添加类标识
+
+</pre><br>
+至此，安装结束！
+<p></p>
+<p><span style="font-size:16px"><strong>『基本功能使用方法』</strong></span></p>
+<p>在配置好Vim，并生成了ctags标签库前提条件下，Vim中在输入 “xxx." 或者 "xxx-&gt;" 时会弹出如下补全提示：</p>
+<p></p>
+<div class="dp-highlighter bg_html"><div class="bar"><div class="tools"><b>[html]</b> <a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/duguteng/article/details/7417181#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><div style="position: absolute; left: 402px; top: 2026px; width: 23px; height: 11px; z-index: 99; "><embed id="ZeroClipboardMovie_4" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="23" height="11" name="ZeroClipboardMovie_4" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=4&amp;width=23&amp;height=11" wmode="transparent"></div></div></div><ol start="1" class="dp-xml"><li class="alt"><span><span>+-------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class=""><span>|method1(&nbsp;&nbsp;&nbsp;f&nbsp;&nbsp;+&nbsp;&nbsp;MyNamespace::MyClass|&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>|_member1&nbsp;&nbsp;&nbsp;m&nbsp;&nbsp;+&nbsp;&nbsp;MyNamespace::MyClass|&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>|_member2&nbsp;&nbsp;&nbsp;m&nbsp;&nbsp;#&nbsp;&nbsp;MyNamespace::MyClass|&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>|_member3&nbsp;&nbsp;&nbsp;m&nbsp;&nbsp;-&nbsp;&nbsp;MyNamespace::MyClass|&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>+-------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;&nbsp;^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;(1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4)&nbsp;&nbsp;&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="html" style="display: none; ">    +-------------------------------------+  
+    |method1(   f  +  MyNamespace::MyClass|  
+    |_member1   m  +  MyNamespace::MyClass|  
+    |_member2   m  #  MyNamespace::MyClass|  
+    |_member3   m  -  MyNamespace::MyClass|  
+    +-------------------------------------+  
+        ^       ^  ^          ^  
+       (1)     (2)(3)        (4)  </pre><br>
+其中1为符号名称；2为符号类型；3为访问控制标识；4为符号定义所在域(scope)。
+<p></p>
+<p></p>
+<h4><a name="t0"></a>&nbsp;符号名称</h4>
+<p></p>
+<p>1为omnicppcomplete所查找到的可选符号(symbol)名称，如以'('结尾，则为函数。</p>
+<p>按理说可以显示函数的原型，但是我的不可以，不知道为什么？<br>
+</p>
+<h4><a name="t1"></a>&nbsp;符号类型</h4>
+<p>符号的类型，可能的值为</p>
+<div class="xcmd" style="background-color:rgb(192,192,192)">
+<ul>
+<li><span style="color:#FF0000">c</span> : 类(class)</li><li><span style="color:#FF0000">d</span> : 宏(macro definition)</li><li><span style="color:#FF0000">e</span> : 枚举值(enumeator)</li><li><span style="color:#FF0000">f </span>: 函数(function)</li><li><span style="color:#FF0000">g</span> : 枚举类型名称</li><li><span style="color:#FF0000">m</span> : 类/结构/联合成员(member)</li><li><span style="color:#FF0000">n </span>: 命名空间(namespace)</li><li><span style="color:#FF0000">p :</span> 函数原型(function prototype)</li><li><span style="color:#FF0000">s</span> : 结构体名称(structure name)</li><li><span style="color:#FF0000">t :</span> 类型定义(typedef)</li><li><span style="color:#FF0000">u</span> : 联合名(union name)</li><li><span style="color:#FF0000">v</span> : 变量定义(variable defination)</li></ul>
+</div>
+<h4><a name="t2"></a>访问控制</h4>
+<p>类成员访问控制，取值：</p>
+<div class="xcmd" style="background-color:rgb(192,192,192)">
+<ul>
+<li><span style="color:#FF0000">+</span> : 公共(public)</li><li><span style="color:#FF0000">#</span> : 保护(protected)</li><li><span style="color:#FF0000">- </span>: 私有(private)</li></ul>
+</div>
+<h4><a name="t3"></a>符号定义所在域</h4>
+<p>符号在何处被定义。</p>
+<h4><a name="t4"></a><span style="font-size:16px"><strong>『常用配置选项』</strong></span></h4>
+<p>Vim中，可以通过以下选项控制omnicppcomplete查找/补全方式：</p>
+<div class="xcmd" style="background-color:rgb(192,192,192)">
+<ul>
+<li><span style="color:#FF0000">OmniCpp_GlobalScopeSearch</span> : 全局查找控制。0:禁止；1:允许(缺省)</li><li><span style="color:#FF0000">OmniCpp_NamespaceSearch </span>: 命名空间查找控制。
+<ul>
+<li>0 : 禁止查找命名空间</li><li>1 : 查找当前文件缓冲区内的命名空间(缺省)</li><li>2 : 查找当前文件缓冲区和包含文件中的命名空间</li></ul>
+</li><li><span style="color:#FF0000">OmniCpp_DisplayMode </span>: 类成员显示控制(是否显示全部公有(public)私有(private)保护(protected)成员)。
+<ul>
+<li>0 : 自动 </li><li>1 : 显示所有成员</li></ul>
+</li><li><span style="color:#FF0000">OmniCpp_ShowScopeInAbbr </span>: 选项用来控制匹配项所在域的显示位置。缺省情况下，omni显示的补全提示菜单中总是将匹配项所在域信息显示在缩略信息最后一列。
+<ul>
+<li>0 : 信息缩略中不显示匹配项所在域(缺省)</li><li>1 : 显示匹配项所在域，并移除缩略信息中最后一列</li></ul>
+</li><li><span style="color:#FF0000">OmniCpp_ShowPrototypeInAbbr</span> : 是否是补全提示缩略信息中显示函数原型。
+<ul>
+<li>0 : 不显示(缺省)</li><li>1 : 显示原型</li></ul>
+</li><li><span style="color:#FF0000">OmniCpp_ShowAccess</span> : 是否显示访问控制信息('+', '-', '#')。0/1, 缺省为1(显示)</li><li><span style="color:#FF0000">OmniCpp_DefaultNamespaces</span> : 默认命名空间列表，项目间使用','隔开。<br>
+如：<span style="color:#FF0000">let </span><span style="color:#FF0000">OmniCpp_DefaultNamespaces</span> = ["std', "MyNamespace"]</li><li><span style="color:#FF0000">OmniCpp_MayCompleteDot </span>: 在'.'号后是否自动运行omnicppcomplete给出提示信息。0/1, 缺省为1</li><li><span style="color:#FF0000">OmniCpp_MayCompleteArray</span> : 在"-&gt;"后是否自动运行omnicppcomplete给出提示信息。0/1, 缺省为1</li><li><span style="color:#FF0000">OmniCpp_MayCompleteScope </span>: 在域标识符"::"后是否自动运行omnicppcomplete给出提示信息。0/1, 缺省为0</li><li><span style="color:#FF0000">OmniCpp_SelectFirstItem </span>: 是否自动选择第一个匹配项。仅当"completeopt"不为"longest"时有效。
+<ul>
+<li>0 : 不选择第一项(缺省)</li><li>1 : 选择第一项并插入到光标位置</li><li>2 : 选择第一项但不插入光标位置</li></ul>
+</li><li><span style="color:#FF0000">OmniCpp_LocalSearchDecl</span> : 使用Vim标准查找函数/本地(local)查找函数。Vim内部用来在函数中查找变量定义的函数需要函数括号位于文本的第一列，而本地查找函数并不需要。</li></ul>
+</div>
+<p></p>
+<p><span style="font-size:16px"><strong>『阅读说明』</strong></span></p>
+<p><span style="font-size:10px">&nbsp;&nbsp;&nbsp; 1）Vim存在多个配置文件vimrc，比如/etc/vimrc，此文件影响整个系统的Vim。还有~/.vimrc，此文件只影响本用户的Vim。而且~/.vimrc文件中的配置会覆盖/etc/vimrc中的配置。这里我们只修改~/.vimrc文件。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 2）Vim的插件（plugin）安装在Vim的runtimepath目录下，你可以在Vim命令行下运行"set rtp“命令查看。这里我们选择安装在~/.vim目录，没有就创建一个。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 3）当本文说”在Vim命令行下运行cmdxx命令“时，意思是指在Vim的命令行模式下运行cmdxx命令，即在Vim的正常模式下通过输入冒号"："进入命令行模式，然后紧接着输入命令cmdxx。在后文描述中都会省略冒号"："输入。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 4）如果没有说明“在Vim命令行下运行某命令”，则是在shell中执行该命令。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 5）如果命令中间被空白符间隔或有与正文容易混淆的字符，我会用双引号将命令与正文区分。所以读者在实际操作时，不要输入命令最前面和最后面引号。</span></p>
+<p><span style="font-size:10px">&nbsp; &nbsp; 6）本文关于组合快捷键的描述，形如a-b形式的快捷键表示同时按下a键和b键，而形如"a-b c"形式的快捷键，则表示先同时按下a键和b键，然后放开ab键，再按下c键。</span></p>
+<p><span style="font-size:10px">&nbsp;&nbsp;&nbsp; 7） 本人使用的系统是Ubunt 11.10 ，Vim版本是Vi IMproved 7.3</span></p>
+<p><br>
+</p>
+
+</div>
+<div class="share_buttons" id="sharePanel"><span>分享到：</span> <a name="sina" class="share_sina" title="分享到新浪微博"></a><a name="qq" class="share_qq" title="分享到腾讯微博"></a></div>
+<!--192.168.1.236-->
+<div class="article_next_prev">
+    <li class="prev_article"><span>上一篇：</span><a href="http://blog.csdn.net/duguteng/article/details/7414592">vim 中Taglist的安装和使用</a></li>
+    <li class="next_article"><span>下一篇：</span><a href="http://blog.csdn.net/duguteng/article/details/7417264">vim 中SuperTab的安装和使用</a></li>
+</div>
+
+
+    
+</div>
+<div id="ad_cen"><iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 774px; height: 2px; " src="./vim 中OmniCppComplete的安装和使用_files/ad(1).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(4, 'ad_cen');
+</script>
+<div id="comment_title" class="panel_head">查看评论<a name="comments"></a></div>
+<div id="comment_list"><dl class="comment_item comment_topic" id="comment_item_2463216"><dt class="comment_head" floor="1">1楼 <span class="user"><a class="username" href="http://blog.csdn.net/mafeichao" target="_blank">mafeichao</a> <span class="ptime">2012-12-10 17:16发表</span>  <a href="http://blog.csdn.net/duguteng/article/details/7417181#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display: none; " commentid="2463216" username="mafeichao"> <a href="http://blog.csdn.net/duguteng/article/details/7417181#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/duguteng/article/details/7417181#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/mafeichao" target="_blank"><img src="./vim 中OmniCppComplete的安装和使用_files/3_mafeichao.jpg" width="40" height="40"></a></dd><dd class="comment_body">这里有一个不错的补充http://www.cnblogs.com/xkfz007/articles/2501888.html</dd></dl><div class="clear"></div></div>
+<div id="comment_bar" style="display: none; "></div>
+<div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:csdn.showLogin(function (dat) {js_logined(dat.data.userName);});">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fduguteng%2Farticle%2Fdetails%2F7417181">[注册]</a></div></div>
+<div class="announce">* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+<script type="text/javascript">
+    var fileName = '7417181';
+    var commentscount = 1;
+    var islock = false
+</script>
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/comment.js"></script>
+<div id="ad_bot"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 774px; height: 170px; " src="./vim 中OmniCppComplete的安装和使用_files/ad(2).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(5, 'ad_bot');
+</script>
+<div id="report_dialog"></div>
+
+<div id="d-top" style="display: none; ">
+<a id="d-top-a" href="http://blog.csdn.net/duguteng/article/details/7417181#" title="回到顶部">
+<img src="./vim 中OmniCppComplete的安装和使用_files/top.png" alt="TOP"></a>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var d_top=$('#d-top');
+        document.onscroll=function(){
+            var scrTop=(document.body.scrollTop||document.documentElement.scrollTop);
+            if(scrTop>500){
+                d_top.show();
+            }else{
+                d_top.hide();
+            }
+        }
+        $('#d-top-a').click(function(){
+            scrollTo(0,0);
+            this.blur();
+            return false;
+        });
+    });
+</script>
+
+
+
+<div class="clear"></div>
+</div>
+</div>
+
+<div id="side">
+<div class="side">
+<div id="panel_Profile" class="panel">
+    <ul class="panel_head"><span>个人资料</span></ul>
+    <ul class="panel_body profile">
+        <div id="blog_userface">
+            <a href="http://my.csdn.net/duguteng" target="_blank">
+            <img src="./vim 中OmniCppComplete的安装和使用_files/1_duguteng.jpg" title="访问我的空间" style="max-width:90%">
+            </a>
+            <br>
+            <span><a href="http://my.csdn.net/duguteng" class="user_name" target="_blank">duguteng</a></span>
+        </div>
+<div class="interact">
+<!--<a href="#" class="attented" title="已关注"></a>-->
+<a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+<a href="javascript:void(0);" class="letter" onclick="loginto(1)" title="[发私信]"></a>
+</div>
+        <div id="blog_medal">
+        <div id="bms_box"><a href="http://medal.blog.csdn.net/allmedal.aspx" target="_blank"><img src="./vim 中OmniCppComplete的安装和使用_files/holdon_s2.gif" onmouseover="m_over_m(this,0)" onmouseout="m_out_m()" alt=""></a></div></div>
+        <ul id="blog_rank">
+            <li>访问：<span>17675次</span></li>
+            <li>积分：<span>372分</span></li>
+            <li>排名：<span>千里之外</span></li>
+        </ul>
+        <ul id="blog_statistics">
+            <li>原创：<span>17篇</span></li>
+            <li>转载：<span>25篇</span></li>
+            <li>译文：<span>0篇</span></li>
+            <li>评论：<span>4条</span></li>
+        </ul>
+    </ul>
+</div>
+<script type="text/javascript">
+    var _blogger = 'duguteng';
+</script>
+
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>文章分类</span></ul>
+    <ul class="panel_body">
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/914199">ubuntu</a><span>(17)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/914200">linux内核</a><span>(2)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/929955">C 语言</a><span>(14)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/1113152">vim</a><span>(5)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/duguteng/article/category/1253728">系统性能优化</a><span>(1)</span>
+        </li>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+    <ul class="panel_head"><span>文章存档</span></ul>
+    <ul class="panel_body">
+        <div id="archive_list"><li><a href="http://blog.csdn.net/duguteng/article/month/2012/10">2012年10月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/08">2012年08月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/07">2012年07月</a><span>(10)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/05">2012年05月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/04">2012年04月</a><span>(1)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/duguteng/article/month/2012/03">2012年03月</a><span>(11)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2012/02">2012年02月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2011/12">2011年12月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/duguteng/article/month/2011/11">2011年11月</a><span>(3)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>阅读排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7412652" title="vim 中Ctags的安装和使用">vim 中Ctags的安装和使用</a><span>(4994)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7726536" title="linux下svn不能连接上windows服务器：SSL handshake failed: SSL 错误：在证书中检测到违规的密钥用法">linux下svn不能连接上windows服务器：SSL handshake failed: SSL 错误：在证书中检测到违规的密钥用法</a><span>(1464)</span>
+        </li>
+        <li>
+            <a href="./vim 中OmniCppComplete的安装和使用_files/vim 中OmniCppComplete的安装和使用.html" title="vim 中OmniCppComplete的安装和使用">vim 中OmniCppComplete的安装和使用</a><span>(1397)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417264" title="vim 中SuperTab的安装和使用">vim 中SuperTab的安装和使用</a><span>(1230)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7706986" title="Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）">Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）</a><span>(939)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7414592" title="vim 中Taglist的安装和使用">vim 中Taglist的安装和使用</a><span>(774)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7417276" title="vim 中Winmanager，NERDTree和MiniBufExplorer安装使用">vim 中Winmanager，NERDTree和MiniBufExplorer安装使用</a><span>(720)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7774092" title="Foo 是什么意思">Foo 是什么意思</a><span>(657)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7014310" title="ubuntu下用命令将源设置为中科大源">ubuntu下用命令将源设置为中科大源</a><span>(503)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7272596" title="JOS 内核启动过程">JOS 内核启动过程</a><span>(323)</span>
+        </li>
+    </ul>
+</div>
+<div id="hotarticls2" class="panel">
+    <ul class="panel_head"><span>评论排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7412652" title="vim 中Ctags的安装和使用">vim 中Ctags的安装和使用</a><span>(3)</span>
+        </li>
+        <li>
+            <a href="./vim 中OmniCppComplete的安装和使用_files/vim 中OmniCppComplete的安装和使用.html" title="vim 中OmniCppComplete的安装和使用">vim 中OmniCppComplete的安装和使用</a><span>(1)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/8056321" title="系统性能分析的一些文章">系统性能分析的一些文章</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7706986" title="Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）">Vbox中虚拟机和主机共享文件（主机linux，虚拟机xp或linux）</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7558114" title="Ubuntu 下运行 Shell 脚本时显示 &quot;declare not found&quot; 的问题">Ubuntu 下运行 Shell 脚本时显示 "declare not found" 的问题</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7552774" title="x86中断向量表">x86中断向量表</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7552766" title="DOS功能调用">DOS功能调用</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7546825" title="linux 汇编 hello world + 调试">linux 汇编 hello world + 调试</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7546716" title="linux 汇编——hello world！">linux 汇编——hello world！</a><span>(0)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/duguteng/article/details/7472011" title="C语言运算符优先级详细列表">C语言运算符优先级详细列表</a><span>(0)</span>
+        </li>
+    </ul>
+</div>
+<div id="homepageArticles" class="panel">
+    <ul class="panel_head"><span>推荐文章</span></ul>
+    <ul class="panel_body" id="ad_commend">
+    <iframe id="ad_frm_2" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 195px; height: 186px; " src="./vim 中OmniCppComplete的安装和使用_files/ad.html"></iframe></ul>
+</div>
+<script type="text/javascript">
+    new Ad(12, 'ad_commend');
+</script><div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/hubi0952" class="user_name">hubi</a>:
+好！！！！
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7417181#comments">vim 中OmniCppComplete的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/mafeichao" class="user_name">mafeichao</a>:
+这里有一个不错的补充http://www.cnblogs.com/xkfz007/articles/...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/einkarl" class="user_name">einkarl</a>:
+文章深入浅出，难得这么好的指南文章，多些楼主！
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/duguteng/article/details/7412652#comments">vim 中Ctags的安装和使用</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/wslong" class="user_name">wslong</a>:
+文章总结得真好，正好今天在同学影响下用了下ctags。通过你的文章更深入了解了这个技术。向你学习！
+    </p>
+    </li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+
+<div class="clear"></div>
+</div>
+
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/newblog.min.js"></script>
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/showblogmedal.ashx"></script>
+
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/publib_footer.js"></script><link rel="stylesheet" type="text/css" href="./vim 中OmniCppComplete的安装和使用_files/pub_footer_2012.css"><div class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd>京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>北京创新乐知信息技术有限公司 版权所有</dd><dd>世纪乐知(北京)网络技术有限公司 提供技术支持</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd><img src="./vim 中OmniCppComplete的安装和使用_files/ico_email.gif" alt="" title=""> 联系邮箱：webmaster(at)csdn.net</dd><dd>Copyright © 1999-2012, CSDN.NET, All Rights Reserved&nbsp;<a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./vim 中OmniCppComplete的安装和使用_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div><script type="text/javascript" charset="utf-8" src="./vim 中OmniCppComplete的安装和使用_files/tracking.js"></script>
+
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./vim 中OmniCppComplete的安装和使用_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./vim 中OmniCppComplete的安装和使用_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./vim 中OmniCppComplete的安装和使用_files/msg.popup.js"></script>
+
+
+</div>
+
+</body></html>

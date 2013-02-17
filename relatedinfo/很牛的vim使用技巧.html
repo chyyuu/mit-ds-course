@@ -1,0 +1,842 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0067)http://linux.chinaunix.net/techdoc/desktop/2009/07/04/1121975.shtml -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
+
+
+
+<title>很牛的vim使用技巧 - 技术文档 - 桌面应用 Linux时代 - 开源、自由、共享 - 中国最大的Linux技术社区</title>
+<meta name="keywords" content="很牛的vim使用技巧 - 技术文档 - 桌面应用 Linux时代 - 开源、自由、共享 - 中国最大的Linux技术社区">
+<meta name="description" content="很牛的vim使用技巧 - 技术文档 - 桌面应用  桌面应用 Linux 技术文档">
+
+<link href="./很牛的vim使用技巧_files/all.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+
+<!--
+
+.STYLE1 {color: #FF0000}
+
+.STYLE2 {font-size: 14px}
+
+-->
+
+</style>
+
+</head>
+
+
+
+<body>
+
+<table width="950" border="0" align="center" cellpadding="0" cellspacing="0">
+
+  <tbody><tr>
+
+    <td height="27">	<table border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse" width="100%">
+	<tbody><tr><form name="login" action="http://linux.chinaunix.net/bbs/logging.php?action=login" method="post"></form>
+	<td><script language="javascript" src="./很牛的vim使用技巧_files/loginbox.php"></script></td>
+	
+	<td align="right">
+	·<a href="http://www.chinaunix.net/" class="list1">ChinaUnix首页</a>
+
+	·<a href="http://bbs.chinaunix.net/" class="list1">论坛</a>
+	·<a href="http://blog.chinaunix.net/" class="list1">博客</a>&nbsp;
+	</td>
+	</tr>
+	</tbody></table></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="1" bgcolor="#CCCCCC"></td>
+
+  </tr>
+
+  <tr>
+
+    <td><table width="100%" border="0" cellpadding="0" cellspacing="0">
+
+      <tbody><tr>
+
+        <td height="84"><img src="./很牛的vim使用技巧_files/logo.jpg"></td>
+
+        <td align="right"><iframe src="./很牛的vim使用技巧_files/iframe.html" width="750" height="80" frameborder="0" scrolling="no"></iframe>
+</td>
+
+      </tr>
+
+    </tbody></table></td>
+
+  </tr>
+
+  <tr>
+
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+      <tbody><tr>
+
+        <td width="3"><img src="./很牛的vim使用技巧_files/bgtop1.jpg" width="3" height="26"></td>
+
+        <td width="944" background="./很牛的vim使用技巧_files/bgtop2.gif" class="whitetop">
+<a href="http://linux.chinaunix.net/" target="_blank">Linux首页</a> |
+<a href="http://linux.chinaunix.net/news/">Linux新闻</a> |
+<a target="_blank" href="http://linux.chinaunix.net/bbs" style="color:red"><b>Linux论坛</b></a> |
+<a href="http://linux.chinaunix.net/techdoc/">Linux文档</a> |
+<a target="_blank" href="http://download.chinaunix.net/disc/linux/">Linux下载</a> |
+<a target="_blank" href="http://blog.chinaunix.net/techart.php?frmid=6">Linux博客</a> |
+<a target="_blank" href="http://search.chinaunix.net/">Linux搜索</a> |
+<a target="_blank" href="http://linux.chinaunix.net/bbs/index.php?gid=68">开源项目孵化平台</a>
+ |
+<a target="_blank" href="http://linux.chinaunix.net/ebook/" style="color:red">《开源时代》</a></td>
+
+        <td width="3" align="right"><img src="./很牛的vim使用技巧_files/bgtop3.jpg" width="3" height="26"></td>
+
+      </tr>
+
+    </tbody></table></td>
+
+  </tr>
+
+</tbody></table>
+
+<table width="950" border="0" align="center" cellpadding="0" cellspacing="0">
+
+<tbody><tr>
+
+    <td valign="bottom" class="BlkLightblue">
+<a target="_blank" href="http://linux.chinaunix.net/techdoc/beginner/">
+		新手入门</a> | <span lang="zh-cn">
+		<a target="_blank" href="http://linux.chinaunix.net/techdoc/install/">
+		安装启动</a> | </span>
+		<a target="_blank" href="http://linux.chinaunix.net/techdoc/system/">
+		管理员指南</a> | <a target="_blank" href="http://man.chinaunix.net/">开发手册</a> 
+		| <a target="_blank" href="http://linux.chinaunix.net/techdoc/desktop/">
+		桌面应用</a> |
+		<a target="_blank" href="http://linux.chinaunix.net/techdoc/develop/">
+		程序开发</a> |
+		<a target="_blank" href="http://linux.chinaunix.net/techdoc/database/">
+		数据库</a> | <span lang="zh-cn">
+		<a target="_blank" href="http://linux.chinaunix.net/techdoc/net/">网络技术</a>|
+<a target="_blank" href="http://linux.chinaunix.net/topics/2007-01-25/15/index.shtml">
+CentOS</a></span> |
+<a target="_blank" href="http://linux.chinaunix.net/search2.php?key=fedora&id=0">
+Fedora</a> <span lang="zh-cn">| </span>
+<a target="_blank" href="http://linux.chinaunix.net/search2.php?key=mysql&id=0">
+MySQL</a>
+
+<span lang="zh-cn">| </span>
+<a target="_blank" href="http://linux.chinaunix.net/search2.php?key=apache&id=0">
+Apache</a>
+
+<span lang="zh-cn">| </span>
+<a target="_blank" href="http://linux.chinaunix.net/search2.php?key=ubuntu&id=0">
+<font color="#FF0000">Ubuntu</font></a>
+
+<span lang="zh-cn">| </span>
+<a target="_blank" href="http://linux.chinaunix.net/topics/2008-07-10/18/index.shtml">
+<font color="#FF0000">Gentoo</font></a>| 
+<b>
+<a target="_blank" href="http://linux.chinaunix.net/topics/2008-07-30/19/index.shtml">
+<font color="#FF0000">OSCON08</font></a></b>
+</td>
+
+</tr>
+<tr><td>
+
+</td></tr>
+  <tr>
+
+    <td height="30" valign="bottom">&nbsp;&nbsp;<a href="http://linux.chinaunix.net/">Linux时代</a> &gt;&gt;  <a href="http://linux.chinaunix.net/techdoc/" class="list1">技术文档</a> &gt;&gt; <a href="http://linux.chinaunix.net/techdoc/desktop/" class="list1">桌面应用</a></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="1" bgcolor="#CCCCCC"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="8"></td>
+
+  </tr>
+
+</tbody></table><table width="950" border="0" align="center" cellpadding="0" cellspacing="0">
+
+  <tbody><tr>
+
+    <td valign="top" class="BLKtext"><table width="660" border="0" align="center" cellpadding="0" cellspacing="0">
+
+      <tbody><tr>
+
+        <td height="8">&nbsp;</td>
+
+      </tr>
+
+      <tr>
+
+        <td height="30" class="Ftext1">很牛的vim使用技巧</td>
+
+      </tr>
+
+      <tr>
+
+        <td><table width="80%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+          <tbody><tr>
+
+            <td height="1" bgcolor="#CCCCCC"></td>
+
+          </tr>
+
+        </tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td height="40" align="center">来源: 
+ ChinaUnix博客 　日期：
+2009.07.04 22:50　(共有<span class="STYLE1" id="postcount"></span>条评论)  <a href="http://linux.chinaunix.net/bbs/thread-1121975-1-1.html" target="_blank">我要评论</a></td>
+
+      </tr>
+
+      <tr>
+
+        <td>&nbsp;</td>
+
+      </tr>
+
+      <tr>
+
+        <td class="F14">
+读本文之前请注意：<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;1. 本文的目标是提供一些vim的使用技巧，利用这些技巧可以提高vim的操作效率。部分技巧在vi上也可以使用，但是现在基本上都是用vim了。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;2. 本文是整理和总结使用技巧，而非讲解vim入门，因此不会涉及最基本的使用，例如如何上移或下移光标，对此类操作请参阅任何一本vim或者vi教程。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;3. 本文阅读对象是了解了vim的基本操作，而希望高效地利用vim进行工作的人。熟练使用vim的人自然不必细读，如果能留下您的宝贵意见，本人将感激不尽。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;4. 本文由本人搜集整理，转载请注明出处<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;本文一般情况下用（里边的字母一般大小写无所谓,除非特别注明）表示按住ctrl同时按下相关字母，命令前加一个i表示在插入模式下用这个命令<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>1. 选定文字 / 拷贝粘贴</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;v为可视模式,可以选定多行。选定多行之后，可以用yy或者dd等等进行拷贝和剪切。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;p 是粘贴<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;y 和d 可以直接拷贝或者剪切选定的内容<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;yw是拷贝一个单词<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;如果要复制整行的最简单办法就是V,y,p 就行了<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;v是可以选定一行任意个字符的,V是行选定的,一次一整行，然后通过向下或向上移动光标而选定多行。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;对于v选定的,拷贝后就是这么多,选多少就拷贝多少,而V选定的,粘贴的话会自动换到下一行<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;命令模式下,也是块选定,不过是列块选定<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>2. 折叠代码</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;可以zf进行折叠, 用zo打开折叠,也可以方向键向右打开折叠,zc 关闭折叠(只要在被折叠的块中的任一个语句就行)<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>3. 缩进代码</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;是右缩进<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;按v选定后按=就是自动格式化代码,自动缩进,内部的递归的缩进都做到了<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;行左移&gt;，该命令用于调整源码缩进格式简便快速。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>4. 移动光标</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;%是从大括号的开始移动到大括号的结束位置<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:后边加行号就是跳到这一行<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 光标返回到以前的位置。相当于光标移动的“撤销”<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 光标返回到后来的位置。相当于光标移动的“恢复”<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>5. 多文件编辑 / 缓冲区命令</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;vim下每一个打开的文件对应一个缓冲区（buffer）。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;多文件编辑会有两种情形，一种是在进入 vim 前所用的参数就是多个文件（这种情形称为 argument list）。另一种情形是进入 vim 后另外再开其它的文件（称为 buffer list）。不过都可以统称为buffer。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#0000ff&quot;"><b>5.1 打开文件</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;vi flname1 flname2… flnameN<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;将多个文件调入缓冲，是 argument list。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:e filename<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;这是在进入 vim 后，在不离开 vim 的情形下再开其它文件，只要您要编辑的档案是在目前目录，Tab 补全键还是可以使用。是buffer list。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;注意：:e 或者:new 或者:split 后边可以跟目录,这样就可以在目录下慢慢找要打开的文件了<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#0000ff&quot;"><b>5.2 缓冲区跳转</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:n&nbsp; &nbsp;编辑下一个文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:2n 编辑下二个文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:N&nbsp; &nbsp;编辑前一个文件。注意，这种用法只能用于 argument list 的情形。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:rew 回到首文件<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:args 查看当前编辑缓冲文件状态<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:e# 或 Ctrl-^&nbsp; &nbsp;编辑前一个档案，用于两文件互相编辑时相当好用。这种用法不管是 argument list 或buffer list 档案间皆可使用。 使用Ctrl－^ 命令更便捷，但如终端类型不正确该功能将无效。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;用:ls来显示缓冲区中的文件，编号后边有#的代表是前一个文件，可以通过:e#来进入，有%a的代表是当前文件，什么也没有的可以通过:bn来进入，这里的n代表文件编号。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:b文件名或编号&nbsp; &nbsp;移至该文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在 :ls 中就会出示各文件的编号，这个编号在未离开 vim 前是不会变的。这个指令 elvis 也是可以使用。当然 :e#编号 也是可以的，这样的用法则是所有 vi clone 都通用了。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在 buffers 中，减号 - 表示这个 buffer 并未载入，不过，不必担心，载入相当快速的。加号 + 表示这个 buffer 已经修改过了。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:bn&nbsp; &nbsp;buffer next。这里的n代表字母n<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:bl&nbsp; &nbsp;buffer last。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;以上两个指令 elvis 不适用。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;如果您是使用 vim 的 GUI，那就在菜单上就会有 Buffers 这个选项，可以很容易的知道及移动各buffer 间。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#0000ff&quot;"><b>5.3 移除缓冲区</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:bd(elete)&nbsp; &nbsp;buffer 在未离开 vim 前是不会移除的，可使用这个指令移除。其实移除它干什么呢？vim是您在叫用时才会载入的，因此这些 buffers 并不是像 cache 一般要占内存的。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#0000ff&quot;"><b>5.4 重新编辑</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;放弃一修改过的文件，重新编辑。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(1)使用命令　:q!强行退出后再vi flname重新进入。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(2)使用命令　:e!强行重编辑更便捷。这样也是会打开文件，但会放弃目前编辑文件的改变，否则如果文件已有变动，vim 预设是不让您随便离开的。:e! 后不接什么的话，代表舍弃一切修改，重新载入编辑中文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#0000ff&quot;"><b>5.5 其他命令</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:files 或 :buffers 或 :ls&nbsp; &nbsp;会列出目前 buffer 中的所有文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在 elvis 中可使用 :b 来叫出 buffers。 <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:f 或 Ctrl-g&nbsp; &nbsp;显示目前编辑的文件名、是否经过修改及目前光标所在之位置。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:f 文件名&nbsp; &nbsp;改变编辑中的文件名。(file)<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:r 文件名&nbsp; &nbsp;在光标所在处插入一个文件的内容。(read)<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:35 r 文件名&nbsp; &nbsp;将文件插入至 35 行之后。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;gf&nbsp; &nbsp;这是 vim 的特殊打开文件的方法，会打开光标所在处的 word 为名的文件，当然，这个文件要在当前目录内，否则会创建新文件。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>6. 查找命令</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;用/查找单词后,n可以跳到下一个,N则是上一个,:nohls可以取消高亮<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;查找时,:set ignorecase”项让VIM忽略大小写，“:set noignorecase” 来关闭这项功能。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>7. 修改文字</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;cw:删除一个单词并进入插入模式,cc:删除一行并进入插入模式。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;r:然后输入的字母将替换当前字母并保持命令模式,R则是不停的替换(一个挨着一个)。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;0到行首,$到行尾。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>8. 函数间跳转</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;ctrl+]和ctrl+T分别是查找函数的定义和返回,好像需要ctag的支持<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i&nbsp; &nbsp;跳转到光标所指标识符的定义行,是打开一个新的小窗口显示,记住要加个i,最好是找自己项目下的文件,否则找库函数的话还不如man.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;大写 K&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;看光标所指标识符的 man 帮助页<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>9. 窗口命令</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; = ctrl+w<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:split 文件名 同时在一个页面显示多个文件的内容,类似多窗口,用切换当前窗口<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;f&nbsp; &nbsp;切分显示光标在处的文件名，VIM 会在 path 中搜索该文件名，比如常用它打开 #include 语句中的文件<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;_&nbsp; &nbsp;当同时打开几个文件时，按 _ 使当前窗口最大化<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;用Ctrl-W命令指定光标移动： <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W +&nbsp; &nbsp;&nbsp; &nbsp; 扩大窗口<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W -&nbsp; &nbsp;&nbsp; &nbsp; 缩小窗口<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W h&nbsp; &nbsp;&nbsp; &nbsp; 移动到窗口左边<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W j&nbsp; &nbsp;&nbsp; &nbsp; 移动到窗口下边<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W k&nbsp; &nbsp;&nbsp; &nbsp; 移动到窗口上边<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;Ctrl-W l&nbsp; &nbsp;&nbsp; &nbsp; 移动到窗口右边<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;等于是按下后,松开键盘,再按下一个命令就可以了.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;如果要关闭分割窗口可以用:close，剩下只有一个窗口的话就不能关了。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;多窗口是split，像用e打开多个文件是将文件放在缓冲区中。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>10. 自动完成</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i&nbsp; &nbsp;向上搜索，补全一个词<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i&nbsp; &nbsp;向下搜索，补全一个词<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i 补全一行。<br>
+比如你写过一行 for (int i = 0; i 即可。如果补全出来的不是你想要的那一行，你可以按&nbsp;&nbsp;或<br>
+ 选择上一个或下一个匹配行i&nbsp; &nbsp;在文件系统中搜索，补全一个文件名<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;如果按&nbsp;&nbsp;或&nbsp;&nbsp;补全一个词，在当前文件中没有找到匹配，VIM 将搜索 #include 语句中的文件，而文件的位置将在 path 中搜索。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i&nbsp; &nbsp;把上一行对应列的字符抄下来<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i&nbsp; &nbsp;把下一行对应列的字符抄上来,这两个都可以一直按下去,到了行尾自己会停的.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>11. 注释整块内容</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;注释块的方法:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 选定要注释掉的行&nbsp; &nbsp;I&nbsp; &nbsp;//&nbsp; &nbsp;Esc <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;I之后输入的东西就是插入到选定的行前边的,直至Esc.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;要去掉注释的办法:选定注释符//,然后d <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;列块选定后I是在前边都插入,A是在后边都插入<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;是按列块模式的选定,是行选定,v是普通选定<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<font color="&quot;#ff0000&quot;"><b>12. 其他命令</b></font><br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; <br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;u可以撤销上一步操作, ctrl+r可以恢复<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i命令执行一个普通模式的命令，执行完毕后回到插入模式，不用多次Esc<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;i后续字符&nbsp; &nbsp;输入特殊的 ASCII 字符或键。<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;在光标当前位置处重复上一次操作<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;:!命令行&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;执行一条外部命令<br>
+***********************************************************************************<br>
+我是 vim 粉丝, 用了许久, 有一些自己的感受, 又到处挖到一些别人的技巧. 感觉对 vim 粉丝比较有用, 就把它记在这儿. 希望借此文套出大家自己的巧活, 就正应了抛砖引玉的古话了.<br>
+先稍为介绍一下 vim. vi 是 unix/linux 下极为普遍的一种文本编辑器, 大部分机器上都有. vi 有各种变种,<br>
+在不同的机器上常用不同的变种软件. 其中 vim 比较好用也用得比较广泛. vim 是 Vi IMproved 的缩写, 表示更好的 vi.<br>
+我个人觉得它是非常好的编辑器(为了避免 Emacs 粉丝挑眼, 就不说最好了). 没用过的也建议试试看, 当然 vim<br>
+对编写文本文件很方便好用, 比如编写程序, html文档等等, 却不能用来编写 word 文档.<br>
+关于 vim 的安装, 基本使用方法等网络上能搜出许多, 就不在这里罗嗦了, 要是对 vim 有兴趣, 那就看看这里(中文文档): <br>
+<a href="http://vcd.gro.clinux.org/" target="_blank">http://vcd.gro.clinux.org/</a><br>
+本文就说些其中比较有用, 比较常用的命令, 若能熟练运用这些命令, 那么会发现编辑文件很舒服.<br>
+说明:<br>
+以下的例子中 xxx 表示在命令模式下输入 xxx 并回车<br>
+以下的例子中 :xxx 表示在扩展模式下输入 xxx 并回车<br>
+小括号中的命令表示相关命令.<br>
+在编辑模式或可视模式下输入的命令会另外注明.<br>
+1. 查找<br>
+&nbsp; &nbsp;/xxx(?xxx)&nbsp; &nbsp;&nbsp; &nbsp; 表示在整篇文档中搜索匹配xxx的字符串, / 表示向下查找, ? 表示<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 向上查找.其中xxx可以是正规表达式,关于正规式就不多说了.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 一般来说是区分大小写的, 要想不区分大小写, 那得先输入<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; :set ignorecase<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 查找到以后, 再输入 n 查找下一个匹配处, 输入 N 反方向查找.<br>
+&nbsp; &nbsp;*(#)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 当光标停留在某个单词上时, 输入这条命令表示查找与该单词匹配的<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 下(上)一个单词. 同样, 再输入 n 查找下一个匹配处, 输入 N 反方<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 向查找.<br>
+&nbsp; &nbsp;g*(g#)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令与上条命令相似, 只不过它不完全匹配光标所在处的单词, 而<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 是匹配包含该单词的所有字符串.<br>
+&nbsp; &nbsp;gd&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;本命令查找与光标所在单词相匹配的单词, 并将光标停留在文档的非<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 注释段中第一次出现这个单词的地方.<br>
+&nbsp; &nbsp;%&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 本命令查找与光标所在处相匹配的反括号, 包括 () [] {}<br>
+&nbsp; &nbsp;f(F)x&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;本命令表示在光标所在行进行查找, 查找光标右(左)方第一个x字符.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 找到后:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 输入 ; 表示继续往下找<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 输入 , 表示反方向查找<br>
+2. 快速移动光标<br>
+&nbsp; &nbsp; 在 vi 中, 移动光标和编辑是两件事, 正因为区分开来, 所以可以很方便的进行光标定<br>
+位和编辑. 因此能更快一点移动光标是很有用的.<br>
+&nbsp; &nbsp;w(e)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到下一个单词.<br>
+&nbsp; &nbsp;b&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到上一个单词.<br>
+&nbsp; &nbsp;0&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到本行最开头.<br>
+&nbsp; &nbsp;^&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到本行最开头的字符处.<br>
+&nbsp; &nbsp;$&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到本行结尾处.<br>
+&nbsp; &nbsp;H&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到屏幕的首行.<br>
+&nbsp; &nbsp;M&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到屏幕的中间一行.<br>
+&nbsp; &nbsp;L&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到屏幕的尾行.<br>
+&nbsp; &nbsp;gg&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;移动光标到文档首行.<br>
+&nbsp; &nbsp;G&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 移动光标到文档尾行.<br>
+&nbsp; &nbsp;c-f&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;(即 ctrl 键与 f 键一同按下) 本命令即 page down.<br>
+&nbsp; &nbsp;c-b&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;(即 ctrl 键与 b 键一同按下, 后同) 本命令即 page up.<br>
+&nbsp; &nbsp;''&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令相当有用, 它移动光标到上一个标记处, 比如用 gd, * 等查<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 找到某个单词后, 再输入此命令则回到上次停留的位置.<br>
+&nbsp; &nbsp;'.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令相当好使, 它移动光标到上一次的修改行.<br>
+&nbsp; &nbsp;`.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令相当强大, 它移动光标到上一次的修改点.<br>
+3. 拷贝, 删除与粘贴<br>
+&nbsp; &nbsp; 在 vi 中 y 表示拷贝, d 表示删除, p 表示粘贴. 其中拷贝与删除是与光标移动命令<br>
+结合的, 看几个例子就能够明白了.<br>
+&nbsp; &nbsp;yw&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝从当前光标到光标所在单词结尾的内容.<br>
+&nbsp; &nbsp;dw&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示删除从当前光标到光标所在单词结尾的内容.<br>
+&nbsp; &nbsp;y0&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝从当前光标到光标所在行首的内容.<br>
+&nbsp; &nbsp;d0&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示删除从当前光标到光标所在行首的内容.<br>
+&nbsp; &nbsp;y$&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝从当前光标到光标所在行尾的内容.<br>
+&nbsp; &nbsp;d$&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示删除从当前光标到光标所在行尾的内容.<br>
+&nbsp; &nbsp;yfa&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示拷贝从当前光标到光标后面的第一个a字符之间的内容.<br>
+&nbsp; &nbsp;dfa&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示删除从当前光标到光标后面的第一个a字符之间的内容.<br>
+&nbsp; &nbsp;特殊地:<br>
+&nbsp; &nbsp;yy&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝光标所在行.<br>
+&nbsp; &nbsp;dd&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示删除光标所在行.<br>
+&nbsp; &nbsp;D&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 表示删除从当前光标到光标所在行尾的内容.<br>
+&nbsp; &nbsp;关于拷贝, 删除和粘贴的复杂用法与寄存器有关, 可以自行查询.<br>
+4. 数字与命令<br>
+&nbsp; &nbsp; 在 vi 中数字与命令结合往往表示重复进行此命令, 若在扩展模式的开头出现则表示行<br>
+号定位. 如:<br>
+&nbsp; &nbsp;5fx&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示查找光标后第 5 个 x 字符.<br>
+&nbsp; &nbsp;5w(e)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;移动光标到下五个单词.<br>
+&nbsp; &nbsp;5yy&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示拷贝光标以下 5 行.<br>
+&nbsp; &nbsp;5dd&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示删除光标以下 5 行.<br>
+&nbsp; &nbsp;y2fa&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 表示拷贝从当前光标到光标后面的第二个a字符之间的内容.<br>
+&nbsp; &nbsp;:12,24y&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 表示拷贝第12行到第24行之间的内容.<br>
+&nbsp; &nbsp;:12,y&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝第12行到光标所在行之间的内容.<br>
+&nbsp; &nbsp;:,24y&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示拷贝光标所在行到第24行之间的内容. 删除类似.<br>
+5. 快速输入字符<br>
+&nbsp; &nbsp; 在 vi 中, 不要求你输入每一个字符, 可以有很多种方法快速输入一些字符.<br>
+&nbsp; &nbsp; 使用 linux/unix 的同学一定有一个经验, 在命令行下输入命令时敲入头几个字符再按<br>
+TAB 系统就会自动将剩下的字符补齐, 假如有多个匹配则会打印出来. 这就是著名的命令<br>
+补齐(其实windows中也有文件名补齐功能). vi 中有许多的字符串补齐命令, 非常方便.<br>
+&nbsp; &nbsp;c-p(c-n)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在编辑模式中, 输入几个字符后再输入此命令则 vi 开始向上(下)搜<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 索开头与其匹配的单词并补齐, 不断输入此命令则循环查找. 此命令<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 会在所有在这个 vim 程序中打开的文件中进行匹配.<br>
+&nbsp; &nbsp;c-x-l&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在编辑模式中, 此命令快速补齐整行内容, 但是仅在本窗口中出现的<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 文档中进行匹配.<br>
+&nbsp; &nbsp;c-x-f&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;在编辑模式中, 这个命令表示补齐文件名. 如输入:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; /usr/local/tom 后再输入此命令则它会自动匹配出:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; /usr/local/tomcat/<br>
+&nbsp; &nbsp;abbr&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 即缩写. 这是一个宏操作, 可以在编辑模式中用一个缩写代替另一个<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 字符串. 比如编写java文件的常常输入 System.out.println, 这很<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 是麻烦, 所以应该用缩写来减少敲字. 可以这么做:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; :abbr sprt System.out.println<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 以后在输入sprt后再输入其他非字母符号, 它就会自动扩展为System.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; out.println<br>
+6. 替换<br>
+&nbsp; &nbsp; 替换是 vi 的强项, 因为可以用正规表达式来匹配字符串.以下提供几个例子.<br>
+&nbsp; &nbsp;:s/aa/bb/g&nbsp; &nbsp;&nbsp; &nbsp; 将光标所在行出现的所有包含 aa 的字符串中的 aa 替换为 bb<br>
+&nbsp; &nbsp;:s/\/bb/g&nbsp; &nbsp;将光标所在行出现的所有 aa 替换为 bb, 仅替换 aa 这个单词<br>
+&nbsp; &nbsp;:%s/aa/bb/g&nbsp; &nbsp;&nbsp; &nbsp;将文档中出现的所有包含 aa 的字符串中的 aa 替换为 bb<br>
+&nbsp; &nbsp;:12,23s/aa/bb/g 将从12行到23行中出现的所有包含 aa 的字符串中的 aa 替换为 bb<br>
+&nbsp; &nbsp;:12,23s/^/#/&nbsp; &nbsp;&nbsp;&nbsp;将从12行到23行的行首加入 # 字符<br>
+&nbsp; &nbsp;:%s= *$==&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;将所有行尾多余的空格删除<br>
+&nbsp; &nbsp;:g/^\s*$/d&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;将所有不包含字符(空格也不包含)的空行删除.<br>
+7. 多文件编辑<br>
+&nbsp; &nbsp; 在一个 vim 程序中打开很多文件进行编辑是挺方便的.<br>
+&nbsp; &nbsp;:sp(:vsp) 文件名&nbsp; &nbsp;&nbsp;&nbsp;vim 将分割出一个横(纵)向窗口, 并在该窗口中打开新文件.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;从 vim6.0 开始, 文件名可以是一个目录的名称, 这样, vim 会<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;把该目录打开并显示文件列表, 在文件名上按回车则在本窗口打<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;开该文件, 若输入 O 则在新窗口中打开该文件, 输入 ? 可以看<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;到帮助信息.<br>
+&nbsp; &nbsp;:e 文件名&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;vim 将在原窗口中打开新的文件, 若旧文件编辑过, 会要求保存.<br>
+&nbsp; &nbsp;c-w-w&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; vim 分割了好几个窗口怎么办? 输入此命令可以将光标循环定位<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;到各个窗口之中.<br>
+&nbsp; &nbsp;:ls&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令查看本 vim 程序已经打开了多少个文件, 在屏幕的最下方<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;会显示出如下数据:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;1&nbsp; &nbsp; %a&nbsp; &nbsp;&nbsp; &nbsp; "usevim.html"&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 行 162<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;2&nbsp; &nbsp; #&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;"xxxxxx.html"&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 行 0<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;其中:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;1&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 表示打开的文件序号, 这个序号很有用处.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;%a&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;表示文件代号, % 表示当前编辑的文件,<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;# 表示上次编辑的文件<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;"usevim.html"&nbsp; &nbsp; 表示文件名.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;行 162&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;表示光标位置.<br>
+&nbsp; &nbsp;:b 序号(代号)&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令将指定序号(代号)的文件在本窗口打开, 其中的序号(代号)<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;就是用 :ls 命令看到的.<br>
+&nbsp; &nbsp;:set diff&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令用于比较两个文件, 可以用<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;:vsp filename<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;命令打开另一个文件, 然后在每个文件窗口中输入此命令,就能看<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;到效果了.<br>
+8. 宏替换<br>
+&nbsp; &nbsp; vi 不仅可以用 abbr 来替换文字, 也可以进行命令的宏定义. 有些命令输起来很费劲,<br>
+因此我把它们定义到 - 上, 这样就很方便了.这些配置可以预先写到 ~/.vimrc<br>
+(windows 下为 $VIM/_vimrc) 中, 写进去的时候不用写前面的冒号.<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:nohls&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;取消被搜索字串的高亮<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;w&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 命令模式下转移光标到不同窗口<br>
+&nbsp; &nbsp;:imap&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;输入模式下运行<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:%s= *$==&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;删除所有行尾多余的空格.<br>
+&nbsp; &nbsp;:imap&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 同上<br>
+&nbsp; &nbsp;:java 中: (注, 这里为什么说 java 中, 因为以下定义对其他文件格式不起作用, 下文<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 会说到如何实现这一点)<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:comp javac:mak -d . %<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令用 javac 编译 java 文件, 它会自动将光标定位到出错点. 不过这需要定<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;义一个 javac.vim 文件在 $VIM/compiler 下, 在 javac.vim 里面只有两行字:<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;setlocal makeprg=javac<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;setlocal errorformat=%A%f:%l:\ %m,%-Z%p^,%-C%.%#<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:comp ant:mak<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令用 ant 编译 java 文件, 它会自动将光标定位到出错点. 一般来说, 安装<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;vim 后已经有了compiler/ant.vim文件, 因此这个命令可以直接使用. 但是需要<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;在当前目录下有 build.xml 文件, 当然还必须安装 ant 才行.<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:cl&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令用于查看所有的编译错误.<br>
+&nbsp; &nbsp;:imap&nbsp;&nbsp;<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:cc&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令用于查看当前的编译错误.<br>
+&nbsp; &nbsp;:imap&nbsp;&nbsp;<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:cn&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令用于跳到下一个出错位置.<br>
+&nbsp; &nbsp;:imap&nbsp;&nbsp;<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:cp&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;此命令用于跳到上一个出错位置.<br>
+&nbsp; &nbsp;:imap&nbsp;&nbsp;<br>
+&nbsp; &nbsp;:nmap&nbsp;&nbsp;:JavaBrowser<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令用于在窗口左部分割出一个新窗口, 里面的内容是 java 的资源树, 包括<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;本文件中出现的类, 类的成员变量及成员方法, 就好像 JCreator 表现的那样.<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;在这个窗口中输入 ? 会看到帮助. 嘿嘿, 很好用, 不过需要 ctags 支持.<br>
+&nbsp; &nbsp;:imap&nbsp;&nbsp;<br>
+9. TAB<br>
+&nbsp; &nbsp; TAB 就是制表符, 单独拿出来做一节是因为这个东西确实很有用.<br>
+&nbsp; &nbsp; &gt;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 输入此命令则光标所在行向右移动一个 tab.<br>
+&nbsp; &nbsp; 5&gt;&gt;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;输入此命令则光标后 5 行向右移动一个 tab.<br>
+&nbsp; &nbsp; :12,24&gt;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;此命令将12行到14行的数据都向右移动一个 tab.<br>
+&nbsp; &nbsp; :12,24&gt;&gt;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 此命令将12行到14行的数据都向右移动两个 tab.<br>
+&nbsp; &nbsp; 那么如何定义 tab 的大小呢? 有人愿意使用 8 个空格位, 有人用4个, 有的用2个.<br>
+&nbsp; &nbsp; 有的人希望 tab 完全用空格代替, 也有的人希望 tab 就是 tab. 没关系, vim 能<br>
+&nbsp; &nbsp; 帮助你.以下的设置一般也都先写入配置文件中, 免得老敲.<br>
+&nbsp; &nbsp; :set shiftwidth=4&nbsp; &nbsp; 设置自动缩进 4 个空格, 当然要设自动缩进先.<br>
+&nbsp; &nbsp; :set sts=4&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;即设置 softtabstop 为 4. 输入 tab 后就跳了 4 格.<br>
+&nbsp; &nbsp; :set tabstop=4&nbsp; &nbsp;&nbsp; &nbsp; 实际的 tab 即为 4 个空格, 而不是缺省的 8 个.<br>
+&nbsp; &nbsp; :set expandtab&nbsp; &nbsp;&nbsp; &nbsp; 在输入 tab 后, vim 用恰当的空格来填充这个 tab.<br>
+10. autocmd<br>
+&nbsp; &nbsp;&nbsp;&nbsp;这个命令十分的强大, 可以用这个命令实现对不同的文件格式应用不同的配置; 可以<br>
+在新建文件时自动添加上版权声明等等. 这些命令一般定义在 ~/.vimrc 这样的配置文件<br>
+里面. 由于他很强大, 所以我不能给出很具体的说明, 只能举几个例子, 详细的请看帮助.<br>
+&nbsp; &nbsp;:autocmd!&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 删除所有之前的自动命令.<br>
+&nbsp; &nbsp;autocmd FileType&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;java&nbsp; &nbsp;source ~/.vim/files/java.vim<br>
+&nbsp; &nbsp;autocmd FileType&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;java&nbsp; &nbsp;source ~/.vim/files/jcommenter.vim<br>
+&nbsp; &nbsp;&nbsp;&nbsp;以上两条命令让我在打开 java 文件时才应用后面提到的两个配置文件.<br>
+&nbsp; &nbsp;autocmd BufNewFile&nbsp; &nbsp;&nbsp; &nbsp; *.java&nbsp; &nbsp;0r ~/.vim/files/skeletons/java.skel<br>
+&nbsp; &nbsp;&nbsp;&nbsp;以上这条命令让我在新建 java 文件时自动加入 java.skel 文件的内容.<br>
+&nbsp; &nbsp;autocmd BufNewFile&nbsp; &nbsp;&nbsp; &nbsp; *.java&nbsp; &nbsp;normal gnp<br>
+&nbsp; &nbsp;&nbsp;&nbsp;以上这条命令让我在新建 java 文件时自动运行 gnp 命令, 这个命令进行一些特殊化<br>
+&nbsp; &nbsp;&nbsp;&nbsp;处理, 比如将新 java 文件中的 __date__ 替换成今天的日期什么的.<br>
+11. 常用脚本<br>
+&nbsp; &nbsp;&nbsp;&nbsp;在 vim.sf.net 你可以发现很多脚本(script), 这些脚本常常有让你意想不到的作用.<br>
+我常用的有:<br>
+&nbsp; &nbsp;&nbsp;&nbsp;jcommenter.vim&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;自动加入 javadoc 风格的注释.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;JBrowser.vim&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;类资源浏览. C, C++ 等可以用 Tlist<br>
+&nbsp; &nbsp;&nbsp;&nbsp;还有许多有用的, 比如 checkstyle.vim 可以检验你的编程风格, jad.vim 可以直接<br>
+&nbsp; &nbsp;&nbsp;&nbsp;反编译 .class 文件等等.<br>
+12. 常用配置<br>
+&nbsp; &nbsp;&nbsp;&nbsp;在~/.vimrc 配置文件中你常常需要一些个性化配置. 比如上面写的一些宏定义, 一些<br>
+autocmd 定义等等. 比如:<br>
+&nbsp; &nbsp;&nbsp;&nbsp;set suffixes=.bak,~,.o,.h,.info,.swp,.aux,.bbl,.blg,.dvi,.lof,.log,.lot,.ps,.toc<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;这样在vim中打开文件时, 按 tab 键补齐文件名时它会忽略上述文件.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;set nu&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;显示行号<br>
+&nbsp; &nbsp;&nbsp;&nbsp;set ai&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;设置自动缩进<br>
+&nbsp; &nbsp;&nbsp;&nbsp;map Y y$&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;让 Y 和 D 一样, 要不然 Y 的本意和 yy 一样.<br>
+13. 其他<br>
+&nbsp; &nbsp;&nbsp;&nbsp;还有许多有意思的命令, 记录在这里免得忘记.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;重复上次编辑命令.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;:g/^/exec "s/^/".strpart(line(".")." ", 0, 4)&nbsp; &nbsp; 在行首插入行号<br>
+&nbsp; &nbsp;&nbsp;&nbsp;:runtime! syntax/2html.vim&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;转换 txt 成 html, 会按照你的颜色配置来转<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+<br>
+<b>本文来自ChinaUnix博客，如果查看原文请点：</b><a href="http://blog.chinaunix.net/u3/94705/showart_1985855.html" target="_blank">http://blog.chinaunix.net/u3/94705/showart_1985855.html</a> 
+</td>
+
+      </tr>
+
+
+      <tr>
+
+        <td height="20" align="right"> 　 <a href="http://linux.chinaunix.net/bbs/thread-1121975-1-1.html" target="_blank">发表评论</a>
+
+  <a href="http://linux.chinaunix.net/bbs/thread-1121975-1-1.html" target="_blank">查看评论</a>(共有<span class="STYLE1" id="postcount2"></span>条评论)
+
+</td>
+
+      </tr>
+      <tr>
+
+        <td>&nbsp;</td>
+
+      </tr>
+
+      
+
+    </tbody></table>
+
+
+</td>
+
+    <td width="8">&nbsp;</td>
+
+    <td width="245" valign="top" bgcolor="#FFF9EB">
+<center><br>
+<form action="http://linux.chinaunix.net/search2.php" method="GET">
+<input type="text" name="key" size="15"><input type="hidden" name="id" value="0"><input type="submit" value="搜索">
+</form>
+<br>
+</center>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+      <tbody><tr>
+
+        <td height="27" background="./很牛的vim使用技巧_files/bg245.jpg" class="F13"><table width="100%"><tbody><tr><td class="F13">最新资讯</td><td align="right"><a href="http://linux.chinaunix.net/news" target="_blank">更多&gt;&gt;</a>&nbsp;</td></tr></tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td valign="top" bgcolor="#FFFFFF" class="BLKtext"><table width="97%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+          <tbody><tr>
+
+            <td height="5"></td>
+
+          </tr>
+
+          <tr>
+
+            <td>· <a href="http://linux.chinaunix.net/news/2010/12/10/1175491.shtml" title="谷歌劝说诺基亚采用Android操作系统" target="_blank">谷歌劝说诺基亚采用Android操作..</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/10/1175493.shtml" title="Apache 基金会确认退出 JCP 执行委员会" target="_blank">Apache 基金会确认退出 JCP 执..</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175306.shtml" title="Chrome 10 新功能探秘：新增GPU混合加速功能" target="_blank">Chrome 10 新功能探秘：新增GP..</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175307.shtml" title="金山宣布开源其安全软件" target="_blank">金山宣布开源其安全软件</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175309.shtml" title="女黑客在开源会议上抱受骚扰" target="_blank">女黑客在开源会议上抱受骚扰</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175310.shtml" title="21款值得关注的Linux游戏" target="_blank">21款值得关注的Linux游戏</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175311.shtml" title="马化腾：腾讯半年后彻底转型，开放和分享" target="_blank">马化腾：腾讯半年后彻底转型，..</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/07/1175305.shtml" title="[多图] Chrome OS 预发布版本多图赏析" target="_blank">[多图] Chrome OS 预发布版本多..</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/01/1175001.shtml" title="Lubuntu 11.04 默认应用抢先一览" target="_blank">Lubuntu 11.04 默认应用抢先一览</a><br>
+· <a href="http://linux.chinaunix.net/news/2010/12/01/1175002.shtml" title="Red Hat宣布收购云计算软件提供商Makara" target="_blank">Red Hat宣布收购云计算软件提供..</a><br>
+</td>
+
+          </tr>
+
+          <tr>
+
+            <td height="5"></td>
+
+          </tr>
+
+        </tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td height="10" bgcolor="#FFFFFF"></td>
+
+      </tr>
+
+      <tr></tr></tbody></table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+      <tbody><tr>
+
+        <td height="27" background="./很牛的vim使用技巧_files/bg245.jpg" class="F13"><table width="100%"><tbody><tr><td class="F13">论坛热点</td><td align="right"><a href="http://linux.chinaunix.net/bbs" target="_blank">更多&gt;&gt;</a>&nbsp;</td></tr></tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td valign="top" bgcolor="#FFFFFF" class="BLKtext"><table width="97%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+          <tbody><tr>
+
+            <td height="5"></td>
+
+          </tr>
+
+          <tr>
+
+            <td>· <a href="http://bbs.chinaunix.net/thread-3687970-1-1.html" title="do_execve时候用户栈中参数的位置问题" target="_blank">do_execve时候用户栈中参数的..</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687969-1-1.html" title="swapinfo -atm 问题" target="_blank">swapinfo -atm 问题</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687968-1-1.html" title="Linux 的优点简述" target="_blank">Linux 的优点简述</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687967-1-1.html" title="VM虚拟机上得Red Hat Linux上搭建的ftp服务器，windows登陆不进去，但一个局域网其他" target="_blank">VM虚拟机上得Red Hat Linux上..</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687965-1-1.html" title="我看成了上海男人喜欢女人毛多还是毛少" target="_blank">我看成了上海男人喜欢女人毛..</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687964-1-1.html" title="校车展览，看了你就知道" target="_blank">校车展览，看了你就知道</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687963-1-1.html" title="在遇到他之前，唯一需要做的，就是让自己足够优秀。在遇到他之前，请把最好的年华留给" target="_blank">在遇到他之前，唯一需要做的..</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687962-1-1.html" title="GRUB的疑问" target="_blank">GRUB的疑问</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687961-1-1.html" title="从来没有人真正付足书价——所付的只是印刷费" target="_blank">从来没有人真正付足书价——..</a><br>
+· <a href="http://bbs.chinaunix.net/thread-3687960-1-1.html" title="云存储 vs 网盘" target="_blank">云存储 vs 网盘</a><br>
+</td>
+
+          </tr>
+
+          <tr>
+
+            <td height="5"></td>
+
+          </tr>
+
+        </tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td height="10" bgcolor="#FFFFFF"></td>
+
+      </tr>
+
+      <tr></tr></tbody></table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+      <tbody><tr>
+
+        <td height="27" background="./很牛的vim使用技巧_files/bg245.jpg" class="F13"><table width="100%"><tbody><tr><td class="F13">文档更新</td><td align="right"><a href="http://linux.chinaunix.net/techdoc" target="_blank">更多&gt;&gt;</a>&nbsp;</td></tr></tbody></table></td>
+
+      </tr>
+
+      <tr>
+
+        <td valign="top" bgcolor="#FFFFFF" class="BLKtext"><table width="97%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+          <tbody><tr>
+
+            <td height="5"></td>
+
+          </tr>
+
+          <tr>
+
+            <td>· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686893.shtml" title="orcale queue" target="_blank">orcale queue</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686868.shtml" title="谁可以推荐几本经典的操作系统的书（英文版）" target="_blank">谁可以推荐几本经典的操作系统的..</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686867.shtml" title="【北京】某物联网公司招云计算应用高级开发工程师" target="_blank">【北京】某物联网公司招云计算应..</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686866.shtml" title="【北京】某物联网公司招云计算应用高级开发工程师" target="_blank">【北京】某物联网公司招云计算应..</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686865.shtml" title="谁能推荐几本关于操作系统的书" target="_blank">谁能推荐几本关于操作系统的书</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686864.shtml" title="如何添加网络接口eth1" target="_blank">如何添加网络接口eth1</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686863.shtml" title="葡萄牙语入门教材的选取与经验分享" target="_blank">葡萄牙语入门教材的选取与经验分享</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686862.shtml" title="葡萄牙语就业前景分析" target="_blank">葡萄牙语就业前景分析</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686861.shtml" title="葡萄牙语学习经验交流" target="_blank">葡萄牙语学习经验交流</a><br>
+· <a href="http://linux.chinaunix.net/techdoc/develop/2012/03/16/3686860.shtml" title="Щ" target="_blank">Щ</a><br>
+</td>
+
+          </tr>
+
+   
+        </tbody></table></td>
+
+      </tr>
+
+
+      <tr></tr></tbody></table>
+</td>
+
+  </tr>
+
+</tbody></table>
+<script src="./很牛的vim使用技巧_files/threadcount.php"></script>
+<table width="950" border="0" align="center" cellpadding="0" cellspacing="0">
+
+  <tbody><tr>
+
+    <td>&nbsp;</td>
+
+  </tr>
+
+</tbody></table>
+
+<table width="950" border="0" align="center" cellpadding="0" cellspacing="0">
+
+  <tbody><tr>
+
+    <td height="2" bgcolor="#308CF6"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="30" align="center"><a href="http://www.chinaunix.net/about/index.shtml" target="_blank">关于我们</a> | <a href="http://www.chinaunix.net/about/connect.html" target="_blank">联系方式</a> | <a href="http://www.chinaunix.net/about/service.html" target="_blank">广告合作</a> | <a href="http://www.wintalent.cn:8031/wt5/sequelmedia/web/index" target="_blank">诚聘英才</a> | <a href="http://www.chinaunix.net/about/channel.html" target="_blank">网站地图</a> | <a href="http://www.chinaunix.net/about/friend.html" target="_blank">友情链接</a> | <a href="http://linux.chinaunix.net/bbs/register.php" target="_blank">免费注册</a></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#308CF6"></td>
+
+  </tr>
+
+  <tr>
+
+    <td align="center"><p>Copyright &#169; 2001-2009 ChinaUnix.net All Rights Reserved</p>
+
+        <p>感谢所有关心和支持过ChinaUnix的朋友们<br>
+	</p><p>
+ <a href="http://www.it168.com/images/icp.jpg" target="_blank">京ICP证:060528号</a></p></td>
+
+  </tr>
+
+</tbody></table>
+
+<!-- 统计 START -->
+<script src="./很牛的vim使用技巧_files/pv.js" type="text/javascript"></script>
+<script>
+function sendPV(){
+    var pvTrack = new PvTrack();
+    pvTrack.type = 10; // 频道类别ID
+    pvTrack.channel = 22; // 频道ID
+   
+    pvTrack.pageType = 0;
+    pvTrack.track();
+}
+window.setTimeout("sendPV()", 0);
+</script>
+<script language="javascript" src="./很牛的vim使用技巧_files/pv(1).js" type="text/javascript"></script><script src="./很牛的vim使用技巧_files/ga.js" type="text/javascript"></script>
+<!-- 统计 .END -->
+<div style="display:none">
+<script type="text/javascript"> 
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F0ee5e8cdc4d43389b3d1bfd76e83216b' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./很牛的vim使用技巧_files/h.js" type="text/javascript"></script>
+</div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./很牛的vim使用技巧_files/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-11982772-4");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+<script type="text/javascript" src="./很牛的vim使用技巧_files/601.js"></script><script type="text/javascript" src="./很牛的vim使用技巧_files/601(1).js"></script><script type="text/javascript" src="./很牛的vim使用技巧_files/601(2).js"></script>
+
+
+
+
+
+
+</body></html>

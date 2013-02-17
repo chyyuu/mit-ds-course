@@ -1,0 +1,176 @@
+body, td, p  {
+	font-family: arial,helvetica,sans-serif;
+	font-family: arial,helvetica,sans-serif;
+}
+
+th {
+	font-family: arial,helvetica,sans-serif;
+	font-weight: bold;
+	text-align: left;
+}
+
+em {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.darkbg {
+	background-color: #007f00;
+}
+
+.lightbg {
+	background-color: #cccc99;
+}
+
+.sidebar {
+	font-family: arial,helvetica,sans-serif;
+	background-color: #f0f0dd;
+	font-size: small;
+}
+
+.topheader {
+	font-family: arial,helvetica,sans-serif;
+	font-size: large;
+	font-weight: bold;
+	background-color: #cccc99;
+}
+
+.sidebarheader {
+	font-family: arial,helvetica,sans-serif;
+	font-size: small;
+	font-weight: bold;
+}
+.download {
+	padding: 5px 0 8px 5px;
+	background-color: #0d0;
+}
+
+.newsdate {
+	font-style: italic;
+	color: #6666cc;
+	font-size:small;
+}
+
+pre,code {
+	font-family: "andale mono", "monotype.com", "courier new", monospace;
+}
+
+h1 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: medium;
+	font-weight: bold;
+	color: #000066;
+}
+
+.txth1 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: medium;
+	font-weight: bold;
+	color: #000066;
+}
+
+h2 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: small;
+	font-weight: bold;
+	color: #000066;
+}
+
+.txth2 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: small;
+	font-weight: bold;
+	color: #000066;
+}
+
+h3 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: x-small;
+	font-weight: bold;
+	color: #000066;
+}
+
+.txth3 {
+	font-family: arial,helvetica,sans-serif;
+	font-size: x-small;
+	font-weight: bold;
+	color: #000066;
+}
+
+small {
+	font-family: arial,helvetica,sans-serif;
+	font-size: 75%;
+}
+
+a.small {
+	font-family: arial,helvetica,sans-serif;
+	font-size: 75%;
+	text-decoration: none;
+    color: #000066
+}
+
+.style1 {
+	color: #666666
+}
+
+input {
+	font-family: arial,helvetica,sans-serif;
+}
+
+textarea {
+    font-family: arial, helvetica, sans-serif; 
+    width: 100%; 
+}
+
+.prompt {
+	font-family: arial,helvetica,sans-serif;
+	font-weight: bold;
+}
+
+.errortext {
+	font-family: arial,helvetica,sans-serif;
+	color: #cc0000
+}
+
+.errorheader {
+	font-family: arial,helvetica,sans-serif;
+	color: #cc0000;
+	font-size: medium;
+}
+
+.tableheader {
+	font-family: arial,helvetica,sans-serif;
+	font-weight: bold;
+	background-color: #CCCC99;
+}
+
+.rowodd {
+	font-family: arial,helvetica,sans-serif;
+	background-color: #F0F0DD;
+}
+
+.roweven {
+	font-family: arial,helvetica,sans-serif;
+	background-color: #CCCC99;
+}
+
+tr.tableheader th {
+	font-family: arial,helvetica,sans-serif;
+	background-color: #CCCC99;
+	text-align: center;
+}
+
+
+td.checker {
+	background-color: #007f00;
+	background-image: url(http://vim.sourceforge.net/images/checkerboard.gif);
+}
+
+.example {
+	background-color: #EEFFCC;
+	border-color: #88AA66;
+	border-style: solid none;
+	border-width: 1px medium;
+	padding: 5px;
+}
+

@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0073)http://timothyqiu.com/archives/using-omnicomplete-for-c-cplusplus-in-vim/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Vim 中使用 OmniComplete 为 C/C++ 自动补全 - TimothyQiu's Blog</title>
+
+<link rel="stylesheet" type="text/css" media="all" href="./Vim 中使用 OmniComplete 为 C -- CPP 自动补全_files/style.css">
+
+<script type="text/javascript" async="" src="./Vim 中使用 OmniComplete 为 C -- CPP 自动补全_files/ga.js"></script><script type="text/javascript" async="" src="./Vim 中使用 OmniComplete 为 C -- CPP 自动补全_files/latexit.js"></script><script type="text/javascript">
+//<![CDATA[
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = 'http://latex.codecogs.com/latexit.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+//]]>
+</script>
+<script type="text/javascript">
+//<![CDATA[
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-21964791-1']);
+_gaq.push(['_trackPageview']);
+
+(function(){
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+//]]>
+</script>
+<meta name="keywords" content="OmniComplete,Vim">
+<link rel="pingback" href="http://timothyqiu.com/action/xmlrpc">
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://timothyqiu.com/feed/archives/using-omnicomplete-for-c-cplusplus-in-vim/">
+<link rel="alternate" type="application/rdf+xml" title="RSS 1.0" href="http://timothyqiu.com/feed/rss/archives/using-omnicomplete-for-c-cplusplus-in-vim/">
+<link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="http://timothyqiu.com/feed/atom/archives/using-omnicomplete-for-c-cplusplus-in-vim/">
+<script type="text/javascript">
+//<![CDATA[
+var TypechoComment = {
+    dom : function (id) {
+        return document.getElementById(id);
+    },
+    
+    create : function (tag, attr) {
+        var el = document.createElement(tag);
+        
+        for (var key in attr) {
+            el.setAttribute(key, attr[key]);
+        }
+        
+        return el;
+    },
+
+    reply : function (cid, coid) {
+        var comment = this.dom(cid), parent = comment.parentNode,
+            response = this.dom('respond-post-9'), input = this.dom('comment-parent'),
+            form = 'form' == response.tagName ? response : response.getElementsByTagName('form')[0],
+            textarea = response.getElementsByTagName('textarea')[0];
+
+        if (null == input) {
+            input = this.create('input', {
+                'type' : 'hidden',
+                'name' : 'parent',
+                'id'   : 'comment-parent'
+            });
+
+            form.appendChild(input);
+        }
+        
+        input.setAttribute('value', coid);
+
+        if (null == this.dom('comment-form-place-holder')) {
+            var holder = this.create('div', {
+                'id' : 'comment-form-place-holder'
+            });
+            
+            response.parentNode.insertBefore(holder, response);
+        }
+
+        comment.appendChild(response);
+        this.dom('cancel-comment-reply-link').style.display = '';
+        
+        if (null != textarea && 'text' == textarea.name) {
+            textarea.focus();
+        }
+        
+        return false;
+    },
+
+    cancelReply : function () {
+        var response = this.dom('respond-post-9'),
+        holder = this.dom('comment-form-place-holder'), input = this.dom('comment-parent');
+
+        if (null != input) {
+            input.parentNode.removeChild(input);
+        }
+
+        if (null == holder) {
+            return true;
+        }
+
+        this.dom('cancel-comment-reply-link').style.display = 'none';
+        holder.parentNode.insertBefore(response, holder);
+        return false;
+    }
+}
+//]]>
+</script>
+</head>
+
+<body>
+<div id="nav">
+	<div id="logo">
+		<h1><a href="http://timothyqiu.com/">TimothyQiu's Blog</a></h1>
+		<p class="description">keep it simple stupid</p>
+	</div>
+
+	<ul>
+		<li><a href="http://timothyqiu.com/">首页</a></li>
+		<li><a href="http://timothyqiu.com/about.htm" title="关于">关于</a></li>
+		<li><a href="http://timothyqiu.com/archives.htm" title="归档">归档</a></li>
+		<li><a href="http://timothyqiu.com/miscellany.htm" title="杂物">杂物</a></li>
+	</ul>
+</div>
+<div id="content">
+
+<div class="article">
+	<h1 class="entry_title"><a href="./Vim 中使用 OmniComplete 为 C -- CPP 自动补全_files/Vim 中使用 OmniComplete 为 C -- CPP 自动补全.html">Vim 中使用 OmniComplete 为 C/C++ 自动补全</a></h1>
+	<p class="entry_data">
+		<span>发布时间：March 28, 2011</span>
+		分类：<a href="http://timothyqiu.com/category/technology/">技术</a>	</p>
+<p>OmniComplete 并不是插件的名字，而是 Vim 众多补全方式中的一种（全能补全）。说白了 OmniComplete 其实就是根据光标前的内容猜测光标后的内容，具体怎么猜取决于所采用的脚本。</p>
+
+<p>而 OmniCppComplete 就是专为 C/C++ 编写的 OmniComplete 一个补全脚本。</p>
+
+<p>那么经常和 OmniCppComplete 一起出没的 Ctags 又是什么呢？Ctags 全名 Exuberant Ctags，是一个独立的程序（也就是说，其实和 Vim 一点关系都没有）。它可以为各种语言的源代码生成语言元素（language object）索引文件。对于 C/C++ 来说，就是把源代码中的各种宏、函数、类、类成员等等元素和它们的相关信息生成索引文件，供其它程序使用。</p>
+
+<p>OmniCppComplete 脚本就是根据 Ctags 生成的索引文件进行补全的。
+<!--more-->
+好了，背景知识就是这样，安装步骤如下：</p>
+
+<h2>安装 Ctags</h2>
+
+<ol>
+<li>从官网下载 Ctags 可执行文件，网站是 <a href="http://ctags.sourceforge.net/">http://ctags.sourceforge.net/</a></li>
+<li>将下载到的文件（仅 EXE 文件即可）解压到一个目录，例如 <code>D:/ctags</code></li>
+<li>将该目录加入环境变量 <code>PATH</code></li>
+</ol>
+
+<h2>准备索引文件</h2>
+
+<p>以生成 C++ 标准库索引文件为例：</p>
+
+<ol>
+<li>下载专为 Ctags 修改过的 <a href="http://www.vim.org/scripts/script.php?script_id=2358" title="tags for std c++ (STL, streams, ...) - Modified libstdc++ headers for use with ctags : vim online">libstdc++ 头文件</a></li>
+<li>将其解压到一个目录，例如 <code>D:/ctags/cpp_src</code></li>
+<li><p>使用命令行进入 D:/ctags/cpp_src 后执行：</p>
+
+<pre><code>ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ -f cpp .
+</code></pre></li>
+<li><p>建议将上一步生成的 <code>D:/ctags/cpp_src/cpp</code> 文件放到一个专门放置索引文件的目录以便后面的统一设置，例如放到 <code>D:/ctags/tags</code></p></li>
+</ol>
+
+<p>其它库的索引文件也可以依法炮制，只需切换到该库的 include 文件夹，执行：</p>
+
+<pre><code>ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ -f &lt;文件名&gt; .
+</code></pre>
+
+<h2>安装 OmniCppComplete</h2>
+
+<ol>
+<li>下载 <a title="OmniCppComplete - C/C++ omni-completion with ctags database : vim online" href="http://www.vim.org/scripts/script.php?script_id=1520" target="_blank">OmniCppComplete</a></li>
+<li>将下载到的文件解压到 <code>~/.vim</code> (unix) 或者 <code>%HOMEPATH%\vimfiles</code> (Windows) 文件夹</li>
+<li><p>在 vimrc 文件中加入</p>
+
+<pre><code>" ctags 索引文件 (根据已经生成的索引文件添加即可, 这里我额外添加了 hge 和 curl 的索引文件)
+set tags+=D:/ctags/tags/cpp
+set tags+=D:/ctags/tags/hge
+set tags+=D:/ctags/tags/curl
+" OmniCppComplete
+let OmniCpp_NamespaceSearch = 1
+let OmniCpp_GlobalScopeSearch = 1
+let OmniCpp_ShowAccess = 1
+let OmniCpp_ShowPrototypeInAbbr = 1 " 显示函数参数列表
+let OmniCpp_MayCompleteDot = 1 &nbsp; " 输入 . &nbsp;后自动补全
+let OmniCpp_MayCompleteArrow = 1 " 输入 -&gt; 后自动补全
+let OmniCpp_MayCompleteScope = 1 " 输入 :: 后自动补全
+let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
+" 自动关闭补全窗口
+au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+set completeopt=menuone,menu,longest
+</code></pre></li>
+</ol>
+
+<p>另外，还需确认在 vimrc 中开启了 <code>filetype</code> 选项，不然 OmniComplete 无法自动识别 C/C++ 文件类型进行补全。</p>
+
+<p>这样，在插入模式编辑 C/C++ 源文件时按下 <code>.</code> 或 <code>-&gt;</code> 或 <code>::</code>，或者手动按下 Ctrl+X Ctrl+O 后就会弹出自动补全窗口，此时可以用 Ctrl+N 和 Ctrl+P 上下移动光标进行选择。</p>
+
+<h2>美化咩？</h2>
+
+<p>也许你也已经注意到了一个问题，那就是「自动补全窗口的配色非常之丑」，Vim 自带的几个配色方案中只有两三种配色改掉了自动补全窗口丑陋的紫色，其它的基本上都是很逆天的用灰色表示当前选中项、紫色表示其他项。</p>
+
+<p>要改变自动补全窗口的配色可以在 vimrc 中加上：</p>
+
+<pre><code>highlight Pmenu    guibg=darkgrey &nbsp;guifg=black
+highlight PmenuSel guibg=lightgrey guifg=black
+</code></pre>
+
+<p><code>Pmenu</code> 是所有项的配色，<code>PmenuSel</code> 是选中项的配色，<code>guibg</code> 和 <code>guifg</code> 分别对应背景色和前景色。</p>
+	<p class="tags">标签: <a href="http://timothyqiu.com/tag/OmniComplete/">OmniComplete</a>, <a href="http://timothyqiu.com/tag/Vim/">Vim</a></p>
+</div>
+
+<div id="comments">
+
+
+<!-- comment form -->
+<div id="respond-post-9" class="respond">
+
+<div class="cancel-comment-reply"><a id="cancel-comment-reply-link" href="http://timothyqiu.com/archives/using-omnicomplete-for-c-cplusplus-in-vim/#respond-post-9" rel="nofollow" style="display:none" onclick="return TypechoComment.cancelReply();">取消回复</a></div>
+
+<h4 id="response">添加新评论 »</h4>
+<form method="post" action="http://timothyqiu.com/archives/using-omnicomplete-for-c-cplusplus-in-vim/comment" id="comment_form">
+
+	<p>
+		<input type="text" name="author" id="author" class="text" size="15" value="">
+		<label for="author">称呼<span class="required">*</span></label>
+	</p>
+	<p>
+		<input type="text" name="mail" id="mail" class="text" size="15" value="">
+		<label for="mail">电子邮件<span class="required">*</span></label>
+	</p>
+	<p>
+		<input type="text" name="url" id="url" class="text" size="15" value="">
+		<label for="url">网站</label>
+	</p>
+
+	<p><textarea rows="5" cols="50" name="text" class="textarea"></textarea></p>
+	<p><input type="submit" value="提交评论" class="submit"></p>
+</form>
+</div>
+</div>
+
+</div>
+
+<div id="footer">
+	<a href="http://timothyqiu.com/">TimothyQiu's Blog</a> is powered by <a href="http://www.typecho.org/">Typecho)))</a>
+</div>
+
+
+
+</body></html>

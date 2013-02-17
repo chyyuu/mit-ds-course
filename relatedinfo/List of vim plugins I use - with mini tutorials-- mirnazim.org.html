@@ -1,0 +1,452 @@
+
+<!-- saved from url=(0047)http://mirnazim.org/writings/vim-plugins-i-use/ -->
+<html class="wf-ubuntumono-n4-active wf-ubuntumono-i4-active wf-ubuntumono-n7-active wf-ubuntumono-i7-active wf-gentiumbasic-n4-inactive wf-gentiumbasic-i4-inactive wf-gentiumbasic-n7-inactive wf-gentiumbasic-i7-inactive wf-yanonekaffeesatz-n4-inactive wf-active"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="google-site-verification" content="7kNes4_ZZZxK2SmNwu1AB1fFQtxf_ZyFxSJ_4su_LDU">
+  <title> List of vim plugins I use - with mini tutorials  » mirnazim.org</title>
+  <link rel="stylesheet" type="text/css" href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/pygments_style.css" media="screen"> 
+  <link rel="stylesheet" type="text/css" href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/site.css" media="screen"> 
+  
+  <link href="http://mirnazim.org/atom.xml" type="application/atom+xml" rel="alternate" title="mirnazim.org » Mir Nazim&#39;s Weblog"> 
+<link rel="stylesheet" type="text/css" media="screen" href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/browser-detection.css"><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Gentium+Basic:400,400italic,700,700italic%7CUbuntu+Mono:400,400italic,700,700italic%7CYanone+Kaffeesatz:latin&subset=latin">
+</head>
+<body>
+<div id="page" class="loading">
+  <div id="header">
+    
+<div class="published"><a href="http://mirnazim.org/">Mir Nazim</a> – August 14, 2011</div>
+<h1>List of vim plugins I use - with mini tutorials</h1>
+
+  </div><!--/#header-->
+  <div id="content">
+    
+<div class="body">
+  <p>I am a vim user, and by user I mean I do all(not counting using the textarea inside the web browser) of my editing inside vim. Even when I need to use a word processor, I first type my content inside vim and then open the word processor to format it.</p>
+
+<p>As any vim user knows that Vim experience is not complete without the use of plugins, here is the list of plugins I use on daily basis.</p>
+
+<h2>A word about my vim setup</h2>
+
+<p>I manage my vim/bash configs in separate directory <code>~/dotfiles</code>. Here is what it looks like.</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>ls
+
+bash  bin  desktop  utils  vim
+</code></pre></div>
+
+<p><code>bash</code> directory contains my my <code>.bashrc</code>, <code>.bash_aliases</code> etc. <code>bin</code> - not same as <code>~/bin</code>, contains scripts I use on day to day basis. <code>desktop</code> contains contains configurations exported from my Ubuntu desktop apps(e.g. my compiz-unity profile).</p>
+
+<p>Here is what my <code>vim</code> directory looks like</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>ls
+
+autoload  bundle  sessions  undodir  vimrc
+</code></pre></div>
+
+<p>Everything is <em>soft linked</em> to the relevant locations from here as shown by following commands: </p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>ln -s ~/dotfiles/vim ~/.vim           
+
+<span class="nv">$ </span>ln -s ~/dotfiles/vim/vimrc ~/.vimrc
+
+<span class="nv">$ </span>ln -s ~/dotfiles/bash/bashrc ~/.bashrc
+
+<span class="nv">$ </span>ln -s ~/dotfiles/bash/aliases ~/.bash_aliases
+</code></pre></div>
+
+<h2>1. Pathogen: Vim package manager</h2>
+
+<p>» <a href="https://github.com/tpope/vim-pathogen">Github repository</a> </p>
+
+<p>Pathogen helps me keep the <code>.vim</code> directory clean. When pathogen is used to manage plugins, it is the only plugin that needs to be installed directly by copying the files into <code>.vim</code> directory.</p>
+
+<h3>Installation</h3>
+
+<p>I recommend starting with a blank <code>.vim</code> directory. </p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>mv ~/.vim ~/vim_old                                           <span class="c"># 1. Backup your old .vim directory</span>
+
+<span class="nv">$ </span>mkdir .vim                                                    <span class="c"># 2. Creat a blank .vim directory</span>
+
+<span class="nv">$ </span>git clone git://github.com/tpope/vim-pathogen.git pathogen    <span class="c"># 3. Clone the pathogen repo</span>
+
+<span class="nv">$ </span>mv pathogen/autoload ~/.vim/autoload                          <span class="c"># 4. Move pathogen to .vim directory</span>
+</code></pre></div>
+
+<p>I also track my configurations with git; you can use whatever version control system you prefer(Hg, Bzr or God forbid svn).</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> .vim
+
+<span class="nv">$ </span>git init
+
+<span class="nv">$ </span>git add .
+
+<span class="nv">$ </span>git commit -m <span class="s2">"Initial commit"</span>
+</code></pre></div>
+
+<p>Now edit your <code>.vimrc</code> and add following lines to the top</p>
+
+<div class="codehilite"><pre><code><span class="k">call</span> pathogen#runtime_append_all_bundles<span class="p">()</span>
+
+<span class="k">call</span> pathogen#<span class="k">helptags</span><span class="p">()</span>
+</code></pre></div>
+
+<p>That's it! Pathogen is now installed.</p>
+
+<h3>Usage</h3>
+
+<p>Any other plugins will be installed by simply copying the plugin files into <code>~/.vim/bundle/plugin_name</code> directory. Generally, you will download the plugin, extract it and move to <code>~/.vim/bundle/plugin_name</code>.</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>mv /path/to/plugin ~/.vim/bundle/plugin_name
+</code></pre></div>
+
+<p>Although not required by pathogen, I prefer to manage plugins using <a href="http://progit.org/book/ch6-6.html">git submodules</a>. Let's install fugitive plugin for Git integration to demonstrate the process.</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/tpope/vim-fugitive.git bundle/fugitive
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<p>Note: <code>git submodule init</code> and <code>git submodule update</code> need to be run every time a new submodule is added.  <code>git submodule foreach git pull</code> command is used to pull latest upstream changes. </p>
+
+<h2>2. Command-t: Pattern based file opener</h2>
+
+<p>» <a href="https://wincent.com/products/command-t">Homepage</a> » <a href="http://git.wincent.com/command-t.git">Git repository</a></p>
+
+<p>The Command-T plug-in for VIM provides an extremely fast, intuitive mechanism for opening files with a minimal number of keystrokes. It's named "Command-T" because it is inspired by the "Go to File" window bound to <code>Command-T</code> key in TextMate.</p>
+
+<p>Files are selected by typing characters that appear in their paths, and are ordered by an algorithm which knows that characters that appear in certain locations (for example, immediately after a path separator) should be given more weight.</p>
+
+<p>Here are is a screenshot of command-t in action while writing this very blog post.</p>
+
+<p><a href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/command-t.png" title="Command-t"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/command-t.png" alt="Command-t" title="Command-t"></a></p>
+
+<h3>Installation</h3>
+
+<p>Command-t is developed in ruby therefore ruby needs to be installed on your system. Here is how to installation on Ubuntu.</p>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>sudo aptitude install ruby ruby-dev
+
+<span class="nv">$ </span>git submodule add git://git.wincent.com/command-t.git bundle/command-t
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+
+<span class="nv">$ </span><span class="nb">cd</span> ~/.vim/bundle/command-t/ruby/command-t/
+
+<span class="nv">$ </span>ruby extconf.rb
+
+<span class="nv">$ </span>make
+</code></pre></div>
+
+<p>Detailed installation instructions are available at <a href="https://wincent.com/products/command-t">Command-t homepage</a></p>
+
+<h3>Usage</h3>
+
+<p>Command-t provides three functions</p>
+
+<ol>
+<li><p><code>CommandT</code> - opens filelist in current directory</p></li>
+<li><p><code>CommandTBuffer</code> - opens currently open buffers</p></li>
+<li><p><code>CommandTFlush</code> - re-read file list in current directory</p></li>
+</ol>
+
+<p>I have mapped these functions as following:</p>
+
+<div class="codehilite"><pre><code><span class="nb">noremap</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">o</span> <span class="p">&lt;</span>Esc<span class="p">&gt;</span>:CommandT<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+
+<span class="nb">noremap</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span>O <span class="p">&lt;</span>Esc<span class="p">&gt;</span>:CommandTFlush<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+
+<span class="nb">noremap</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">m</span> <span class="p">&lt;</span>Esc<span class="p">&gt;</span>:CommandTBuffer<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</code></pre></div>
+
+<h2>3. DelimitMate: Intelligent autocompletion for quotes, parenthesis, brackets etc.</h2>
+
+<p>» <a href="https://github.com/Raimondi/delimitMate">Github repository</a></p>
+
+<p>DelimitMate provides automatic closing of quotes, parenthesis, brackets, etc., besides some other related features that make my time in insert mode a little bit easier.</p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/Raimondi/delimitMate.git bundle/delmitmate
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>While I use delimitMate with default confirguration, it can be customized in quite a number of ways. See <code>:help delimitMate</code> for detailed information on available confirguration options.</p>
+
+<h2>4. CloseTag: Intelligently close HTML tags</h2>
+
+<p>» <a href="http://github.com/docunext/closetag.vim">Github repository</a></p>
+
+<p>CloseTag is simple plugin that intelligently closes the html tags based of the currently open tag. It is triggered when you type <code>&lt;/</code>. CloseTag will detect and close the open tag intelligently.</p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/docunext/closetag.vim.git bundle/closetag
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>For efficiency purposes I have configured CloseTag to load only for html/xml like files. Here is my <code>vimrc</code> snippet for the same.</p>
+
+<div class="codehilite"><pre><code>autocmd <span class="nb">FileType</span> html<span class="p">,</span>htmldjango<span class="p">,</span>jinjahtml<span class="p">,</span>eruby<span class="p">,</span>mako <span class="k">let</span> <span class="k">b</span>:closetag_html_style<span class="p">=</span><span class="m">1</span>
+
+autocmd <span class="nb">FileType</span> html<span class="p">,</span>xhtml<span class="p">,</span>xml<span class="p">,</span>htmldjango<span class="p">,</span>jinjahtml<span class="p">,</span>eruby<span class="p">,</span>mako source <span class="p">~</span><span class="sr">/.vim/</span>bundle<span class="sr">/closetag/</span>plugin/closetag.<span class="k">vim</span>
+</code></pre></div>
+
+<h2>5. Pyflakes: Liniting for python files</h2>
+
+<p>» <a href="http://github.com/kevinw/pyflakes-vim">Github repository</a></p>
+
+<p><a href="http://pypi.python.org/pypi/pyflakes">Pyflakes</a> is syntax checking and linting library for python. The vim plugin for same is provides me with syntax check right inside vim. It notifies me of any module I have imported but not used, variables I have assigned and not used, syntax errors etc. </p>
+
+<p>Check out the red squiggly lines pointing out an unused variable and a indentation error in the screenshot below; a relevant error message will appear in the statusbar when the cursor is on the error in question.</p>
+
+<p><a href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/vim-pyflakes.png" title="Pyflakes"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/vim-pyflakes.png" alt="PyFlakes" title="Pyflakes"></a></p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/kevinw/pyflakes-vim.git bundle/pyflakes
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>Pyflakes should start working automatically as soon as you install it.</p>
+
+<h2>6. NERDCommenter: Fast comment manipulations</h2>
+
+<p>» <a href="https://github.com/scrooloose/nerdcommenter">Github repository</a></p>
+
+<p>NERDCommenter provides a bunch of key mapping for working with comments in a very fast and efficient manner.</p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/scrooloose/nerdcommenter.git bundle/nerdcommenter
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>Some useful key mappings that I use regularly are:</p>
+
+<ul>
+<li><p><code>[count]&lt;leader&gt;ci</code> - Toggles the comment state of the selected line(s) individually.</p></li>
+<li><p><code>[count]&lt;leader&gt;cy</code>- Same as <leader>cc except that the commented line(s) are yanked first.</leader></p></li>
+<li><p><code>&lt;leader&gt;c$</code> - Comments the current line from the cursor to the end of line.</p></li>
+<li><p><code>&lt;leader&gt;cA</code> - Adds comment delimiters to the end of line and goes into insert mode between them.</p></li>
+</ul>
+
+<p>For complete list of NERDCommenter commands see <code>:help NERDCommenter</code></p>
+
+<h2>7. SuperTab: Word completion on steriods</h2>
+
+<p>» <a href="https://github.com/ervandew/supertab">Github repository</a></p>
+
+<p>SuperTab let's me do all my insert mode completion using the <code>&lt;TAB&gt;</code> key.</p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/vim-scripts/supertab.git bundle/supertab
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>Type a couple of letters of the word and press <code>Tab</code> key and if it occurs somewhere in the open buffers, SuperTab will autocomplete it. E.g. typing <code>He&lt;TAB&gt;</code>will popup a list of words from open buffers that start with <strong><em>He</em></strong>. (See screenshot)</p>
+
+<p><a href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/supertab.png" title="SuperTab"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/supertab.png" alt="SuperTab" title="SuperTab"></a></p>
+
+<p>SuperTab also works with vim's builtin autocomplete feature OmniComplete. Just add following line after your OmniComplete configurations.</p>
+
+<div class="codehilite"><pre><code><span class="k">let</span> g:SuperTabDefaultCompletionType <span class="p">=</span> <span class="c">"context"</span>
+</code></pre></div>
+
+<h2>8. Fugitive: Git integration</h2>
+
+<p>» <a href="https://github.com/tpope/vim-fugitive">Github repository</a></p>
+
+<p>If had to pick the most awesome vim plugin, it would definitely be Fugitive. It provides an amazingly deep Git integration for vim.</p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/tpope/vim-fugitive.git bundle/fugitive
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p>I am not even going to attempt describing Fugitive usage here. I would rather point you to the awesome <a href="http://vimcasts.org/blog/2011/05/the-fugitive-series/">5 Part Fugitive Screecasts Series</a> by <a href="http://drewneil.com/">Drew Neil</a>. Go, Learn!</p>
+
+<h2>9. Tagbar: Awesome source code [tag]browsing</h2>
+
+<p>» <a href="https://github.com/majutsushi/tagbar">Github repository</a></p>
+
+<p>Tagbar displays the tags of the current file in a sidebar, similar to Taglist, but in a super sexy way - ordered by scope. </p>
+
+<p><a href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/tagbar.png" title="Tagbar"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/tagbar.png" alt="Tagbar" title="Tagbar"></a></p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span>sudo aptitude install exuberant-ctags  <span class="c"># Required by Tagbar</span>
+
+<span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add git://github.com/majutsushi/tagbar.git bundle/tagbar
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<p>Tagbar does not need any configuration by default and can be opened by <code>:TagbarOpen</code> or <code>:TagbarToggle</code>, but I have configured it as follows</p>
+
+<div class="codehilite"><pre><code><span class="k">let</span> g:tagbar_usearrows <span class="p">=</span> <span class="m">1</span>
+
+nnoremap <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="k">l</span> :TagbarToggle<span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</code></pre></div>
+
+<h2>10. Solarized Colorscheme</h2>
+
+<p>» <a href="https://github.com/altercation/vim-colors-solarized">Github repository</a></p>
+
+<p>Solarized is the awesome colorscheme for vim(and many other apps) by <a href="http://ethanschoonover.com/">Ethan Schoonover</a>. It provides both light and dark versions. You have already seen the dark colorscheme in the screenshots included above. Here is a screenshots of light version.</p>
+
+<p><a href="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/screen-python-light.png"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/screen-python-light.png" alt="Solarized"></a> </p>
+
+<h3>Installation</h3>
+
+<div class="codehilite"><pre><code><span class="nv">$ </span><span class="nb">cd</span> ~/.vim
+
+<span class="nv">$ </span>git submodule add  git://github.com/altercation/vim-colors-solarized.git bundle/solarized
+
+<span class="nv">$ </span>git submodule init <span class="o">&amp;&amp;</span> git submodule update
+</code></pre></div>
+
+<h3>Usage</h3>
+
+<p><a href="https://github.com/altercation/vim-colors-solarized/blob/master/README.mkd">Solarized Vim README</a> contains detailed configuration documentation; here is how I configured my instance</p>
+
+<div class="codehilite"><pre><code><span class="k">set</span> <span class="nb">background</span><span class="p">=</span><span class="nb">dark</span>
+
+<span class="k">let</span> g:solarized_termtrans<span class="p">=</span><span class="m">1</span>
+
+<span class="k">let</span> g:solarized_termcolors<span class="p">=</span><span class="m">256</span>
+
+<span class="k">let</span> g:solarized_contrast<span class="p">=</span><span class="s2">"high"</span>
+
+<span class="k">let</span> g:solarized_visibility<span class="p">=</span><span class="s2">"high"</span>
+
+<span class="k">colorscheme</span> solarized
+</code></pre></div>
+
+<p>If you want to use solarized in the terminal vim you will need to set <code>TERM</code> environment variable.</p>
+
+<div class="codehilite"><pre><code><span class="nb">export </span><span class="nv">TERM</span><span class="o">=</span><span class="s2">"xterm-256color"</span>
+</code></pre></div>
+
+<p>You can also use <a href="https://github.com/godlygeek/csapprox">CSAprox</a> plugin to use gvim themes inside terminal vim.</p>
+
+<h2>The rest</h2>
+
+<p>While the plugins described above are the ones without which I cannot even imagine working sanely, they are not the only ones. I use a variety of utility and syntax plugins. Some of them are:</p>
+
+<ul>
+<li><p><a href="https://github.com/tpope/vim-surround">Surround</a> - For editing the surroundings of text.</p></li>
+<li><p><a href="https://github.com/vim-scripts/Better-CSS-Syntax-for-Vim">Better CSS Syntax</a> - Provides better CSS syntax highlighting.</p></li>
+<li><p><a href="http://mirnazim.org/writings/vim-plugins-i-use/github.com/ap/vim-css-color">Vim CSS Color</a> - Sets background of color hex codes to what they are.</p></li>
+<li><p><a href="https://github.com/godlygeek/csapprox">CSAprox</a> - Allows use of GVim color schemes in almost all terminals</p></li>
+<li><p>Syntax plugins for various programming languages like JavaScript, HTML/XML, PHP, etc.</p></li>
+</ul>
+
+<p>For curious minds, my vim configurations(along with some other stuff) is available at <a href="https://github.com/mnazim/dotfiles">github.com/mnazim/dotfiles</a>.</p>
+
+<hr>
+
+<h4>Updates</h4>
+
+<p><strong><em>August 22, 2011:</em></strong> Corrected some mistakes and updated some obsolete repositories to active ones, thanks to the good people over at <a href="http://news.ycombinator.com/item?id=2910350">Hacker News</a>, <a href="http://www.reddit.com/r/vim/comments/jkvl9/list_of_vim_plugins_i_use_with_mini_tutorials/">Reddit</a> and Stéfan van der Walt who took the time to drop me an email. </p>
+
+<p><strong><em>August 26, 2011:</em></strong> A few readers reported confusing language in the para defining soft-linking of files and directories inside <code>~/dotfiles</code> to relevant locations. Changed naration and added the example commands to be more explicit.</p>
+
+</div>
+<div class="meta">
+  
+</div>
+<div class="tags">
+  <p>This entry was tagged 
+  
+  <a class="tag" href="http://mirnazim.org/tags/vim"><span>vim</span></a>, 
+  
+  <a class="tag" href="http://mirnazim.org/tags/editor"><span>editor</span></a>, 
+  
+  <a class="tag" href="http://mirnazim.org/tags/programming"><span>programming</span></a>
+  
+</p></div>
+<div id="underpost">
+  <h3>Discussions/Feedback.</h3>
+  
+  <p>I do not accept comments on this blog. Managing the spam is a headache and I am better off without it. However, I do welcome your feedback - good or bad via email at <code>feedback@mirnazim.org</code>. Specifically, I would be grateful for your feedback on errors, omissions, broken links, etc. </p>
+
+  
+</div>
+
+    <!--<div id="comments">-->
+      <!--<p>I do not accept comments on this blog(moderating spam gives me severe heartburns); However, I  welcome your feedback at <a href="#">feedback(at)mirnazim(dot)org</a></p>-->
+    <!--</div>-->
+  </div><!--/#content-->
+  <div id="footer">
+    <p>© Mir Nazim 2010. Some Rights Reserved</p>
+  </div>
+</div><!--/#page-->
+
+
+
+<div id="nav">
+  <div><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/mirnazim.face.png"></div>
+  <a title="Home" href="http://mirnazim.org/">home</a>
+  <a title="About" class="about" href="http://mirnazim.org/about/">about</a>
+  <a title="Atom feeds" href="http://mirnazim.org/atom.xml">atom</a>
+  <!--<span class="spacer">&nbsp;</span>-->
+  <a title="Twitter" href="http://twitter.com/mirnazim">twitter</a>
+  <a title="LinkedIn" href="http://in.linkedin.com/in/mirnazim">linkedIn</a>
+  <a title="Google+" href="http://gplus.to/mirnazim">google+</a>
+  <a title="Github" href="http://github.com/mnazim">github</a>
+  <a title="Flickr" href="http://www.flickr.com/photos/mirnazim/">flickr</a>
+</div>
+<span style="position:absolute;z-index:5555;top:25px;left:-5px; display: inline-block;"><a style="display: inline-block;" href="http://americancensorship.org/"><img src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/stop-censorship-small.png" style="vertical-align: bottom; border: 10px solid #000;  padding: 0 0px; background: #000;"></a></span>
+<!-- Google Analytics--> 
+<script src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/webfont.js" type="text/javascript" async=""></script><script type="text/javascript" async="" src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/ga.js"></script><script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25128315-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- End Google Analytics-->
+<script type="text/javascript" src="./List of vim plugins I use - with mini tutorials-- mirnazim.org_files/googlefonts.js"></script>
+
+</body></html>
