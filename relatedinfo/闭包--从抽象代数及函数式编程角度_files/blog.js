@@ -1,0 +1,11 @@
+document.writeln("<script type=\"text\/javascript\"><!--");
+document.writeln("google_ad_client = \"ca-pub-7090564139599510\";");
+document.writeln("\/* 728x90, 创建于 10-8-28 *\/");
+document.writeln("google_ad_slot = \"5590362768\";");
+document.writeln("google_ad_width = 728;");
+document.writeln("google_ad_height = 90;");
+document.writeln("\/\/-->");
+document.writeln("<\/script>");
+document.writeln("<script type=\"text\/javascript\"");
+document.writeln("src=\"http:\/\/pagead2.googlesyndication.com\/pagead\/show_ads.js\">");
+document.writeln("<\/script>");

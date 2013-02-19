@@ -1,0 +1,155 @@
+.lf-comments {
+	margin-top: 40px;
+	position: relative;
+}
+
+	.lf-comments .heading {
+		line-height: 1.7em;
+	}
+	
+	.lf-comments .subscribe,
+	.lf-comments .subscribed {
+		position: absolute;
+		top: 0px;
+		right: 30px;
+		padding: 3px 10px 4px;
+	}
+
+
+/* @group Comment List 
+-------------------------*/
+
+.lf-comments-list {
+	padding-top: 10px;
+	list-style: none;
+	margin: 0;
+}
+	.lf-comments-list li {background: none;}
+	.lf-comments-list .depth-2 {margin: 0 0 0 40px}
+	.lf-comments-list .depth-3 {margin: 0 0 0 80px}
+	.lf-comments-list .depth-4 {margin: 0 0 0 120px}
+	
+	.lf-comments-list .comment {
+		min-height: 55px;
+		margin: 20px 0;
+		position: relative;
+		margin-left: 70px;
+		padding: 10px;
+		border: 1px solid #F1F1F1;
+		-webkit-border-radius: 2px;
+		   -moz-border-radius: 2px;
+				border-radius: 2px;
+	}
+	.lf-comments-list .comment.disabled {
+		opacity: 0.7;
+		border: 1px solid pink;
+	}
+	
+	.lf-comments-list .comment:before,
+	.lf-comments-list .comment:after {
+		content: "";
+		position: absolute;
+		top: 10px;
+		left: -10px;
+		border-width: 0 10px 14px 0px;
+		border-style: solid;
+		border-color: transparent #F1F1F1;
+		display: block;
+		width: 0;
+	}
+	
+	.lf-comments-list .comment:after {
+		top: 11px;
+		left: -8px;
+		border-color: transparent #FFF;
+		display: block;
+		width: 0;
+	}
+
+	.lf-comments-list .disabled:before {
+	    border-color: transparent pink;
+	}
+	
+		.comment time, .comment-ip {
+			float: right;
+			font-size: 12px;
+			clear: both;
+		}
+		.comment p {
+			clear: both;
+		}
+		
+		.author {
+			display: inline;
+			font-size: 12px;
+			font-weight: bold;
+			line-height: 1.5em;
+			color: #666;
+			border-bottom: 0;
+		}
+		
+		.author span {
+			display: none;
+		}
+		
+		.lf-comments-list .avatar {
+			position: absolute;
+			left: -70px;
+			top: 0;
+			width: 48px;
+			height: 48px;
+			border: 1px solid #F1F1F1;
+			background: #F5F5F5;
+		}
+		
+		.lf-comments-list .comment-controls {
+			text-align: right;
+		}
+/* @end */
+
+
+
+/* @group Comment Form 
+-------------------------*/
+
+	.lf-comments-form {
+		margin-bottom: 0;
+	}
+		.lf-comments-form label {
+			display: block;
+			float: none;
+			width: auto;
+			text-align: left;
+			line-height: 20px;
+			padding-top: 0;
+			margin-top: 20px;
+		}
+		.lf-comments-form textarea {
+		    height: 100px;
+		    width: 98.5%;
+		    /*padding: 1%;
+		     Epic FireFox workaround needs to come last 
+		    -moz-box-sizing: border-box;
+		    padding: -moz-calc(5px);
+		    width: -moz-calc(100%);*/
+		}
+		
+		.lf-comments-form .button {
+			margin: 1em 0;
+			float: right;
+		}
+		
+		.lf-comments-form .login-message {
+			text-align: center;
+		}
+		
+		.lf-comments-form .invalid {
+			color: red;
+		}
+		.lf-comments-form .inline-label {
+			display: inline-block;
+		}
+		.lf-comments-form .winnie {
+			display:none!important;
+		}
+/* @end */

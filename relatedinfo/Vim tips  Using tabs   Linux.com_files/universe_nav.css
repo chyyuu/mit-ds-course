@@ -1,0 +1,24 @@
+
+#dropmenudiv{
+	position:absolute;
+	border:1px solid #CCC;
+	border-bottom-width: 0;
+	font:normal 10px;
+	line-height:18px;
+	z-index:100;
+}
+
+#dropmenudiv a{
+	width: 100%;
+	display: block;
+	text-indent: 3px;
+	border-bottom: 1px solid #CCC;
+	padding: 1px 0;
+	text-decoration: none;
+
+	font-size: 10px;
+}
+
+#dropmenudiv a:hover{ /*hover background color*/
+	background-color: #eee;
+}

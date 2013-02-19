@@ -1,0 +1,3107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0040)http://my.oschina.net/acmfly/blog/108408 -->
+<html lang="zh-CN" xml:lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="Content-Language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="shortcut icon" type="image/x-icon" href="http://my.oschina.net/img/favicon.ico">
+  <title>闭包漫谈（从抽象代数及函数式编程角度） -  acmfly的开源记录 - 开源中国社区</title>
+      <meta name="Description" content="闭包漫谈（从抽象代数及函数式编程角度）：前言 如果Google一下“闭包”这个词，会发现网上关于闭包的文章已经不计其数，甚至很多人将闭包看做面试...">
+    <link rel="stylesheet/less" href="./闭包--从抽象代数及函数式编程角度_files/styles.less" type="text/css" media="screen">
+  <link rel="stylesheet" href="./闭包--从抽象代数及函数式编程角度_files/tip-yellowsimple.css" type="text/css">
+  <link rel="stylesheet" type="text/css" href="./闭包--从抽象代数及函数式编程角度_files/jquery.fancybox-1.3.4.css" media="screen">
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/jquery.form.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/jquery.fancybox-1.3.4.pack.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/jquery.poshytip.min.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/oschina.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/less-1.3.0.min.js"></script><style type="text/css" media="screen" id="less:acmfly-styles">:focus {
+  outline: 0;
+}
+* {
+  padding: 0;
+  margin: 0;
+}
+a {
+  color: #4466bb;
+  outline: 0;
+}
+a:hover {
+  color: #0000aa;
+}
+ul,
+ol {
+  list-style-type: none;
+}
+img {
+  border: 0;
+}
+textarea {
+  resize: none;
+}
+body {
+  background: #f9f9f9;
+  text-align: center;
+  font-size: 10pt;
+}
+label.SELECTED {
+  color: #A00;
+  font-weight: bold;
+}
+.clear {
+  clear: both;
+  font-size: 1px;
+  line-height: 0;
+}
+.clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+.clearfix {
+  display: inline-block;
+}
+html[xmlns] .clearfix {
+  display: block;
+}
+* html .clearfix {
+  height: 1%;
+}
+.ostable {
+  width: 100%;
+  table-layout: fixed;
+}
+.ostable td {
+  vertical-align: top;
+  overflow: hidden;
+}
+.highlight {
+  color: #A00;
+  padding: 0 1px;
+  margin: 0 2px;
+}
+.NoData {
+  text-align: center;
+  padding: 20px 0;
+  color: #999999;
+}
+a.tag {
+  background-color: #E0EAF1;
+  border-bottom: 1px solid #3E6D8E;
+  border-right: 1px solid #7F9FB6;
+  color: #3E6D8E;
+  font-size: 8pt;
+  line-height: 2.4;
+  margin: 2px 2px 2px 0;
+  padding: 2px 4px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.tag:hover {
+  background-color: #3E6D8E;
+  color: #fff;
+}
+a.project {
+  background-color: #cfc;
+  color: #060;
+}
+a.project:hover {
+  background-color: #5cc26f;
+  color: #fff;
+}
+a.rndbutton {
+  background: #5cc26f;
+  color: #fff;
+  text-decoration: none;
+  height: 30px;
+  float: left;
+  margin: 0;
+  border: 0px solid #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+a.rndbutton:hover {
+  background: #40ab54;
+}
+a.rndbutton:hover span {
+  background: #40ab54;
+  color: #fff;
+}
+a.rndbutton span {
+  background: #5cc26f;
+  color: #fff;
+  float: left;
+  margin: 0 0 0 12px;
+  padding: 0 12px 0 0;
+  height: 30px;
+  line-height: 30px;
+}
+.obj_type_1 a.title {
+  background: url('/img/a2.gif') no-repeat left center;
+}
+.obj_type_2 a.title {
+  background: url('/img/thread.gif') no-repeat left center;
+}
+.obj_type_3 a.title {
+  background: url('/img/thread.gif') no-repeat left center;
+}
+.obj_type_4 a.title {
+  background: url('/img/a3.gif') no-repeat left center;
+}
+.obj_type_5 a.title {
+  background: url('/img/code.gif') no-repeat left center;
+}
+.obj_type_7 a.title {
+  background: url('/img/a3.gif') no-repeat left center;
+}
+#OSC_Screen {
+  width: 990px;
+  margin: 0px auto;
+  text-align: left;
+  padding: 0 4px;
+  margin-bottom: 50px;
+}
+#OSC_Banner {
+  background: #40aa53;
+  border-top: 0;
+  height: 36px;
+  padding: 2px 5px 0 5px;
+}
+#OSC_Banner #OSC_Logo {
+  float: left;
+  margin: 1px 0 0 2px;
+  width: 140px;
+}
+#OSC_Banner #OSC_Logo a {
+  float: left;
+  background: url('/img/2012/osc.png') no-repeat 0 1px;
+  width: 133px;
+  height: 34px;
+  text-indent: -9999px;
+}
+#OSC_Banner #OSC_Slogon {
+  float: left;
+  margin: 10px 0 0 10px;
+  color: #f2f2f2;
+}
+#OSC_Banner #OSC_Slogon a {
+  color: #fff;
+}
+#OSC_Banner #OSC_Channels {
+  margin-right: 10px;
+  float: right;
+  font-weight: bold;
+  font-size: 10.5pt;
+  height: 35px;
+  line-height: 35px;
+}
+#OSC_Banner #OSC_Channels ul li {
+  float: left;
+  margin: 0px 5px 0 10px;
+}
+#OSC_Banner #OSC_Channels ul li a {
+  text-decoration: none;
+  color: #f2f2f2;
+  padding: 2px;
+}
+#OSC_Banner #OSC_Channels ul li a:hover {
+  color: #fff;
+}
+#OSC_Notification {
+  width: 200px;
+  margin-left: 10px;
+  font-size: 9pt;
+}
+#OSC_Notification a.msgbox {
+  background: url('/img/msg.gif') no-repeat 5px 5px;
+  padding: 2px 4px 2px 22px;
+  text-decoration: none;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+#OSC_Notification a.newmsg {
+  color: #A00;
+  background: url('/img/msg2.gif') no-repeat 5px 3px;
+  padding: 2px 4px 2px 22px;
+  text-decoration: none;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+#OSC_Notification a:hover {
+  font-weight: bold;
+  color: #C00;
+}
+#OSC_Notification a em {
+  font-style: normal;
+  font-weight: bold;
+  margin-right: 2px;
+  text-decoration: underline;
+}
+#OSC_Topbar {
+  margin: 2px 0;
+}
+#OSC_Topbar #VisitorInfo {
+  font-size: 9pt;
+  color: #888;
+  float: left;
+}
+#OSC_Topbar #VisitorInfo a {
+  text-decoration: none;
+}
+#OSC_Topbar #SearchBar form {
+  float: right;
+  margin: 3px 0 0 0;
+  width: 310px;
+  background: #eee;
+  padding: 1px;
+}
+#OSC_Topbar #SearchBar form .ipt {
+  display: inline-block;
+  height: 22px;
+  padding: 2px 0 0 5px;
+  background: #FFF;
+}
+#OSC_Topbar #SearchBar form .ipt input {
+  color: #868686;
+  width: 200px;
+  font: 13px/22px Tahoma, Geneva, sans-serif;
+  border: none;
+  background: #FFF;
+  padding: 0;
+  height: 20px;
+  outline: 0;
+}
+#OSC_Topbar #SearchBar form .bnt {
+  color: #FFF;
+  text-align: center;
+  background: #5cc26f;
+  width: 45px;
+  height: 24px;
+  border: 0;
+  cursor: pointer;
+}
+#OSC_Topbar #SearchBar form .bnt:hover {
+  background: #40ab54;
+}
+#OSC_Topbar #SearchBar form .search-by {
+  float: left;
+}
+#OSC_Topbar #SearchBar form .search_on {
+  background: #FFF;
+  text-align: center;
+  position: relative;
+}
+#OSC_Topbar #SearchBar form .search_on .text {
+  height: 24px;
+  line-height: 23px;
+  width: 50px;
+  display: block;
+  color: #868686;
+  cursor: pointer ;
+  text-align: left;
+  padding: 0px 0 0 10px;
+  background: url(/img/android/selectbox_bg.png) no-repeat;
+}
+#OSC_Topbar #SearchBar form .search_on .text.on {
+  background-position: 0 -24px;
+}
+#OSC_Topbar #SearchBar form .search_on .text.hover {
+  background-position: 0 -48px;
+}
+#OSC_Topbar #SearchBar form .search_list {
+  background: #FFF;
+  display: none;
+  position: absolute;
+  width: 80px;
+  border: 1px solid #c3c3c3;
+  z-index: 9999;
+}
+#OSC_Topbar #SearchBar form .search_list li {
+  width: 80px;
+  height: 24px;
+  line-height: 24px;
+}
+#OSC_Topbar #SearchBar form .search_list a {
+  display: block;
+  color: #333 !important;
+  font-size: 8pt !important;
+  text-decoration: none;
+  padding: 0 0 0 10px;
+}
+#OSC_Topbar #SearchBar form .search_list a:hover {
+  background: #3399ff;
+  color: #ffffff !important;
+}
+#OSC_Topbar #SearchBar form .f_r {
+  float: right;
+}
+#OSC_Topbar #SearchBar form .f_l {
+  float: left;
+}
+#OSC_Topbar #SearchBar form .last {
+  margin: 0 !important;
+}
+#OSC_Topbar #SearchBar form .hide {
+  display: none;
+}
+/* 底部版权 */
+#OSC_Footer {
+  margin-top: 20px;
+  padding-bottom: 50px;
+  height: 38px;
+  line-height: 38px;
+  border-top: 2px solid #cccccc;
+  color: #666666;
+  text-align: center;
+}
+#OSC_Content {
+  margin: 10px 2px;
+  position: relative;
+}
+#SpaceLeft {
+  float: left;
+  width: 220px;
+}
+#SpaceLeft a {
+  text-decoration: none;
+}
+#SpaceMain {
+  margin: 0 220px 0 230px;
+  word-wrap: break-word;
+}
+#SpaceRight {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 210px;
+  word-wrap: break-word;
+}
+.SpaceList {
+  margin: 0 0 0 230px;
+  border: 1px solid #eee;
+  padding: 10px 15px;
+  background: #fff;
+  word-wrap: break-word;
+}
+.SpaceList .TopBar {
+  margin: 0 0 25px 0;
+  color: #999999;
+  font-size: 9pt;
+  height: 22px;
+  line-height: 22px;
+}
+.SpaceList .TopBar h1 {
+  color: #333333;
+}
+.Owner {
+  background: #5cc26f;
+  padding: 15px 5px 15px 10px;
+  position: relative;
+}
+.Owner a.Img:hover {
+  background: none;
+}
+.Owner a {
+  color: #fff;
+  padding: 0 1px;
+}
+.Owner a:hover {
+  background: #fff;
+  color: #5cc26f;
+}
+.Owner a.ThemeSetting {
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-indent: -9999px;
+  width: 28px;
+  height: 28px;
+  background: url('/img/2012/enter_narrow.png') no-repeat 0 0;
+}
+.Owner a.ThemeSetting:hover {
+  background: url('/img/2012/enter_narrow.png') no-repeat 0 -30px;
+}
+.Owner .Img img {
+  float: left;
+  width: 56px;
+  height: 56px;
+  background: #fff;
+  padding: 3px;
+  margin: 0 8px 10px 0;
+}
+.Owner .Img:hover img {
+  background: #eee;
+}
+.Owner span.U {
+  float: left;
+  width: 130px;
+}
+.Owner span.U .Name {
+  color: #FFF;
+  font-size: 14pt;
+  display: block;
+  margin: 0 0 12px 0;
+  font-weight: bold;
+  word-wrap: break-word;
+}
+.Owner span.U .Name {
+  background: none;
+}
+.Owner span.U .opts {
+  color: #fff;
+  font-size: 9pt;
+}
+.Owner span.U .opts a {
+  color: #fff;
+}
+.Owner span.U .opts a:hover {
+  background-color: #fff;
+  color: #5cc26f;
+}
+.Owner a#gender_icon {
+  text-indent: -9999px;
+  background-color: #5cc26f;
+}
+.Owner a#gender_icon:hover {
+  background-color: #5cc26f;
+}
+.Owner .stat {
+  color: #fff;
+  font-size: 9pt;
+}
+.Owner .stat a {
+  margin-right: 3px;
+}
+.Resume {
+  background: #7798cb url('/img/2012/resume24.png') no-repeat left bottom;
+  margin: 3px 0 0 0;
+  color: #fff;
+  padding: 18px 10px 18px 40px;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+.Resume textarea {
+  width: 170px;
+  height: 60px;
+  font-size: 9pt;
+}
+.Opts {
+  margin: 3px 0 0 0;
+}
+.Opts a {
+  cursor: pointer;
+  float: left;
+  width: 108px;
+  height: 108px;
+}
+.Opts a.a1 {
+  background-color: #5cc26f;
+}
+.Opts a.a1:hover {
+  background-color: #40ab54;
+}
+.Opts a.a2 {
+  background-color: #5cc26f;
+}
+.Opts a.a2:hover {
+  background-color: #40ab54;
+}
+.Opts a span {
+  padding: 82px 0 0 10px;
+  font-size: 11pt;
+  color: #fff;
+}
+.Opts a i {
+  text-indent: -9999px;
+  display: block;
+  margin: 10px 0 0 20px;
+  width: 67px;
+  height: 67px;
+  background-image: url('/img/2012/space-opts.png');
+  background-repeat: no;
+}
+.Opts a.a2 {
+  margin-left: 4px;
+}
+.Opts a.blog i {
+  background-position: 0 -67px;
+}
+.Opts a.admin i {
+  background-position: 0 -201px;
+}
+.Opts a.sendmsg i {
+  background-position: 0 -134px;
+}
+.Opts a.ask i {
+  background-position: 0 0;
+}
+.Mod {
+  background: #EAEAEA;
+  margin: 3px 0 0 0;
+  padding: 5px 0;
+  color: #666666;
+  overflow: hidden;
+}
+.Mod strong {
+  display: block;
+  font-size: 12pt;
+  border-bottom: 2px solid #7798cb;
+  padding: 0 10px 5px 10px;
+  color: #666666;
+}
+.Mod strong .more {
+  float: right;
+  font-weight: normal;
+  font-size: 10pt;
+  margin: 3px 0 0 0;
+}
+.Mod ul,
+.Mod ol {
+  margin: 10px;
+  line-height: 24px;
+}
+.Users ul li {
+  float: left;
+}
+.Users ul li a {
+  margin: 1px 1px 0 0;
+}
+.Users ul li img {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #EAEAEA;
+}
+.Users ul li a:hover img {
+  border: 1px solid #5cc26f;
+}
+.Users .more {
+  margin: 10px 0;
+  text-align: right;
+  padding: 0 5px 0 0 ;
+}
+#BlogCatalogs ul li a {
+  background: url('/img/fw_arrow.gif') no-repeat left center;
+  padding-left: 15px;
+  color: #333333;
+}
+#BlogCatalogs ul li a:hover {
+  color: #000;
+}
+#BlogCatalogs ul li span {
+  color: #666666;
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+  margin-left: 5px;
+}
+#BlogCatalogs ul li.draft a {
+  font-weight: bold;
+}
+#HotBlogs ol li a {
+  color: #333333;
+  display: block;
+}
+#HotBlogs ol li a:hover {
+  color: #000;
+  background: #ddd;
+}
+#RelativeBlogs {
+  position: fixed;
+  bottom: 0;
+  right: -400px;
+  width: 380px;
+  height: 160px;
+  background-color: #FFFFFF;
+  font-size: 10.5pt;
+  border: 1px solid #5cc26f;
+}
+#RelativeBlogs strong {
+  display: block;
+  margin: 0 0 10px 0;
+  background: #5cc26f;
+  color: #fff;
+  padding: 2px 5px;
+}
+#RelativeBlogs strong a#btn_close {
+  cursor: pointer;
+  float: right;
+  color: #fff;
+  font-size: 9pt;
+}
+#RelativeBlogs ul {
+  margin: 10px;
+}
+#RelativeBlogs ul li {
+  line-height: 22px;
+}
+#RelativeBlogs ul li a {
+  background: url('/img/a2.gif') no-repeat left center;
+  padding-left: 15px;
+  font-size: 10pt;
+  text-decoration: none;
+}
+#RelativeBlogs ul li .date {
+  float: right;
+  font-size: 8pt;
+  color: #666666;
+  -webkit-text-size-adjust: none;
+}
+#BlogReplies ul li {
+  color: #666666;
+  border-bottom: 1px dashed #999999;
+}
+.TopBar .NavPath {
+  float: left;
+}
+.TopBar .PreviewMod {
+  float: right;
+}
+.TopBar .PreviewMod a.active {
+  font-weight: bold;
+  color: #4466BB;
+}
+.TopBar .PreviewMod a {
+  color: #666666;
+}
+.BlogList .Blog {
+  margin: 0 0 30px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  position: relative;
+}
+.BlogList .Blog .date {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  background: #7798cb;
+  width: 50px;
+  height: 43px;
+  font-size: 8pt;
+  color: #fff;
+  -webkit-text-size-adjust: none;
+  text-align: center;
+}
+.BlogList .Blog .date em {
+  font-style: normal;
+  font-family: Calibri;
+  font-size: 16pt;
+  display: block;
+  font-weight: bold;
+}
+.BlogList .Blog .title {
+  margin-right: 80px;
+  overflow: hidden;
+}
+.BlogList .Blog h2 {
+  font-size: 12pt;
+  margin: 0 0 5px 0;
+}
+.BlogList .Blog h2.BlogAccess_false {
+  background: url('/img/lock.gif') no-repeat 3px center;
+  padding-left: 20px;
+}
+.BlogList .Blog h2.BlogTop_1 {
+  background: url('/img/top.gif') no-repeat left center;
+  padding-left: 22px;
+}
+.BlogList .Blog h2.BlogSong {
+  background: url('/img/song.gif') no-repeat left center;
+  padding-left: 22px;
+}
+.BlogList .Blog h2 a {
+  text-decoration: none;
+  color: #333333;
+}
+.BlogList .Blog .outline {
+  color: #666666;
+  font-size: 9pt;
+}
+.BlogList .Blog .bottom {
+  margin: 20px 0 0 0;
+  color: #666666;
+  font-size: 9pt;
+}
+.BlogList .Blog .bottom a.fullcontent {
+  margin-left: 10px;
+}
+.BlogList .Blog .TextContent {
+  margin: 15px 0 0 0px;
+  color: #666666;
+  line-height: 22px;
+  overflow: hidden;
+  letter-spacing: 1px;
+}
+.BlogList .Blog a {
+  color: #666666;
+}
+.BlogList .Blog a:hover {
+  color: #333333;
+}
+.BlogTitle {
+  padding: 5px 0 5px 0;
+  margin: 0 0 20px 0;
+}
+.BlogTitle h1 {
+  font-size: 20pt;
+  margin: 0 0 10px 0;
+  color: #000;
+}
+.BlogTitle .BlogStat {
+  color: #666666;
+}
+.BlogTitle .BlogStat strong {
+  margin: 0 2px;
+  color: #A00;
+}
+.BlogTitle .BlogStat a {
+  color: #A00;
+}
+.BlogTitle .BlogStat a:hover {
+  background: #A00;
+  color: #fff;
+}
+.BlogTitle .BlogStat .admin {
+  float: right;
+}
+.BlogTitle .BlogStat .admin em {
+  font-style: normal;
+  font-weight: bold;
+  color: #A00;
+  margin: 0 2px;
+}
+.BlogContent {
+  font-size: 10.5pt;
+  overflow: hidden;
+}
+.BlogContent p {
+  margin-bottom: 15pt;
+  line-height: 1.5;
+  letter-spacing: 1px;
+}
+.BlogContent pre {
+  line-height: 18px;
+  margin: 10px 0;
+  font-size: 9pt;
+  font-family: Courier New,Arial;
+  border: 1px solid #ddd;
+  border-left: 5px solid #6CE26C;
+  background: #f6f6f6;
+  padding: 5px;
+}
+.BlogContent img {
+  max-width: 640px;
+}
+.BlogContent ul,
+ol {
+  margin: 0 0 10px 20px;
+  list-style-position: inside;
+}
+.BlogContent ul {
+  list-style-type: disc;
+}
+.BlogContent ol {
+  list-style-type: decimal;
+}
+.BlogContent blockquote {
+  margin: 15px 10px;
+  border: 2px solid #eee;
+  padding: 5px 5px 5px 35px;
+  background: #f4f5f7 url('/img/blockquote.gif') no-repeat left top;
+  color: #060;
+  font-size: 9pt;
+}
+.BlogContent code {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #DDD;
+  background-color: #F6F6F6;
+  border-radius: 3px;
+}
+.BlogContent pre > code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+.BlogContent pre code {
+  background-color: transparent;
+  border: none;
+}
+.BlogShare {
+  height: 40px;
+}
+#BlogVote {
+  float: right;
+}
+#BlogVote a {
+  float: left;
+  background: #5cc26f;
+  color: #fff;
+  width: 40px;
+  height: 32px;
+  line-height: 32px;
+  text-decoration: none;
+  text-align: center;
+}
+#BlogVote a:hover {
+  background: #40ab54;
+}
+#BlogVote span {
+  float: left;
+  margin: 6px 0 0 5px;
+}
+#BlogVote em {
+  font-style: normal;
+  color: #A00;
+  font-weight: bold;
+  margin: 0 3px 0 2px;
+}
+.BlogTags {
+  margin-top: 10px;
+}
+.BlogLinks {
+  margin: 10px 0 20px 0;
+}
+.BlogLinks ul {
+  list-style-type: none;
+  font-weight: bold;
+  height: 24px;
+}
+.BlogLinks ul li.prev {
+  float: left;
+  width: 48%;
+}
+.BlogLinks ul li.next {
+  float: right;
+  width: 48%;
+  text-align: right;
+}
+.BlogCopyright {
+  color: #666666;
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  background: #ffe;
+  padding: 5px;
+}
+.BlogCopyright a {
+  color: #666666;
+  text-decoration: none;
+}
+.BlogComments {
+  margin-top: 10px;
+  padding-top: 0;
+}
+.BlogComments h2 a {
+  float: right;
+  font-weight: normal;
+  font-size: 10pt;
+}
+.BlogComments ul {
+  margin: 20px 0 0 0;
+}
+.BlogComments ul li {
+  margin: 0 0 20px 0;
+}
+.BlogComments ul li .portrait {
+  width: 50px;
+  padding-top: 3px;
+}
+.BlogComments ul li .portrait img {
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  background: #fff;
+}
+.BlogComments ul li .body .title {
+  color: #666666;
+  font-size: 9pt;
+}
+.BlogComments ul li .body .post {
+  margin: 10px 0 0 0;
+}
+.BlogComments ul li .body .post div.ref {
+  border: 1px solid #ddd;
+  margin: 0 0 10px 0;
+  padding: 2px;
+  font-size: 9pt;
+  background: #FFFEC8;
+}
+.BlogComments ul li .body .post div.ref h4 {
+  margin: 0;
+  padding: 1px 3px;
+  background: #CC9966;
+  color: #fff;
+  font-size: 10pt;
+}
+.BlogComments ul li .body .post div.ref p {
+  margin: 0;
+  padding: 2px;
+  line-height: 20px;
+  color: #666666;
+  font-size: 9pt;
+}
+.BlogCommentForm {
+  margin: 0 5px;
+}
+.BlogCommentForm form {
+  margin: 20px 0 20px 0;
+  padding: 0;
+}
+.BlogCommentForm form textarea {
+  padding: 5px;
+  border: 1px solid #999999;
+  margin: 5px 0;
+}
+.BlogCommentForm form input.SUBMIT {
+  font-size: 14px;
+  height: 28px;
+  line-height: 26px;
+  padding: 0 5px;
+}
+.BlogCommentForm form input.TEXT {
+  padding: 2px;
+  border: 1px solid #999999;
+}
+.LMod {
+  border: 1px solid #eee;
+  background: #fff;
+  padding: 10px 10px 5px 10px;
+  overflow: hidden;
+}
+.LMod strong {
+  display: block;
+  font-size: 12pt;
+  padding: 0 10px;
+  color: #666666;
+}
+.LMod ul {
+  margin: 15px 0 0 0;
+}
+.LMod ul li {
+  margin: 0 0 10px 0;
+}
+.LMod ul li .d {
+  color: #999999;
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+  margin-left: 5px;
+}
+.LMod ul li a {
+  background: url('/img/a2.gif') no-repeat left 6px;
+  padding-left: 15px;
+  text-decoration: none;
+}
+.LMod .more {
+  margin: 10px 0;
+  text-align: right;
+  padding: 0 5px 0 0 ;
+}
+.MMod {
+  border: 1px solid #eee;
+  background: #fff;
+}
+.RMod {
+  border: 1px solid #eee;
+  background: #fff;
+  padding: 10px;
+}
+.RMod strong {
+  color: #333333;
+  display: block;
+  font-size: 14pt;
+  font-weight: normal;
+  margin: 0 0 10px 0;
+}
+.RMod strong a {
+  float: right;
+  font-weight: normal;
+  font-size: 10pt;
+  margin: 5px 2px 0 0;
+}
+.RMod ul li a {
+  color: #333333;
+  text-decoration: none;
+}
+.RMod ul li a:hover {
+  color: #000;
+}
+#Ad {
+  margin: 20px 0 0 0;
+}
+#Ad strong {
+  display: block;
+  margin: 0 0 10px 0;
+}
+#AboutMe {
+  padding: 20px;
+}
+#MyBlog {
+  background: #5cc26f;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+#MyBlog a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 16pt;
+  float: left;
+  margin-left: 10px;
+}
+#MyBlog .action {
+  float: left;
+  width: 30px;
+  height: 30px;
+  background: url('/img/2012/action-icons.png') no-repeat 0 0;
+}
+#MyBlog:hover {
+  background: #40ab54;
+}
+#TopBlogs {
+  margin: 10px 0 0 0;
+  padding-bottom: 10px;
+}
+#TopBlogs strong {
+  padding-left: 5px;
+  padding-right: 0;
+}
+#TopBlogs strong a {
+  font-weight: normal;
+  float: right;
+  text-decoration: none;
+  color: #000;
+}
+#TopBlogs ul li {
+  margin: 0 5px 3px 0;
+}
+#TopBlogs ul li .s {
+  font-size: 9pt;
+  color: #999;
+  margin-left: 5px;
+}
+#TopBlogs ul li .d {
+  float: right;
+  font-size: 9pt;
+}
+#TopBlogs ul li a {
+  background: none;
+  padding-left: 10px;
+}
+#UserSkills #UserScore {
+  border-bottom: 1px dashed #eee;
+  margin: 0 0 15px 0;
+  overflow: hidden;
+  padding-bottom: 10px;
+}
+#UserSkills #UserScore h1 {
+  font-size: 12pt;
+  font-weight: normal;
+  float: left;
+  text-align: center;
+}
+#UserSkills #UserScore h1 em {
+  font-size: 24pt;
+  color: red;
+  font-style: normal;
+  color: #F00;
+  display: block;
+  margin: 5px 0 0 0;
+}
+#UserSkills #UserScore h1 a {
+  color: #999;
+  text-decoration: none;
+  display: block;
+}
+#UserSkills #UserScore h1 a:hover {
+  color: #000;
+}
+#UserSkills #UserScore h1.best {
+  width: 80px;
+}
+#UserSkills #UserScore h1.score {
+  width: 90px;
+  border-left: 1px solid #eee;
+  padding-left: 10px;
+}
+#UserSkills h1.Title {
+  color: #5cc26f;
+  font-size: 16pt;
+}
+#UserSkills h1.Title a {
+  font-weight: normal;
+  font-size: 10pt;
+  float: right;
+  margin: 3px 2px 0 0;
+}
+#UserSkills ul li {
+  margin: 10px 0 0 0;
+}
+#UserSkills ul li strong {
+  font-size: 10.5pt;
+  margin: 0px;
+  font-weight: bold;
+}
+#UserSkills ul li p {
+  color: #666;
+}
+#UserSkills ul li .more {
+  display: block;
+}
+#Profile li {
+  margin: 10px 0 0 0;
+  font-size: 9pt;
+  color: #666666;
+}
+#Profile li b {
+  display: block;
+  color: #333333;
+  margin-bottom: 2px;
+}
+#Profile li b.inline {
+  display: inline;
+}
+#Profile li a {
+  color: #4466bb;
+}
+#Profile li a:hover {
+  color: #0000aa;
+}
+#FavorBox {
+  margin-top: 10px;
+  padding-bottom: 20px;
+}
+#FavorBox ul {
+  margin: 0 0 0 0;
+}
+#FavorBox ul li {
+  float: left;
+  width: 85px;
+  height: 62px;
+  text-align: center;
+  margin: 30px 0 0 5px;
+  overflow: hidden;
+}
+#FavorBox ul li .logo {
+  display: block;
+  margin: 0 0 3px 0;
+}
+#FavorBox ul li img {
+  width: 40px;
+  height: 40px;
+}
+#FavorBox ul li .name {
+  font-weight: bold;
+  font-size: 9pt;
+  height: 20px;
+  line-height: 20px;
+}
+#FavorUpdate {
+  margin-top: 10px;
+}
+#FavorUpdate ul {
+  margin: 20px 0 0 0;
+}
+#FavorUpdate ul li {
+  margin: 0 0 10px 0;
+  color: #999999;
+  font-size: 9pt;
+}
+#FavorUpdate ul li a {
+  font-weight: bold;
+  font-size: 9pt;
+  display: block;
+  margin-bottom: 2px;
+}
+#FavorUpdate ul li .date {
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+}
+.AdminNav {
+  background: #5cc26f;
+  padding: 10px;
+  font-size: 14pt;
+}
+.AdminNav a.u {
+  float: left;
+  width: 40px;
+}
+.AdminNav a.u img {
+  width: 36px;
+  height: 36px;
+}
+.AdminNav a.h {
+  float: left;
+  color: #fff;
+  margin: 5px 0 0 10px;
+}
+.AdminNav a.h:hover {
+  color: #eee;
+}
+#AdminMenus {
+  font-size: 10.5pt;
+}
+#AdminMenus li.caption {
+  margin-bottom: 20px;
+}
+#AdminMenus li.caption ol {
+  margin: 10px 0 0 0;
+  line-height: 26px;
+}
+#AdminMenus li.caption ol li {
+  padding-left: 10px;
+}
+#AdminMenus li.caption ol li.active {
+  background: #f6f6f6;
+  font-weight: bold;
+}
+#AdminMenus li.caption ol li.active a {
+  color: #333333;
+}
+#AdminBody {
+  min-height: 600px;
+  color: #333333;
+}
+#AdminBody .AdminHead {
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 20px;
+}
+#AdminBody .AdminHead h1 {
+  color: #666666;
+  margin-bottom: 15px;
+}
+#AdminBody .AdminHead h1 a {
+  text-decoration: none;
+  color: #666666;
+}
+#AdminBody .AdminHead h1 .SubTitle {
+  font-weight: normal;
+  font-size: 10.5pt;
+  margin-left: 10px;
+}
+#AdminBody .AdminHead h1 .SubTitle a {
+  color: #666666;
+}
+#AdminBody .AdminHead h1 .SubTitle a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+#AdminBody .AdminHead .RelativeLinks {
+  float: right;
+  margin: 10px 10px 0 0;
+}
+#AdminBody .AdminHead .RelativeLinks a {
+  margin-left: 10px;
+}
+#AdminBody .AdminHead .Tabs {
+  font-size: 16pt;
+  padding-left: 20px;
+  height: 37px;
+  height: 37px;
+}
+#AdminBody .AdminHead .Tabs li {
+  float: left;
+  margin-right: 10px;
+}
+#AdminBody .AdminHead .Tabs li a {
+  display: block;
+  padding: 5px 10px;
+  color: #666666;
+  text-decoration: none;
+}
+#AdminBody .AdminHead .Tabs li a:hover {
+  color: #000;
+}
+#AdminBody .AdminHead .Tabs li a.active {
+  background: #7798cb;
+  color: #fff;
+}
+#AdminBody .AdminHead .Tabs li a.active:hover {
+  color: #fff;
+}
+#ProfileForms .Langs strong {
+  display: block;
+}
+#ProfileForms .Langs ul li {
+  float: left;
+  width: 160px;
+  height: 25px;
+}
+#ProfileForms .Fields ul li {
+  float: left;
+  width: 220px;
+  height: 25px;
+}
+.Drafts ul li {
+  margin: 0 0 20px 0;
+  border-bottom: 1px dashed #cccccc;
+  padding-bottom: 10px;
+}
+.Drafts ul li h2 {
+  color: #999999;
+}
+.Drafts ul li h2 a.title {
+  font-size: 12pt;
+  color: #333333;
+  text-decoration: none;
+}
+.Drafts ul li h2 .opts {
+  float: right;
+  font-weight: normal;
+  font-size: 10pt;
+}
+.Drafts ul li p {
+  color: #999999;
+  margin: 10px 10px 0 10px;
+  line-height: 24px;
+}
+.BlogCommentList li {
+  margin: 0 0 10px 0;
+  border-bottom: 1px dashed #666666;
+  padding-bottom: 10px;
+}
+.BlogCommentList li .user {
+  width: 50px;
+}
+.BlogCommentList li .user img {
+  width: 36px;
+  height: 36px;
+}
+.BlogCommentList li .body {
+  overflow: hidden;
+}
+.BlogCommentList li .body a {
+  font-weight: bold;
+}
+.BlogCommentList li .body p {
+  color: #666666;
+  margin: 5px 0 0 0;
+  line-height: 22px;
+}
+.BlogCommentList li .opts {
+  width: 100px;
+}
+.BlogCommentList li .opts a {
+  display: block;
+  text-decoration: none;
+}
+.BlogCatalogManage form {
+  margin: 20px 0 0 0;
+}
+.BlogCatalogManage form h3 {
+  font-size: 10.5pt;
+  margin: 0 0 10px 0;
+}
+.BlogCatalogManage form h3 span {
+  font-weight: normal;
+  margin: 0 0 0 10px;
+  color: #666666;
+}
+.BlogCatalogManage form.BlogCatalogs table {
+  background: #cccccc;
+}
+.BlogCatalogManage form.BlogCatalogs table th {
+  background: #999999;
+  color: #333333;
+  padding: 3px 10px;
+  text-align: center;
+  font-weight: bold;
+}
+.BlogCatalogManage form.BlogCatalogs table td {
+  background: #fff;
+  padding: 3px 5px;
+}
+.BlogCatalogManage form.BlogCatalogs table td a {
+  text-decoration: none;
+}
+.BlogCatalogManage form.BlogCatalogs table td.idx,
+.BlogCatalogManage form.BlogCatalogs table td.num {
+  text-align: center;
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+}
+#Logs {
+  margin: 10px 0 0 0;
+  padding: 10px;
+}
+#Logs .UserLogs {
+  margin: 20px 10px;
+}
+ul.LogTabs {
+  border-bottom: 1px solid #7798cb;
+  padding-left: 10px;
+  height: 28px;
+  line-height: 28px;
+}
+ul.LogTabs li {
+  float: left;
+  margin-right: 5px;
+}
+ul.LogTabs li a {
+  display: block;
+  background: #f6f6f6;
+  text-decoration: none;
+  font-size: 10.5pt;
+  padding: 0 10px;
+  color: #999999;
+}
+ul.LogTabs li a:hover {
+  color: #666666;
+}
+ul.LogTabs li.active a {
+  background: #7798cb;
+  color: #fff;
+}
+ul.LogFilter {
+  padding: 0 0 0 10px;
+  margin-top: 10px;
+  height: 20px;
+  line-height: 20px;
+}
+ul.LogFilter li {
+  float: left;
+  margin-right: 15px;
+}
+ul.LogFilter li a {
+  text-decoration: none;
+  display: block;
+  padding: 0 5px;
+}
+ul.LogFilter li a.active {
+  border: 1px solid #7798cb;
+}
+#FavoriteList {
+  padding-right: 30px;
+}
+#FavoriteTags {
+  width: 170px;
+}
+#FavoriteTags strong {
+  display: block;
+  margin: 0 0 20px 0;
+}
+#FavoriteList ul.FavList {
+  margin: 20px 0 20px 10px;
+}
+#FavoriteList ul.FavList li {
+  margin-bottom: 5px;
+}
+#FavoriteList ul.FavList li .opts {
+  float: right;
+  font-size: 9pt;
+}
+#FavoriteList ul.FavList li .opts a {
+  color: #666666;
+}
+#FavoriteList ul.FavList li .opts a:hover {
+  color: #000;
+}
+#FavoriteList ul.FavList li a.title {
+  text-decoration: none;
+  font-size: 10.5pt;
+  padding-left: 20px;
+}
+#FavoriteList ul.FavList li .tags {
+  margin-left: 20px;
+}
+#FavoriteList ul.FavList li .tags a {
+  padding: 1px 3px;
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+}
+#FavoriteList ul.FavList li .tags input {
+  padding: 0 3px;
+}
+#FavoriteList ul.FavList li .tags form {
+  color: #666666;
+}
+.NewsList {
+  margin: 0 0 20px 0;
+}
+.NewsList li {
+  margin-bottom: 5px;
+}
+.NewsList li .title a {
+  text-decoration: none;
+}
+.NewsList li .stat {
+  width: 110px;
+  font-size: 9pt;
+  color: #666666;
+}
+.NewsList li .date {
+  width: 70px;
+  color: #666666;
+  font-size: 9pt;
+}
+.NewsList li .opts {
+  width: 110px;
+  text-align: right;
+  color: #666666;
+}
+.ProjectList li {
+  margin: 0 0 10px 0;
+}
+.ProjectList .head {
+  font-weight: bold;
+  color: #000;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 10px;
+}
+.ProjectList li .date {
+  width: 150px;
+  color: #666666;
+  font-size: 9pt;
+}
+.ProjectList li .status {
+  width: 100px;
+}
+.ProjectList li .opts {
+  width: 80px;
+  text-align: right;
+}
+.UserList h1 {
+  border-bottom: 1px solid #cccccc;
+  margin: 0 0 10px 0;
+  padding-bottom: 15px;
+  color: #666666;
+}
+.UserList h1 .SubTitle {
+  font-size: 10pt;
+  font-weight: normal;
+  color: #666666;
+  margin-left: 10px;
+}
+.UserList .SortBar {
+  background: #eee;
+  margin-bottom: 20px;
+  padding: 3px 10px;
+}
+.UserList .SortBar a {
+  margin-left: 10px;
+}
+.UserList .SortBar a.active {
+  font-weight: bold;
+}
+.UserList a {
+  text-decoration: none;
+}
+.UserList li {
+  margin: 0 0 10px 0;
+  border-bottom: 1px dashed #cccccc;
+  padding-bottom: 10px;
+}
+.UserList li td {
+  vertical-align: top;
+  padding: 0;
+}
+.UserList li .avatar {
+  width: 45px;
+}
+.UserList li .avatar img {
+  width: 32px;
+  height: 32px;
+  margin-top: 5px;
+}
+.UserList li .update .name {
+  font-weight: bold;
+}
+.UserList li .update .nickname {
+  margin-left: 10px;
+  color: #666666;
+}
+.UserList li .update .set_memo {
+  display: none;
+}
+.UserList li .update .log {
+  color: #666666;
+  margin: 5px 0 0 0;
+  font-size: 9pt;
+}
+.UserList li .update .log .user {
+  display: none;
+}
+.UserList li .update .log .rpost {
+  margin-left: 10px;
+}
+.UserList li .opts {
+  text-align: right;
+  width: 80px;
+}
+.UserList li .opts a {
+  display: block;
+}
+.Msgs a {
+  text-decoration: none;
+}
+.Msgs li {
+  margin: 0 0 10px 0;
+  border-bottom: 1px dashed #cccccc;
+}
+.Msgs li .user {
+  width: 48px;
+}
+.Msgs li .user img {
+  width: 32px;
+  height: 32px;
+  margin-top: 5px;
+}
+.Msgs li .msg {
+  color: #333333;
+  margin-bottom: 10px;
+  line-height: 22px;
+}
+.Msgs li .bottom {
+  height: 20px;
+}
+.Msgs li .date {
+  float: left;
+  width: 120px;
+  font-size: 9pt;
+  color: #666666;
+}
+.Msgs li .opts {
+  float: right;
+  text-align: right;
+  color: #999999;
+}
+.MsgForm {
+  margin: 0 0 20px 48px;
+}
+.MsgForm strong {
+  display: block;
+  margin-bottom: 5px;
+}
+.MsgForm strong span {
+  font-weight: normal;
+  margin-left: 10px;
+}
+.MsgForm textarea {
+  width: 500px;
+  height: 60px;
+  padding: 3px;
+}
+#MyTweetForm {
+  padding: 10px 15px;
+  border: 1px solid #eee;
+  background: #fff;
+}
+#TForm #TFormEditor {
+  border: 2px solid #5cc26f;
+  padding: 2px;
+  margin: 2px 0 0 0;
+  background: #fff;
+}
+#TForm textarea {
+  border: 0;
+  width: 98%;
+  height: 50px;
+  padding: 5px;
+  font-size: 10pt;
+  overflow: auto;
+  scroll: none;
+  background: #fff;
+}
+#TFormTitle {
+  color: #888;
+  position: relative;
+}
+#TFormTitle .r {
+  float: right;
+  margin: 0px 10px 0 0;
+  font-size: 9pt;
+}
+#TFormTitle .r em {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 10.5pt;
+  color: #A00;
+  margin: 0 3px 0 0;
+}
+#TForm #TFormOpts {
+  margin: 0 0 0 5px;
+}
+#TForm #TFormOpts ul {
+  float: left;
+  margin: 2px 0 0 0;
+  padding: 1px;
+}
+#TForm #TFormOpts ul li {
+  display: inline;
+  margin-right: 5px;
+}
+#TForm #TFormOpts ul li a {
+  font-size: 9pt;
+  text-decoration: none;
+  color: #666666;
+  border: 1px solid #fff;
+  padding: 1px 2px 1px 18px;
+}
+#TForm #TFormOpts ul li a:hover {
+  border: 1px solid #5cc26f;
+}
+#TForm #TFormOpts ul li.t {
+  color: #666666;
+  margin-right: 0;
+}
+#TForm #TFormOpts ul li.emotion a {
+  background: url('/img/space/emotion.gif') no-repeat left center;
+}
+#TForm #TFormOpts ul li.img a {
+  background: url('/img/space/img.gif') no-repeat 2px center;
+  padding-left: 20px;
+}
+#TForm #TFormOpts ul li.app a {
+  background: url('/img/space/app.gif') no-repeat left center;
+}
+#TForm #TFormOpts input.B {
+  cursor: pointer;
+  border: 0;
+  float: right;
+  font-size: 12pt;
+  padding: 3px 20px 5px 20px;
+  margin-right: 10px;
+  color: #fff;
+  background: #5cc26f;
+}
+#TweetFormPopupWraper {
+  display: none;
+  position: absolute;
+  z-index: 9999;
+}
+#TweetFormPopupArrow {
+  background-image: url('/img/space/up_arrow.gif');
+  background-repeat: no-repeat;
+  padding-top: 5px;
+}
+#TweetFormPopupWraper .emotions {
+  background-position: 51px 0px;
+}
+#TweetFormPopupWraper .images {
+  background-position: 107px 0px;
+}
+#TweetFormPopup {
+  width: 392px;
+  border: 2px solid #cccccc;
+  background: #ffc;
+  padding: 5px;
+}
+#TweetFormPopup a.close {
+  float: right;
+  font-size: 8pt;
+  font-weight: bold;
+  -webkit-text-size-adjust: none;
+}
+#TweetFormPopup a.emotion {
+  float: left;
+  width: 24px;
+  height: 24px;
+  background-image: url('/js/ke/plugins/emoticons/qq.gif');
+  background-repeat: no-repeat;
+  margin: 0 2px 4px 0;
+  border: 1px solid #f6f6f6;
+}
+#TweetFormPopup a.emotion:hover {
+  border: 1px solid #5cc26f;
+}
+#TweetFormPopup .TweetPopupTitle {
+  background: #666666;
+  color: #fff;
+  padding: 3px 5px;
+  margin: 0 0 10px 0;
+  font-weight: bold;
+}
+#TweetFormPopup .TweetPopupTitle a {
+  float: right;
+  color: #FFF;
+}
+#TweetImages .l {
+  margin: 0 0 10px 0;
+}
+#TweetImages .tip {
+  color: #666666;
+}
+.Tweet {
+  border-bottom: 1px dashed #cccccc;
+  padding: 0 0 5px 0;
+  margin: 0 0 10px 0;
+}
+.Tweet a {
+  text-decoration: none;
+}
+.Tweet .TweetUser {
+  width: 48px;
+}
+.Tweet .TweetUser img {
+  width: 32px;
+  height: 32px;
+  margin-top: 5px;
+}
+.Tweet .TweetContent {
+  color: #333333;
+}
+.Tweet .TweetContent h5 {
+  font-weight: normal;
+  font-size: 10pt;
+  color: #999999;
+}
+.Tweet .TweetContent .post {
+  font-size: 10.5pt;
+  line-height: 22px;
+  margin: 5px 0 0 0;
+  overflow: hidden;
+}
+.Tweet .TweetContent .ref {
+  font-size: 9pt;
+  margin: 3px 0 0 0;
+  background: url('/img/space/up_arrow.gif') no-repeat 15px 0;
+  padding-top: 5px;
+}
+.Tweet .TweetContent .ref .p {
+  border: 1px solid #cccccc;
+  background: #f6f6f6;
+  padding: 5px;
+  color: #999999;
+}
+.Tweet .TweetContent .ref .rpost {
+  display: block;
+  margin: 3px 0;
+}
+.Tweet .TweetContent .photo {
+  margin: 10px 0;
+}
+.Tweet .TweetContent .photo img {
+  border: 1px solid #f6f6f6;
+  padding: 1px;
+  max-width: 450px;
+  cursor: pointer;
+}
+.Tweet .TweetContent .photo img:hover {
+  border: 1px solid #5cc26f;
+}
+.Tweet .TweetContent .photo .ImgMenu a {
+  margin: 0 5px 0 0;
+}
+.Tweet .TweetContent embed {
+  margin: 3px 0 0 0;
+}
+.Tweet .TweetContent .video {
+  margin: 10px 0;
+}
+.tweet_video_operation {
+  display: none;
+}
+.tweet_video_description {
+  margin: 0 0 5px 0;
+  font-size: 12px;
+}
+.tweet_thumb_wrapper {
+  display: inline-block;
+  border: 1px solid #D2D2D2;
+  background: white;
+  overflow: hidden;
+  padding: 3px;
+  position: relative;
+  cursor: pointer;
+}
+.tweet_play_video {
+  opacity: 0.7;
+  display: inline-block;
+  width: 37px;
+  height: 37px;
+  background: url('/img/play_video.png') no-repeat;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -18px;
+  margin-left: -18px;
+}
+.Tweet .TweetContent .bottom {
+  margin: 10px 0 0 0;
+  height: 18px;
+}
+.Tweet .TweetContent .opts {
+  font-size: 8pt;
+  float: right;
+}
+.Tweet .TweetContent .time {
+  font-size: x-small;
+  margin: 0;
+  color: #888;
+  -webkit-text-size-adjust: none;
+}
+.Tweet .LogReplyList {
+  margin: 0px 0 5px 0;
+  display: none;
+  padding: 5px 5px 5px 0;
+}
+.Tweet .LogReplyList .TweetRplsWrapper {
+  background: #f9f9f9;
+  padding: 10px 10px 20px 10px;
+  border: 1px solid #cccccc;
+}
+.Tweet .LogReplyList .TweetRplsWrapper .loading {
+  background: url('/img/loading.gif') no-repeat left center;
+  padding-left: 22px;
+}
+.Tweet .LogReplyList #closeTweetRpls {
+  float: right;
+  font-weight: bold;
+  line-height: 8px;
+  height: 8px;
+}
+.Tweet .LogReplyList form {
+  margin: 5px 0 0 5px;
+}
+.Tweet .LogReplyList form label {
+  font-size: 9pt;
+}
+.Tweet .LogReplyList .TweetReplyOptions {
+  margin: 3px 0 0 0;
+}
+.Tweet .LogReplyList .TweetReplyOptions input {
+  float: left;
+  margin: 2px 0 0 0;
+}
+.Tweet .LogReplyList .TweetReplyOptions label {
+  float: left;
+}
+.Tweet .pager {
+  margin: 20px 0 0 2px;
+}
+.TweetRpls h6 {
+  font-size: 10pt;
+  margin: 10px 0 5px 0;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 5px;
+}
+.TweetRpls ul {
+  font-size: 9pt;
+}
+.TweetRpls li {
+  border-bottom: 1px dashed #cccccc;
+  padding: 10px 0 5px 0;
+}
+.TweetRpls li .portrait {
+  width: 30px;
+}
+.TweetRpls li .portrait img {
+  width: 24px;
+  height: 24px;
+  margin: 5px 0 0 0;
+}
+.TweetRpls li .TweetReplyBody {
+  overflow: hidden;
+}
+.TweetRpls li .TweetReplyBody .post {
+  line-height: 20px;
+}
+.TweetRpls li .TweetReplyBody .opts {
+  float: none;
+  font-size: 8pt;
+  -webkit-text-size-adjust: none;
+  color: #999999;
+  margin: 10px 0 0 0;
+  height: 18px;
+}
+.TweetRpls li .TweetReplyBody .opts .links {
+  float: right;
+}
+.TweetRpls li .TweetReplyBody .opts a {
+  font-size: 9pt;
+}
+.TweetRpls .all {
+  display: block;
+  margin: 10px 0 0 0 ;
+}
+#TweetReplyPage {
+  width: 500px;
+}
+#TweetReplyPage h1 {
+  font-size: 16pt;
+  margin-bottom: 20px;
+}
+#TweetReplyPage h1 a {
+  text-decoration: none;
+}
+#TweetReplyForm {
+  margin: 0 0 20px 0px;
+}
+#TweetReplyForm textarea {
+  display: block;
+  width: 98%;
+  height: 40px;
+  font-size: 9pt;
+  padding: 2px;
+  margin: 10px 0 5px 0;
+}
+#TweetReplyForm .TweetReplyOptions {
+  float: right;
+}
+#TweetReplyForm #btn_submit {
+  padding: 2px 3px;
+  font-weight: bold;
+  margin-right: 5px;
+}
+#TweetReplyPage #TweetReplies li .TweetReplyBody {
+  width: 450px;
+}
+.gotop {
+  background: url(/img/gotop.gif) no-repeat;
+  display: block;
+  width: 31px;
+  height: 31px;
+}
+#SpaceHomeLayoutSelector {
+  height: 350px;
+}
+#SpaceHomeLayoutSelector a {
+  float: left;
+  width: 48%;
+  text-align: center;
+}
+#SpaceHomeLayoutSelector a em {
+  display: block;
+  font-style: normal;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+#SpaceHomeLayoutSelector a img {
+  border: 3px solid #fff;
+  padding: 5px;
+}
+#SpaceHomeLayoutSelector a.active img {
+  border: 3px solid #7798CB;
+}
+#LayoutSelectorMsg {
+  text-align: center;
+  font-size: 14pt;
+  margin: 20px 0 0 0;
+  color: #000;
+  display: none;
+}
+/* 通用的表单 */
+.error_msg {
+  height: 22px;
+  color: #A00;
+  margin: 10px 0 10px 0;
+  background: url('/img/warning.gif') no-repeat left center;
+  padding-left: 24px;
+}
+.error_msg a {
+  padding: 0 5px 0 5px;
+  font-weight: bold;
+}
+.ok_msg {
+  height: 22px;
+  color: #060;
+  margin: 10px 0 10px 0;
+  background: url('/img/space/tick.png') no-repeat left center;
+  padding-left: 24px;
+}
+.ok_msg a {
+  padding: 0 5px 0 5px;
+  font-weight: bold;
+}
+.MainForm {
+  font-size: 10.5pt;
+}
+.MainForm .Tip {
+  margin: 0 0 10px 0;
+  border: 1px solid #cccccc;
+  background: #ffc;
+  font-size: 9pt;
+  padding: 10px;
+  color: #00A;
+}
+.MainForm .Tip ul {
+  margin: 10px 0 0 10px;
+  line-height: 22px;
+  list-style-type: disc;
+  list-style-position: inside;
+}
+.MainForm form th {
+  text-align: right;
+  padding: 10px;
+  font-weight: normal;
+  color: #666666;
+}
+.MainForm form th.required {
+  font-weight: bold;
+}
+.MainForm form td.t {
+  color: #333333;
+}
+.MainForm form td .tip {
+  color: #5cc26f;
+  font-size: 9pt;
+}
+.MainForm form input.TEXT {
+  padding: 3px;
+}
+.MainForm form select {
+  padding: 3px;
+}
+.MainForm form textarea {
+  padding: 3px;
+  font-size: 12pt;
+}
+.MainForm form input.BUTTON {
+  font-size: 12pt;
+  padding: 2px 5px;
+}
+.MainForm form input.SUBMIT {
+  font-weight: bold;
+  padding: 2px 10px;
+}
+.MainForm form .submit #error_msg {
+  margin-left: 10px;
+}
+.MainForm .FormSection {
+  margin: 20px 0;
+}
+.MainForm .FormSection ul {
+  margin: 20px 0 0 20px;
+}
+/* end 通用的表单 */
+/* paging */
+.pager {
+  height: 28px;
+  line-height: 28px;
+  margin: 2px 0;
+}
+.pager li {
+  font-size: 14px;
+  text-align: center;
+  margin: 0 2px 0 0;
+  display: inline;
+}
+.pager li a {
+  font-family: Courier New,Arial;
+  color: #58595b;
+  background-color: #f0f0f0;
+  padding: 3px 5px;
+  text-decoration: none;
+}
+.pager li a:hover {
+  color: #000;
+}
+.pager li.prev a {
+  background-color: #cccccc;
+  color: #666666;
+}
+.pager li.next a {
+  background-color: #cccccc;
+  color: #666666;
+}
+.pager li.current a {
+  color: #fff;
+  background: #7798cb;
+}
+/* end pager css */</style>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/scrolltopcontrol.js"></script>
+  <script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/jquery.atwho.js"></script>
+  <link rel="stylesheet" type="text/css" href="./闭包--从抽象代数及函数式编程角度_files/jquery.atwho.css">
+  <link rel="alternate" type="application/rss+xml" title="acmfly最新博客" href="http://my.oschina.net/acmfly/rss">
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://my.oschina.net/action/xmlrpc/rsd?space=164475">
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://my.oschina.net/action/xmlrpc/wlwmanifest?space=164475"> 
+  <style type="text/css">
+    body,table,input,textarea,select {font-family:Verdana,sans-serif,宋体;}	
+  </style>
+  <script type="text/javascript">
+  	scrolltotop.offset(100,165);
+	scrolltotop.init();
+  </script>
+</head>
+<body>
+<div id="OSC_Screen">
+	<div id="OSC_Banner">
+		<div id="OSC_Logo">
+        	<a href="http://www.oschina.net/" title="开源中国社区首页">开源中国社区</a>
+        </div>
+        		<div id="OSC_Slogon">JetBrains 开发工具全场2折，<a href="http://www.oschina.net/shop/jetbrains" target="_blank">详情»</a></div>
+        <div id="OSC_Channels">
+        	<ul>
+        	<li><a href="http://www.oschina.net/project" class="software">软件</a></li>
+        	<li><a href="http://www.oschina.net/question" class="question">讨论</a></li>
+        	<li><a href="http://www.oschina.net/code/list" class="code">代码</a></li>
+        	<li><a href="http://www.oschina.net/news" class="news">资讯</a></li>
+        	<li><a href="http://www.oschina.net/translate" class="translate">翻译</a></li>
+        	<li><a href="http://www.oschina.net/blog" class="blog">博客</a></li>
+        	<li><a href="http://www.oschina.net/android" class="android">Android</a></li>
+        	<li><a href="http://www.oschina.net/job" class="job">招聘</a></li>
+        	</ul>
+        </div>
+        <div class="clear"></div>
+	</div>
+	<div id="OSC_Topbar">
+		<div id="VisitorInfo">
+		当前访客身份：
+				游客 [ <a href="http://www.oschina.net/home/login?goto_page=http%3A%2F%2Fmy.oschina.net%2Facmfly">登录</a> | <a href="http://www.oschina.net/home/reg">加入开源中国</a> ]
+				<span id="OSC_Notification">			
+						<a href="http://www.oschina.net/home/login?goto_page=http%3A%2F%2Fmy.oschina.net%2Facmfly" class="msgbox" title="进入我的留言箱">你有<em>0</em>新留言</a>			
+								</span>
+		</div>
+		<div id="SearchBar">
+    		<form action="http://www.oschina.net/search">
+				<input type="hidden" name="user" value="164475">
+																<span class="ipt f_l">
+    			<input type="text" id="txt_q" name="q" class="SERACH" value="在 24469 款开源软件中搜索" onblur="(this.value==&#39;&#39;)?this.value=&#39;在 24469 款开源软件中搜索&#39;:this.value" onfocus="if(this.value==&#39;在 24469 款开源软件中搜索&#39;){this.value=&#39;&#39;;};this.select();">
+				</span>
+				                <div class="search-by selectbox">
+    				<span class="hide">
+    				<select name="scope">					
+                        <option value="project" selected="">软件</option>
+                        <option value="code">代码</option>
+                        <option value="bbs">讨论区</option>
+                        <option value="news">新闻</option>
+                        <option value="blog">博客</option>
+    				</select>
+    				</span>
+                  <div class="search_on" id="search-item"><span class="text">软件</span></div>
+                  <ul class="search_list" style="display: none; ">
+                     <li class="search-item"><a href="http://my.oschina.net/acmfly/blog/108408#1">软件</a></li>
+                     <li><a href="http://my.oschina.net/acmfly/blog/108408#2">代码</a></li>
+                     <li><a href="http://my.oschina.net/acmfly/blog/108408#3">讨论区</a></li>
+                     <li><a href="http://my.oschina.net/acmfly/blog/108408#4">新闻</a></li>
+                     <li><a href="http://my.oschina.net/acmfly/blog/108408#5">博客</a></li>
+                  </ul>
+                </div>
+				<input type="submit" value="搜索" class="bnt f_r">			
+    		</form>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div id="OSC_Content">	
+
+<div id="SpaceLeft">
+<div class="Owner">
+	    <a href="http://my.oschina.net/acmfly" class="Img"><img src="./闭包--从抽象代数及函数式编程角度_files/164475_100.jpg" align="absmiddle" alt="acmfly" title="acmfly" class="LargePortrait"></a>
+    <span class="U">
+        <a href="http://my.oschina.net/acmfly" class="Name" title="男">acmfly</a>
+		<span class="opts">
+			<img src="./闭包--从抽象代数及函数式编程角度_files/men.png" align="absmiddle" title="男">
+        			<script type="text/javascript">
+var nologin = "<a href='javascript:_follow_nologin()' title='成为TA的粉丝'>关注此人</a>"
+var follow0 = "<a href='javascript:_follow_user(164475,true)' title='成为TA的粉丝'>关注此人</a>";
+var follow1 = "已关注 | <a href='javascript:_follow_user(164475,false)' title='取消关注后，此人的更新信息将不会出现在你的首页'>取消</a>";
+var follow2 = "互相关注 | <a href='javascript:_follow_user(164475,false)' title='取消关注后，此人的更新信息将不会出现在你的首页'>取消</a>";
+var follow4 = "<a href='javascript:_follow_user(164475,true)' title='成为TA的粉丝'>+关注此人</a>";
+
+document.write("<span id='_follow_164475_action_'>");
+	document.write(nologin);
+document.write("</span>");
+
+function _follow_nologin(){
+	if(confirm('必须登录后才能关注，是否现在登录？')){
+		location.href="http://www.oschina.net/home/login?goto_page="+location.href;
+	}
+}
+
+function _follow_user(uid, follow){
+	var action = follow?"/action/user/follow":"/action/user/unfollow";
+	ajax_post(action,"id="+uid+"&user=${g_user.id}",function(result){
+		var act = $('#_follow_164475_action_');
+		if(result == '0')
+			_follow_nologin();
+		else if(result == '1')
+			act.html(follow0);
+		else if(result == '2')
+			act.html(follow1);
+		else if(result == '3')
+			act.html(follow2);
+		else if(result == '4')
+			act.html(follow4);
+	});
+}
+</script><span id="_follow_164475_action_"><a href="javascript:_follow_nologin()" title="成为TA的粉丝">关注此人</a></span>				</span>
+    </span>
+    <div class="clear"></div>
+    <div class="stat">
+    	<a href="http://my.oschina.net/acmfly/fellow">关注(4)</a>
+    	<a href="http://my.oschina.net/acmfly/fans">粉丝(13)</a>
+    	<a href="http://www.oschina.net/question/3307_20931" title="查看OSCHINA积分规则">积分(20)</a>
+    </div>
+</div><style>
+#MyResume textarea {width:170px;height:60px;font-size:9pt;}
+</style>
+<div class="Resume" id="MyResume">
+本博客大多数内容为网上资料整理而成，因找不到原创位置，所以...多数文章并未标注“原创”，实在抱歉，同时，感谢原创者的无私奉献，好人一路平安！！！</div>
+
+<div class="Opts clearfix">
+	<a href="javascript:sendmsg(164475, 0)" class="a1 sendmsg"><i>.</i><span>发送留言</span></a>
+	<a href="http://www.oschina.net/question/ask?user=164475" class="a2 ask"><i>.</i><span>请教问题</span></a>
+</div><div class="Mod" id="BlogCatalogs">
+  <strong> 博客分类</strong>
+  <ul>
+	    	<li><a href="http://my.oschina.net/acmfly/blog?catalog=104800">Linux基础概念及命令</a><span>(88)</span></li>
+		<li><a href="http://my.oschina.net/acmfly/blog?catalog=263696">Go语言</a><span>(4)</span></li>
+		<li><a href="http://my.oschina.net/acmfly/blog?catalog=98046">工作日志</a><span>(17)</span></li>
+		<li><a href="http://my.oschina.net/acmfly/blog?catalog=139613">C语言</a><span>(3)</span></li>
+		<li><a href="http://my.oschina.net/acmfly/blog?catalog=98047">日常记录</a><span>(7)</span></li>
+		<li><a href="http://my.oschina.net/acmfly/blog?catalog=98048">转贴的文章</a><span>(1)</span></li>
+	  </ul>
+</div><div class="Mod" id="HotBlogs">
+  <strong>阅读排行</strong>
+  <ol>
+			<li><a href="http://my.oschina.net/acmfly/blog/38425">1. Ubuntu下的KVM详解</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/93410">2. 使用Go语言一段时间的感受</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/52327">3. Linux mint 12 修改加速软件源更新和安装ubuntu软件中心  </a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/40883">4. Grub Rescue修复方法</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/55693">5. GDB调试----带着心上路</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/30389">6. 【2.1】/etc/apt/sources.list文件</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/39959">7. ubuntu添加backtrack的sources list工具源</a></li>
+				<li><a href="http://my.oschina.net/acmfly/blog/40120">8. Reinstall Nessus in BT5</a></li>
+		  </ol>
+</div>
+<div class="Mod" id="BlogReplies">
+  <strong> 最新评论</strong>  
+      <ul>
+		<li>
+		<a href="http://my.oschina.net/acmfly">@acmfly</a>：引用来自“Honghe”的评论 老实说 还是没看明白和...
+		<a href="http://my.oschina.net/action/tweet/go?obj=272170012&type=18&user=164475">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/leopardsaga">@Honghe</a>：老实说 还是没看明白和数学的闭包怎么联系
+		<a href="http://my.oschina.net/action/tweet/go?obj=272111997&type=18&user=225435">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/u/937625">@郑柯</a>：看的我也眼热，决定学习下
+		<a href="http://my.oschina.net/action/tweet/go?obj=271841426&type=18&user=937625">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/acmfly">@acmfly</a>：引用来自“YangMiao”的评论 http://go-tour-zh....
+		<a href="http://my.oschina.net/action/tweet/go?obj=271366389&type=18&user=164475">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/myy">@YangMiao</a>：http://go-tour-zh.appspot.com/ 无法访问啊大锅...
+		<a href="http://my.oschina.net/action/tweet/go?obj=271200959&type=18&user=103181">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/acmfly">@acmfly</a>：引用来自“红尘一人”的评论 let's lua 让我们撸...
+		<a href="http://my.oschina.net/action/tweet/go?obj=270993705&type=18&user=164475">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/acmfly">@acmfly</a>：引用来自“戏水”的评论 这是刚写的吗？第一个正...
+		<a href="http://my.oschina.net/action/tweet/go?obj=270993692&type=18&user=164475">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/alexcheung">@Steve、⑤</a>：go 正在学习中。。。。。 楼主概括的很好！mark...
+		<a href="http://my.oschina.net/action/tweet/go?obj=270927857&type=18&user=614557">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/yy1990cn">@土豆的春天</a>：好多牛人推荐go，真有那么牛逼？
+		<a href="http://my.oschina.net/action/tweet/go?obj=270921100&type=18&user=781989">查看»</a>
+	</li>
+		<li>
+		<a href="http://my.oschina.net/heheceo">@onlyou-CEO</a>：软文？？？
+		<a href="http://my.oschina.net/action/tweet/go?obj=270918643&type=18&user=878751">查看»</a>
+	</li>
+	  </ul>
+  </div><div class="Mod" id="Stat">
+<strong>访客统计</strong>
+<ul>
+	<li><label>今日访问：</label>4</li>
+    <li><label>昨日访问：</label>17</li>
+    <li><label>本周访问：</label>21</li>
+    <li><label>本月访问：</label>267</li>
+    <li><label>所有访问：</label>14404</li>
+</ul>
+</div></div>
+
+
+<div class="SpaceList">
+	<div class="TopBar">
+    	<div class="NavPath">		
+    		<a href="http://my.oschina.net/acmfly/home">空间</a> » <a href="http://my.oschina.net/acmfly/blog">博客</a>			
+			» <a href="http://my.oschina.net/acmfly/blog?catalog=98048">转贴的文章</a>
+			» 博客正文
+    	</div>
+	</div>
+	
+    	<div class="BlogEntity">		
+      <div class="BlogTitle">
+        <h1><img src="./闭包--从抽象代数及函数式编程角度_files/b4.gif" align="absmiddle"> 闭包漫谈（从抽象代数及函数式编程角度）</h1>
+        <div class="BlogStat">
+    		    		    	    <span class="admin">
+				<style>
+#favor_form{width:200px;}
+#favor_form p {color:#666;}
+#favor_form form{height:60px;width:200px;}
+#favor_form form ._favor_input{display:block;margin:2px 0;width:199px;}
+#favor_form form ._favor_button{float:left;padding:2px 5px;}
+.favor_ok {text-align:center;font-size:10.5pt;width:199px;height:60px;margin-top:10px;}
+#TagsSwitcher{cursor:pointer;float:right;margin-top:10px;}
+#MyTags{display:none;width:199px;}
+#MyTags a.tag {float:left; background-color: #E0EAF1;border-bottom: 1px solid #3E6D8E;border-right: 1px solid #7F9FB6;color: #3E6D8E;font-size: 8pt;line-height: 16px;margin: 2px 2px 2px 0;padding: 2px 4px;text-decoration: none;white-space: nowrap;}
+</style>
+<script type="text/javascript">
+var favor_add = "<a href='javascript:add_to_favor(108408,3)' id='favor_trigger' title='添加到收藏夹'>我要收藏</a>";
+var favor_del = "<a href='javascript:delete_favor(108408,3)' id='favor_trigger' style='color:#a00;'>取消收藏</a>";
+var favor_ok = "<p class='favor_ok'>已成功添加到收藏夹<br/><br/> <a href='null/favorites?type=3'>我的收藏夹</a> | <a href='javascript:close_favor()'>关闭</a></p>";
+function delete_favor(obi_id, obj_type){
+	$('#attention_it').html(favor_add);
+	$("#p_attention_count").load("/action/favorite/cancel?type="+obj_type+"&id="+obi_id, {user: ''});
+}
+function add_to_favor(obj_id, obj_type){
+	if(confirm('必须登录后才能收藏，是否现在登录？')){
+		location.href="http://www.oschina.net/home/login?goto_page="+encodeURIComponent(location.href);
+	}
+}
+function close_favor(elem_id){
+    $('#favor_trigger').poshytip('destroy');
+}
+function setTag(tv){
+	var t = $("._favor_input");
+	var value = t.val();
+	if(value!="")
+		t.val(value+","+tv);
+	else
+		t.val(tv)
+}
+function ltrim(str){
+    var whitespace = new String(" \t\n\r");
+    var s = new String(str);
+    if (whitespace.indexOf(s.charAt(0)) != -1){
+        var j=0, i = s.length;
+        while (j < i && whitespace.indexOf(s.charAt(j)) != -1){
+            j++;
+        }
+        s = s.substring(j, i);
+    }
+    return s;
+}
+
+function rtrim(str){
+    var whitespace = new String(" \t\n\r");
+    var s = new String(str);
+    if (whitespace.indexOf(s.charAt(s.length-1)) != -1){
+        var i = s.length - 1;
+        while (i >= 0 && whitespace.indexOf(s.charAt(i)) != -1){
+            i--;
+        }
+        s = s.substring(0, i+1);
+    }
+    return s;
+}
+ 
+function trim(str){
+    return rtrim(ltrim(str));
+}
+</script>
+<em id="p_attention_count">20</em>人收藏此文章,
+<span id="attention_it">
+	<script type="text/javascript">document.write(favor_add);</script><a href="javascript:add_to_favor(108408,3)" id="favor_trigger" title="添加到收藏夹">我要收藏</a>
+</span>			</span>
+    		    		发表于10天前(2013-02-08 20:33) , 
+    		已有<strong>118</strong>次阅读 ，共<strong><a href="http://my.oschina.net/acmfly/blog/108408#comments">2</a></strong>个评论
+    		    	</div> 
+      </div>
+	  <div class="BlogContent"><h1> 前言 </h1> 
+<p> 如果Google一下“闭包”这个词，会发现网上关于闭包的文章已经不计其数，甚至很多人将闭包看做面试JavaScript程序员的必考题（虽然闭包和JavaScript没有什么必然联系）。既然如此，我为什么还要写一篇关于闭包的文章呢？ </p> 
+<p> 首先，虽然网上关于闭包的文章甚多，但是很少以较为形式化的角度阐述闭包，而我认为理解闭包的关键之一就是从形式化角度理解其涵义；其次，大多数文章将闭包的概念与JavaScript语言绑定太死，这样容易局限对闭包概念的理解，而难以窥探到其本质。从JavaScript去理解闭包，个人认为这是本末倒置的，应该先理解纯粹意义上的闭包，然后再理解JavaScript中的闭包机制。 </p> 
+<p> 基于以上情况，本文将从较为形式化的角度阐述闭包概念，当做对现有网络的资料的一个补充。<br> <span></span> </p> 
+<h1> 一个需要明确的重要事实 </h1> 
+<p> 在开始阐述闭包之前，我需要特别明确一个非常重要的事实，那就是<strong><span style="font-size:medium;">“闭包（closure）”一词被用于定义两个毫不相关的概念，分别是数学领域<a href="http://en.wikipedia.org/wiki/Abstract_algebra" target="_blank" rel="nofollow">抽象代数</a>分支下用于描述集合之于运算的一种性质以及计算机科学程序设计语言分支用于描述函数式语言所支持的一种机制。</span></strong>这种不同大约就如“电影《人猿泰山》”和“五岳之尊泰山”中的“泰山”差不多，两个短语中的“泰山”描述的是两个风马牛不相及的概念，虽然是同一个词。 </p> 
+<p> 一般来说，作为程序员我们说的闭包更多是指后者，但是如果你与我一样同时具有一点数学背景，第一次接触“闭包”一词是在抽象数学中的话，那么当刚接触到计算机中的“闭包”时多少会产生困惑，同样，如果你是一个纯粹的程序员，那么当在数学著作中读到“闭包”一词时请小心区分这个“闭包”具体是表述哪一个概念。 </p> 
+<p> 我会在下文中分别阐述数学领域和计算机科学领域闭包的概念。 </p> 
+<h1> 抽象代数中的闭包 </h1> 
+<p> 抽象代数是一门研究代数结构的数学分支，它的研究对象包括群、环、域和向量空间等等。当然我在这里丝毫没有要大谈特谈这些令人头大的概念的意思，我会尽量以一种易懂的半形式化方式去阐述一些概念。 </p> 
+<h2> 集合的定义 </h2> 
+<p> 非正式地，集合是N个对象组成的一个无序、互异且确定的整体。其中N是自然数。这些对象称为集合的元素。 </p> 
+<p> 无序性是指集合中的元素不存在序关系（集合上可以定义序关系，但这些序关系不是集合本身的一部分），每个元素的地位是相同的。 </p> 
+<p> 互异性是指集合中任意两个元素是不同的，即同一集合中任意两个元素间不存在等价关系。 </p> 
+<p> 确定是指对任意一个对象和任意一个集合，这个对象要么属于此集合，要么不属于此集合，二者必居其一，不存在模棱两可的状态（模糊数学中有一种中间隶属状态，本文不考虑模糊数学领域）。 </p> 
+<h2> 运算的定义 </h2> 
+<p> 非正式地，集合上的n元运算是一个映射，这个映射将作用于任意n个集合中的元素，并映射为一个结果（注意结果不一定属于这个集合）。 </p> 
+<p> 例如，设<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" alt="" style="cursor: pointer; "></a>是正整数集合，那么加法（<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_Cfvv.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_Cfvv.jpg" alt="" style="cursor: pointer; "></a>）和减法（<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_bXXA.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_bXXA.jpg" alt="" style="cursor: pointer; "></a>）都可以看做定义在<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" alt="" style="cursor: pointer; "></a>上的二元运算，因为任意两个正整数都可以进行加减。 </p> 
+<h2> 封闭的定义 </h2> 
+<p> 有了集合和运算的概念，就可以定义封闭的概念了。 </p> 
+<p> 非正式地，如果定义于集合<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" alt="" style="cursor: pointer; "></a>上的运算<a href="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" alt="" style="cursor: pointer; "></a>的运算结果仍然属于<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" alt="" style="cursor: pointer; "></a>，那么运算<a href="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" alt="" style="cursor: pointer; "></a>对于集合<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_EXKa.jpg" alt="" style="cursor: pointer; "></a>是封闭的。下面给出“封闭”的一个半形式化定义： </p> 
+<p> 如果对于任意<a href="./闭包--从抽象代数及函数式编程角度_files/08203339_MFcK.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203339_MFcK.jpg" alt="" style="cursor: pointer; "></a>，有<a href="./闭包--从抽象代数及函数式编程角度_files/08203339_hlXX.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203339_hlXX.jpg" alt="" style="cursor: pointer; "></a>，那么说二元运算<a href="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203339_MtuT.jpg" alt="" style="cursor: pointer; "></a>对于集合A是封闭的。 </p> 
+<p> 例如“<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_Cfvv.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_Cfvv.jpg" alt="" style="cursor: pointer; "></a>”对于<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" alt="" style="cursor: pointer; "></a>是封闭的，因为任意两个正整数的和结果仍然是正整数；但是“<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_bXXA.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_bXXA.jpg" alt="" style="cursor: pointer; "></a>”对于<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" alt="" style="cursor: pointer; "></a>不是封闭的，例如3和5属于<a href="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203338_BtHg.jpg" alt="" style="cursor: pointer; "></a>，但是：<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_HtBX.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_HtBX.jpg" alt="" style="cursor: pointer; "></a>。 </p> 
+<h2> 闭包性质 </h2> 
+<p> 一个集合满足闭包性质当且仅当这个集合在某个运算或某些运算的搜集下是封闭的，其中“某些运算的搜集下封闭”是指这个集合单独闭合在每个运算之下。 </p> 
+<p> 值得一提的是，之前这条定义往往被作为一条公理引入一个代数结构，叫做“闭包公理”。但是现代集合论往往将运算形式化的定义为集合间的运算，所以将其作为公理引入代数结构是多余的（因为可以通过其它公理间接定义闭包公理），但是对于子集是否闭合的问题，闭包公理仍然有意义。 </p> 
+<h2> 一个例子 – 存在于形式语言与自动机理论中的闭包 </h2> 
+<p> 上面说了很多东西，我们来看一个抽象代数领域闭包的例子。 </p> 
+<p> 我们回想在形式语言与自动机理论中（或者编译原理中也有提到）在定义语言时做的一些推导。 </p> 
+<p> 一般我们会先定义一个有限集合<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" alt="" style="cursor: pointer; "></a>，叫做字母表，<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" alt="" style="cursor: pointer; "></a>的n阶幂运算定义为形成一个新的集合<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_4UEG.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_4UEG.jpg" alt="" style="cursor: pointer; "></a>，一个对象属于<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_4UEG.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_4UEG.jpg" alt="" style="cursor: pointer; "></a>当且仅当它是<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_wCHM.jpg" alt="" style="cursor: pointer; "></a>中任意n个字母连接成的串，其中<a href="./闭包--从抽象代数及函数式编程角度_files/08203340_rzXA.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_rzXA.jpg" alt="" style="cursor: pointer; "></a>。而 </p> 
+<p> <a href="./闭包--从抽象代数及函数式编程角度_files/08203340_R7lz.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203340_R7lz.jpg" alt="" style="cursor: pointer; "></a> </p> 
+<p> 此时集合<a href="./闭包--从抽象代数及函数式编程角度_files/08203341_08Um.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203341_08Um.jpg" alt="" style="cursor: pointer; "></a>满足闭包性质，因为这个集合对于幂运算是封闭的。有兴趣的读者可以自行证明一下。 </p> 
+<h1> 函数式编程中的闭包 </h1> 
+<p> 在这一章节开始之前，我需要再和大家明确一个比较纠结的事实，就是在<strong><span style="font-size:medium;">函数式编程领域中当说到“闭包”时，也有可能是指数学领域中闭包的概念</span></strong>，这是因为函数式编程在基础理论与抽象代数有一定亲缘性，所以当在函数式语言著作中讨论“闭包”时，有可能是在抽象数学的上下文中讨论的。然而，在表述上可能会有微妙变化。在函数式语言领域对于数学闭包常用的表述是“如果一个运算的结果仍然能被此运算作用，则这个运算是封闭的”，要注意这只不过是上文提到的“闭包”概念的另一种等价表述而已，如果我们将这个运算的所有结果看做一个集合，那么就可以等价表述说这个运算在这个集合上是封闭的。 </p> 
+<p> 而我下面所要阐述的闭包是一种截然不同的概念。所以，当在函数式语言的著作中看到“闭包”时，需要根据上下文环境小心区分其表述哪种概念。 </p> 
+<h2> Lambda演算与自由变量 </h2> 
+<p> <a href="http://en.wikipedia.org/wiki/Functional_programming" target="_blank" rel="nofollow">函数式编程语言</a>的基础是<a href="http://en.wikipedia.org/wiki/Lambda_calculus" target="_blank" rel="nofollow">lambda演算</a>，这是一套用于研究函数定义、应用和递归的形式系统，由数学家<a href="http://en.wikipedia.org/wiki/Alonzo_Church" target="_blank" rel="nofollow">丘奇</a>在20世纪30年代引入。如果您不太熟悉lambda演算，那么维基百科相关页面是很好的快速入门资料，请原谅我不会完整描述lambda演算（因为已经有<a href="http://en.wikipedia.org/wiki/Lambda_calculus" target="_blank" rel="nofollow">很多可以参考的资料</a>）。 </p> 
+<p> 简单来说lambda演算将计算过程看过一系列的函数代换，例如，下面是加运算的lambda函数（假设+运算已经定义）： </p> 
+<p> <a href="./闭包--从抽象代数及函数式编程角度_files/08203341_arkr.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203341_arkr.jpg" alt="" style="cursor: pointer; "></a> </p> 
+<p> lambda演算就是反复将函数应用于实际值，并用实际值代替参数，最终得出结果。例如下面是7+2的计算过程： </p> 
+<p> <a href="./闭包--从抽象代数及函数式编程角度_files/08203341_8LOl.jpg" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/08203341_8LOl.jpg" alt="" style="cursor: pointer; "></a> </p> 
+<p> 首先用第一个参数（7）代替最外层函数的参数（x），然后用第二个参数（2）代替第二层函数的参数（y），最终得到计算结果。 </p> 
+<p> 鉴于如果下面大量使用lambda演算描述问题大家可能会崩溃（我也会崩溃），我将改用函数式语言<a href="http://en.wikipedia.org/wiki/Scheme_%28programming_language%29" target="_blank" rel="nofollow">scheme</a>（<a href="http://en.wikipedia.org/wiki/Lisp_%28programming_language%29" target="_blank" rel="nofollow">Lisp</a>的一个方言）来进行问题描述。注意其实scheme在本质上与lambda演算是等价的，只是看起来更好懂，例如不需要遵循lambda演算一个变态的规定：每个函数只允许有一个参数（虽然任何多参数函数式程序都可以通过<a href="http://en.wikipedia.org/wiki/Currying" target="_blank" rel="nofollow">Currying</a>过程化归为等价的lambda演算）。 </p> 
+<p> 下面是用scheme程序对上述lambda演算的等价表示： </p> 
+<pre>(define (f x y) (+ x y))</pre> 
+<p> 可以这样计算7+2： </p> 
+<pre>(f 7 2)
+;Value: 9</pre> 
+<p> 下面看一个稍微复杂点的例子： </p> 
+<pre>(define (f x) (lambda (y) (+ x y)))</pre> 
+<p> 这里定义了函数f，接受一个参数x，特别要注意它的返回值：不是一个值而是一个匿名函数。如果我们把这个函数单独拿出来： </p> 
+<pre>(lambda (y) (+ x y))</pre> 
+<p> 可以看到，这个匿名函数接收一个参数y，但是却没有参数x！也就是说，如果脱离上下文执行这个函数，则x处于未指定状态，我们说对于这个函数，y是绑定的，而x是自由的。 </p> 
+<p> 一般地：x是一个函数的函数体中的变量，如果x被这个函数的参数指定，则x是绑定于这个函数的，否则说x对于此函数是自由的。 </p> 
+<p> 下面可以看到，变量的绑定和自由概念是理解闭包本质的一把钥匙。 </p> 
+<h2> 程序语言的闭包性质 </h2> 
+<p> 继续上面的scheme程序，我们已经定义了函数f： </p> 
+<pre>(define (f x) (lambda (y) (+ x y)))</pre> 
+<p> 如果我们运行下面程序： </p> 
+<pre>(f 7)
+;Value 13: #[compound-procedure 13]</pre> 
+<p> 可以看到，f返回了一个过程（匿名函数），按照函数演算规则，这个函数应该是： </p> 
+<pre>(lambda (y) (+ 7 y))</pre> 
+<p> 那么下面的运算就很直观了： </p> 
+<pre>((f 7) 2)
+;Value: 9</pre> 
+<p> 注意这里有一个非常重要的地方（也是闭包性质的关键），那就是这个运算执行了两个函数：f和匿名函数。而f的作用域为(f 7)，这就是说，其实在(f 7)之后，f这个函数就结束了，而x（这里被赋值为7）是f的私有变量（绑定于f），那么程序设计语言的设计者就有两种选择：第一，在函数超出其作用域后立即销毁其绑定变量，如果是这样的话，((f 7) 2) 是无法得出结果的，因为在外层的f运算结束后，存放数值“7”的变量就被释放了，所以匿名函数无法得到其自由变量x的值；显然scheme的设计者做了第二种选择：<strong><span style="font-size:medium;">如果一个函数返回另一个函数，而被返回函数又需要外层函数的变量时，不会立即释放这个变量，而是允许被返回的函数引用这些变量。支持这种机制的语言称为支持闭包机制，而这个内部函数连同其自由变量就形成了一个闭包。</span></strong> </p> 
+<p> 上面的这段话不太好理解，但是请务必多读几遍，因为，这就是闭包的全部。 </p> 
+<h2> 从Scheme到JavaScript </h2> 
+<p> 好的，现在开始讨论JavaScript中的闭包。 </p> 
+<p> 上文说过，闭包是函数式语言才有的机制，或者说支持函数式编程泛型的语言才有的性质。一个语言支持函数式编程泛型，如果它同时具有下列特性： </p> 
+<p> 可以将一个函数赋值给一个变量。 </p> 
+<p> 函数可以作为参数传递给另一个函数。 </p> 
+<p> 函数的返回值可以是一个函数。 </p> 
+<p> 结合上面关于闭包性质的定义，就很清楚为什么只有支持函数编程泛型的语言才可以谈闭包性质。 </p> 
+<p> 很显然，JavaScript是具有上述三条性质的，所以可以说JavaScript拥有函数式编程泛型。当然，一般我们还是习惯于用命令式的写JavaScript，但是其闭包本质是一样的。为了说明这一点，我将会首先用JavaScript按照函数式泛型重写上面的scheme程序，然后转为命令式。 </p> 
+<p> 上文用scheme所写的函数f，可以用JavaScript等价实现如下： </p> 
+<pre>function f(x){ return function(y) { return x + y; }; }</pre> 
+<p> 可以执行与上述scheme类似的计算（因为脱离了浏览器，我是用nodejs执行这段JavaScript）： </p> 
+<pre>console.log( (f(7)) (2) );
+//9</pre> 
+<p> 其中f返回的匿名函数与其自由变量x组成了一个闭包系统。 </p> 
+<p> 如果用命令式重写上面的程序，就得到了我们熟悉的闭包： </p> 
+<pre>function f(x){
+    return function(y) {
+        return x + y;
+    };
+}
+
+var lam = f(7);
+console.log(lam(2));</pre> 
+<h1> 总结 </h1> 
+<p> 本文分别讨论了抽象代数和函数式编程中两个截然不同的闭包概念，当然，作为程序员我们更关心的是后者（但前者也不是对程序员一点用也没有，如果学习函数式语言的构造原理，抽象代数中的闭包也是必须理解的概念）。希望本文能对您有所帮助。 </p></div>
+	  	  
+            <div style="margin:10px 0 0 0;">
+		<script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/blog.js"></script><script type="text/javascript"><!--
+google_ad_client = "ca-pub-7090564139599510";
+/* 728x90, 创建于 10-8-28 */
+google_ad_slot = "5590362768";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;"></iframe></ins></ins>
+
+      </div>
+	  	
+	  	  
+      <div class="BlogCopyright">		
+	  		声明：OSCHINA 博客文章版权属于作者，受法律保护。未经作者同意不得转载。
+	  	  </div>
+
+      <div class="BlogLinks">
+    	<ul>
+                <li class="prev"><a href="http://my.oschina.net/acmfly/blog/108351" title="上一篇：开启golang之旅">« 开启golang之旅</a></li>        <li class="next"><a href="http://my.oschina.net/acmfly/blog/108599" title="下一篇：关于字符编码的几点整理">关于字符编码的几点整理 »</a></li>    	</ul>
+				<p style="margin:10px 0 0 0;font-weight:bold;color:#A00;text-decoration:none;">开源中国-程序员在线工具：<a href="http://www.ostools.net/apidocs" style="text-decoration:none;">API文档大全(120+)</a> <a href="http://runjs.cn/" style="text-decoration:none;" target="_blank">JS在线编辑演示</a> <a href="http://www.ostools.net/qr" style="text-decoration:none;" target="_blank">二维码</a>  <a href="http://www.ostools.net/" style="text-decoration:none;" target="_blank">更多&gt;&gt;</a>
+		      </p></div>
+	</div>
+
+	<style type="text/css">
+	#BlogShare strong{float:left;padding-top:10px;font-size:11pt;color:#444;}
+	#BlogShare a.share_sina{float:left;width:32px;height:32px;background:url('/img/icon01.gif') center no-repeat;}
+	#BlogShare a.share_qq{float:left;width:32px;height:32px;margin-left: 10px;background:url('/img/icon02.gif') center no-repeat;}
+	</style>
+	<div class="BlogShare">
+	
+	<span id="BlogShare">
+		<strong>分享到： </strong>
+		<a class="share_sina" title="分享到新浪微博" href="javascript:void((function(s,d,e,r,l,p,t,z,c){var%20f='http://v.t.sina.com.cn/share/share.php?appkey=858381728',u=z||d.location,p=['&url=',e(u),'&title=',e(t||d.title),'&source=',e(r),'&sourceUrl=',e(l),'&content=',c||'gb2312','&pic=',e(p||'')].join('');function%20a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=440,height=430,left=',(s.width-440)/2,',top=',(s.height-430)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else%20a();})(screen,document,encodeURIComponent,'','','','闭包漫谈（从抽象代数及函数式编程角度）: 前言 如果Google一下“闭包”这个词，会发现网上关于闭包的文章已经不计其数，甚至很多人将闭包看做面试JavaScript程序员的必考题（虽然闭包和JavaScript没有什么必然联...','','utf-8'));"></a>
+		<a class="share_qq" title="分享到腾讯微博" href="javascript:(function(){window.open('http://v.t.qq.com/share/share.php?url='+encodeURIComponent(document.location)+'&appkey=96f54f97c4de46e393c4835a266207f4&site=&title='+encodeURIComponent(document.title)+encodeURIComponent(': 前言 如果Google一下“闭包”这个词，会发现网上关于闭包的文章已经不计其数，甚至很多人将闭包看做面试JavaScript程序员的必考题（虽然闭包和JavaScript没有什么必然联...'),'', 'width=450, height=400, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=yes, resizable=no, status=no');}())"></a></span>
+	<span id="BlogVote">
+    <a href="javascript:vote(108408)">顶</a><span>已有 <em id="vote_count">0</em>人顶</span>
+	</span>
+	</div>
+		
+</div>
+<div class="SpaceList" style="margin-top:20px;">
+<div class="BlogComments">
+    <h2><a name="comments"></a>共有 2 条网友评论</h2>
+			<ul id="BlogComments">
+						<li id="cmt_108408_225435_272111997">
+	<table class="ostable"><tbody><tr>
+	<td class="portrait">
+		<a href="http://my.oschina.net/leopardsaga" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/225435_50.jpg" align="absmiddle" alt="Honghe" title="Honghe" class="SmallPortrait" user="225435"></a>			
+	</td>
+	<td class="body">
+		<div class="title">
+			1楼：<a href="http://my.oschina.net/leopardsaga" target="_blank" name="rpl_272111997">Honghe</a>(Android) 发表于 2013-02-11 13:19    			
+        							  <a href="javascript:ReplyInline(108408,225435,272111997)">回复此评论</a>
+					</div>
+		<div class="post" "="">老实说 还是没看明白和数学的闭包怎么联系</div>
+		<div id="inline_reply_of_108408_225435_272111997" class="inline_reply"></div>
+    </td>
+	</tr></tbody></table>
+</li>					<li id="cmt_108408_164475_272170012">
+	<table class="ostable"><tbody><tr>
+	<td class="portrait">
+		<a href="http://my.oschina.net/acmfly" target="_blank"><img src="./闭包--从抽象代数及函数式编程角度_files/164475_50.jpg" align="absmiddle" alt="acmfly" title="acmfly" class="SmallPortrait" user="164475"></a>			
+	</td>
+	<td class="body">
+		<div class="title">
+			2楼：<a href="http://my.oschina.net/acmfly" target="_blank" name="rpl_272170012">acmfly</a> 发表于 2013-02-14 21:54    			
+        							  <a href="javascript:ReplyInline(108408,164475,272170012)">回复此评论</a>
+					</div>
+		<div class="post" "=""><div class="ref"><h4>引用来自“Honghe”的评论</h4><p>老实说 还是没看明白和数学的闭包怎么联系</p></div>可以这样理解，在集合论的基础上发展形成了用于研究函数和递归的lambda演算系统，集合论的闭包思想和lambda闭包演算理论其实是一个东西，而我们所看到的类似函数调用的形式只是闭包运算的数学理论形式化而已。若要问为什么不用传统的集合论闭包形式，个人认为是因为集合论繁琐了，为了一次计算还得定义一个或几个集合，lambda正好隐藏了这些细节。当然lambda和java、ruby、python、go等语言中的闭包完全是一个玩意，形式上有了不同而已。</div>
+		<div id="inline_reply_of_108408_164475_272170012" class="inline_reply"></div>
+    </td>
+	</tr></tbody></table>
+</li>				</ul>
+</div>
+	</div>
+
+<div id="inline_reply_editor" style="display:none;">
+<div class="BlogCommentForm">
+	<form id="form_inline_comment" action="http://my.oschina.net/action/blog/add_comment?blog=108408" method="POST">
+	  <input type="hidden" id="inline_reply_id" name="reply_id" value="">          
+      <textarea name="content" style="width:550px;height:60px;" onkeydown="if(event.ctrlKey&amp;&amp;event.keyCode==13){$(&#39;#form_inline_comment&#39;).submit();}"></textarea><br>
+	  <input type="submit" value="回复" id="btn_comment" class="SUBMIT"> 
+	  <input type="button" value="关闭" class="SUBMIT" id="btn_close_inline_reply"> 文明上网，理性发言
+    </form>
+</div>
+</div>
+
+<div class="SpaceList" style="margin-top:20px;">
+  <a name="comments" id="postform"></a>
+    <div class="BlogCommentForm">
+    <form id="form_comment" action="http://my.oschina.net/action/blog/add_comment?blog=108408" method="POST">          
+      <textarea id="ta_post_content" name="content" style="width:550px;height:100px;" onkeydown="if(event.ctrlKey&amp;&amp;event.keyCode==13){$(&#39;#form_comment&#39;).submit();}"></textarea><br>
+	  <input type="submit" value="发表评论" id="btn_comment" class="SUBMIT"> 
+	  <img id="submiting" style="display:none" src="./闭包--从抽象代数及函数式编程角度_files/loading.gif" align="absmiddle">
+	  <span id="cmt_tip">文明上网，理性发言</span>
+    </form>
+	<a href="http://my.oschina.net/acmfly/blog/108408#" class="more">回到页首</a>&nbsp;|&nbsp;<a href="http://my.oschina.net/acmfly/blog/108408#comments" class="more">回到评论列表</a>
+  </div>
+  </div>
+	
+<div id="RelativeBlogs">
+	<strong><a id="btn_close">关闭</a>相关文章阅读</strong>
+	<ul>
+			<li>
+		<span class="date">2012/09/18</span>
+		<a href="http://my.oschina.net/robinlin/blog/79200" title="JavaScript的this和闭包">JavaScript的this和闭包</a>
+	</li>
+				<li>
+		<span class="date">2011/11/18</span>
+		<a href="http://my.oschina.net/chier/blog/35560" title="[转]   Javascript闭包">[转]   Javascript闭包</a>
+	</li>
+				<li>
+		<span class="date">2012/09/27</span>
+		<a href="http://my.oschina.net/junn/blog/80600" title="JS闭包的理解">JS闭包的理解</a>
+	</li>
+				<li>
+		<span class="date">2012/02/11</span>
+		<a href="http://my.oschina.net/LinBandit/blog/40405" title="js闭包">js闭包</a>
+	</li>
+				<li>
+		<span class="date">2011/12/21</span>
+		<a href="http://my.oschina.net/seajones/blog/37663" title="闭包（closure）">闭包（closure）</a>
+	</li>
+			</ul>
+</div>
+<script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/blog" defer="defer"></script>
+<script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/brush.js"></script>
+<link type="text/css" rel="stylesheet" href="./闭包--从抽象代数及函数式编程角度_files/shCore.css">
+<link type="text/css" rel="stylesheet" href="./闭包--从抽象代数及函数式编程角度_files/shThemeDefault.css">
+<script type="text/javascript"><!--
+$(document).ready(function(){
+	SyntaxHighlighter.config.clipboardSwf = '/js/syntax-highlighter-2.1.382/scripts/clipboard.swf';
+	SyntaxHighlighter.all();
+});
+//-->
+</script>
+<!--[if lt IE 7]>
+<script type="text/javascript" src="/js/minmax.js"></script>
+<![endif]-->
+<script type="text/javascript">
+<!--
+var posting = false;
+var upprev_closed = false;
+var upprev_hidden = true;
+
+$(document).ready(function(){
+    $('.BlogContent img').css('cursor','pointer');
+    jQuery.each($('.BlogContent img'),function(idx,v){
+    	$(v).wrap("<a href='"+$(this).attr('src')+"' target='_blank'></a>");
+    });
+	$('#form_comment').ajaxForm({
+		dataType: 'json',
+		bforeSubmit: function(){
+			posting = true;
+		},
+		success: function(json) {
+        	if(json.msg){
+				///alert(json.msg);
+				$('#cmt_tip').html("<span style='color:#C00;'>"+json.msg+"</span>");
+				$('#ta_post_content').focus();				
+			}else{
+				var url = "http://my.oschina.net/acmfly/blog_post?_cmt_blog="+json.blog+"&_cmt_user="+json.user+"&_cmt_id="+json.id;				
+        		jQuery.get(url, function(data){
+    				$('.BlogComments .NoData').hide();
+        			$('ul#BlogComments').append(data);
+        			$('#form_comment').resetForm();
+        		}); 
+			}
+		}
+	});
+
+    var at_datas = [];
+    $('img.SmallPortrait').each(function(){
+        var name = $(this).attr('alt');
+        if(jQuery.inArray(name, at_datas) < 0 && name != '${g_user.name}')
+            at_datas.push(name);
+    });
+    $("#form_comment textarea").atWho("@", {data: at_datas});
+
+	$("#submiting").ajaxStart(function(){
+	   if(posting){
+    	   $('#btn_submit').attr("disabled","disabled");
+           $(this).show();
+	   }
+    });
+	$("#submiting").ajaxComplete(function(event,request, settings){
+	   if(posting){
+           $(this).hide();
+    	   $('#btn_submit').attr("disabled","");
+	   }
+	   posting = false;
+    }); 
+	
+    $(window).scroll(function() {
+        var lastScreen;
+        if ($("#postform").length > 0)
+            lastScreen = getScrollY() + $(window).height() < $("#postform").offset().top * 1 ? false : true;
+        else
+            lastScreen = getScrollY() + $(window).height() < $(document).height() * 1 ? false : true;
+        if (lastScreen && !upprev_closed) {
+            $("#RelativeBlogs").stop().animate({right:"0px"});
+            upprev_hidden = false;
+        }
+        else if (upprev_closed && getScrollY() == 0) {
+            upprev_closed = false;
+        }
+        else if (!upprev_hidden) {
+            upprev_hidden = true;
+            $("#RelativeBlogs").stop().animate({right:"-400px"});
+        }
+    });
+    $("#RelativeBlogs #btn_close").click(function() {
+        $("#RelativeBlogs").stop().animate({right:"-400px"});
+        upprev_closed = true;
+        upprev_hidden = true;
+    });
+});
+function delete_c(nid,uid,cid){
+  if(confirm("您确认要删除此篇评论？")){
+    var args = "cmt="+cid+"#"+uid+"#"+nid;
+    ajax_post("/action/blog/delete_blog_comments?space=164475",args,function(){$("#cmt_"+nid+"_"+uid+"_"+cid).fadeOut();});
+  }
+}
+function ReplyInline(blog,user,reply){
+	$('.inline_reply').empty();
+	var div_id = '#inline_reply_of_'+blog+'_'+user+'_'+reply;
+	$('#inline_reply_id').val(user+'_'+reply);
+	$(div_id).html($('#inline_reply_editor').html());
+	$('#txt_focus').focus();
+	$('#btn_close_inline_reply').click(function(){
+		$(div_id).empty();
+	});
+	$('#form_inline_comment').ajaxForm({
+		dataType: 'json',
+    	success: function(json) {
+        	if(json.msg){
+        		alert(json.msg);
+        	}
+        	else if(json.id){
+    			location.reload();
+        	}
+    	}
+	});
+}
+function edit_catalogs(qid){
+	popup("/set-catalogs?parent=1&type=3&id="+qid);
+}
+function vote(blogid){
+		alert("必须登录后才能操作 :)");
+	}
+function toggle_recomm(blogid){
+	ajax_post("/action/blog/toggle_recomm","id="+blogid,function(html){
+		if(html == '-1')
+			alert("文章不存在");
+		else if(html == 0){
+			$('#lnk_recomm_'+blogid).removeClass('recommend');
+			$('#lnk_recomm_'+blogid).text("未推荐");
+		}
+		else if(html == 1){
+			$('#lnk_recomm_'+blogid).addClass('recommend');
+			$('#lnk_recomm_'+blogid).text("已推荐");
+		}
+	});
+}
+//-->
+</script></div>
+	<div class="clear"></div>
+	<div id="OSC_Footer"><style>
+.oscapp {text-align:left; width:220px;}
+.oscapp span {float:left;width:140px;}
+.oscapp a {float:left;text-indent:-9999em;width:16px;margin-left:8px;}
+.oscapp a.android {background:url('/img/android.gif') no-repeat left center;}
+.oscapp a.iphone {background:url('/img/iphone.gif') no-repeat left center;}
+.oscapp a.wp7 {background:url('/img/wp7.gif') no-repeat left center;}
+</style>
+<table width="100%"><tbody><tr>
+<td align="left">© 开源中国(OsChina.NET) | <a href="http://www.oschina.net/home/about">关于我们</a> | <a href="mailto:oschina.net@gmail.com">广告联系</a> | <a href="http://weibo.com/oschina2010" target="_blank">@新浪微博</a> | <a href="http://m.oschina.net/">开源中国手机版</a> | <a href="http://www.miitbeian.gov.cn/" target="_blank" style="color:#737573;text-decoration:none;">粤ICP备12009483号-3</a></td>
+<td class="oscapp">
+	<span>开源中国手机客户端：</span>
+	<a href="http://www.oschina.net/app" class="android" title="Android客户端">Android</a>
+	<a href="http://www.oschina.net/app" class="iphone" title="iPhone 客户端">iPhone</a>
+	<a href="http://www.oschina.net/app" class="wp7" title="Windows Phone 客户端">WP7</a>
+</td>
+</tr>
+</tbody></table>
+<script type="text/javascript">
+<!--
+if (top.location != self.location)top.location=self.location;
+//-->
+</script></div>
+</div>
+
+
+<script type="text/javascript" src="./闭包--从抽象代数及函数式编程角度_files/space"></script>
+<script type="text/javascript">
+<!--
+$(document).ready(function() {
+
+	SelectStyle("#search-item",".search_list");
+	$('.Tweet .photo img').click(function(){
+		var T=$(this);
+		var t=this;
+		var bigImg = T.attr('bi');
+		var smallImg = T.attr('si');
+		var src = T.attr('src');
+		var newsrc = (bigImg == src)?smallImg:bigImg;
+		var imgId = T.attr('id');
+		if(newsrc == bigImg){
+    		var loading=$('<img alt="loading" src="/img/loading.gif"/>');
+			var top = T.position().top+T.height()/2-8;
+			var left = T.position().left+T.width()/2-8;
+			loading.css({
+				'position':'absolute',
+				'z-index':999,
+				'top':top,
+				'left':left
+			});
+    		T.before(loading);
+			var tImg=new Image();
+			tImg.src=newsrc;
+			tImg.onload=function(){afterImgLoad(T,loading,imgId,newsrc,bigImg);};
+		}
+		else{
+			T.attr("src",newsrc);
+			$('#img_menu_'+imgId).remove();
+		}
+		return false;
+	});
+	
+	$(".tweet_thumb_wrapper").mouseenter(function(){
+		$(this).find(".tweet_play_video").css("opacity",1);
+	}).mouseleave(function(){
+		$(this).find(".tweet_play_video").css("opacity",0.7);
+	});
+
+    $("#TForm textarea").atWho("@", function(query, callback){
+        jQuery.ajax({
+            type:'POST',
+            url:"/action/tweet/at_suggest",
+            data:{'q':query},
+            dataType:'json',
+            success:function(json){
+                callback(json);
+            }
+        });
+    });
+	
+	toggle_tweet_video = function(id){
+		$("#tweet_video_thumb_"+id).toggle();
+		var video = $("#tweet_video_"+id).toggle();
+		video.siblings(".tweet_video_operation,.tweet_thumb_wrapper").toggle();
+	};
+	
+	function afterImgLoad(T,loading,imgId,url,bigImg){
+		var lnks = "<div id='img_menu_"+imgId+"' class='ImgMenu'>";
+		lnks += "<a href='#' onclick='$(\"#"+imgId+"\").click();return false;'>收起</a>";
+		lnks += "<a href='"+bigImg+"' target='_blank'>查看原图</a></div>";			
+		loading.remove();
+		T.attr("src",url);
+		T.before(lnks);
+	}
+});
+
+function set_fellow_memo(fid,fname){
+	popup("/action/ajax/set_fellow_memo","friend="+fid+"&name="+fname);
+}
+
+function deleteMsgs(uid, fid, fname){
+	if(!confirm("你确认要清除与‘"+fname+"’的所有留言信息吗？"))
+		return ;
+	var args = "user="+uid+"&friend="+fid;
+	ajax_post("/action/msg/delete_user",args,function(html){
+		if(html.length > 0)
+			alert(html);
+		else{
+			$('#Msg_'+fid).fadeOut();
+		}
+	});
+}
+
+function follow_user(uid, uname){
+	just_follow(uid, uname,'${g_user.id}'); //oschina.js
+}
+
+function unfollow_user(uid, uname){
+	if(confirm("确定不再关注" + uname + "了吗？"))
+	just_unfollow(uid,'${g_user.id}',function(){
+		alert('已取消对 ' + uname + ' 的关注');
+	});
+}
+
+function tweet_reply(logid){
+	var r = $('#LogReply_'+logid);
+	if(!r.is(":hidden")){
+		close_tweet_reply(logid);
+		return ;
+	}
+	r.html("<div class='TweetRplsWrapper'><span class='loading'>正在加载评论，请稍候...</span></div>")
+	r.show();
+	r.load("http://my.oschina.net/acmfly/tweet-rpls?log="+logid,function(){
+		$('#edt_tweet_post_'+logid).focus();
+        var at_datas = [];
+        $(this).find("img.SmallPortrait").each(function(){
+            var name = $(this).attr('alt');
+            if(jQuery.inArray(name, at_datas) < 0 && name != '${g_user.name}')
+                at_datas.push(name);
+        });
+        $(this).find("input.TXT_TweetRpl_Text").atWho("@", {data: at_datas});
+        $('#TweetReplyForm_'+logid).ajaxForm({
+        	dataType: 'json',
+			beforeSubmit: function(arr, form, options){
+				$('#BTN_TweetReply_'+logid).attr('disabled','disabled');
+			},
+            success: function(json) {
+            	if(json.msg){
+        			alert(json.msg);
+            	}else if(json.log){
+					$('#log_reply_count_'+logid).text(json.reply_count);
+        			//插入新评论					
+					ajax_get("/action/ajax/get_tweet_reply?id=" + json.log,true,function(html){
+						$('#LogReply_'+logid+' ul').prepend(html);
+					});
+					$('#edt_tweet_post_'+logid).val('');
+            	}
+				$('#BTN_TweetReply_'+logid).removeAttr('disabled');
+            }
+        });
+	});
+}
+function close_tweet_reply(logid){
+	$('#LogReply_'+logid).empty();
+	$('#LogReply_'+logid).hide();
+	$('#Logs .userlogs li').removeClass('hover');
+}
+function reply_rtweet(logid, rid, toname){
+	var edtPost = $('#edt_tweet_post_' + logid);
+	var old_v = edtPost.val();
+	if(old_v.length > 0)
+		edtPost.val(old_v + ',@'+toname+' ');
+	else
+		edtPost.val('回复 @'+toname+' : ');
+	edtPost.focus();
+}
+function delete_tweet(logid){
+	if(confirm("确认要删除这条信息吗？"))
+	ajax_post("/action/tweet/delete?log="+logid+"&user=${g_user.id}","",function(html){
+		if(html.length==0){
+			var elem = $('#LI_'+logid);
+			if(elem.length > 0)
+				$('#LI_'+logid).fadeOut();
+			else
+				location.reload();
+		}
+	});
+}
+function delete_tweet_reply(logid){
+	if(confirm("确认要删除这条评论吗？"))
+	ajax_post("/action/tweet/delete_reply?id="+logid+"&user=${g_user.id}","",function(html){
+		if(html.length==0)
+			$('#TweetReply_'+logid).fadeOut();
+	});
+}
+
+function delete_blog(blog_id){
+    if(!confirm("文章删除后无法恢复，请确认是否删除此篇文章？")) return;
+    ajax_post("/action/blog/delete?id="+blog_id+"&user=${g_user.id}&user_code=${g_user.activate_code}","",function(html){
+    	location.href="http://my.oschina.net/acmfly/blog";
+    });
+}
+
+function SelectStyle(on,option){
+	var currentSort = $(on).attr('id');
+	var currentText = $(option+" li."+currentSort+" a").html();
+	$(on + " .text").html(currentText);
+	$(on + " .text").hover(function(){
+		$(this).addClass("hover")
+	},function(){
+		$(this).removeClass("hover")
+	});
+	$(option+" li a").each(function(index){
+		$(this).click(function(){
+			thishtml = $(this).html();
+			$(on + " .text").removeClass("on").html(thishtml);		
+			$(".selectbox select ").find("option").removeAttr('selected').eq(index).attr("selected","selected");	
+			$(option).hide()
+			return false;
+		});
+		
+	});		
+	
+	$(".selectbox").click(function(){		
+		$(option).toggle();
+		$(on + " .text").toggleClass("on");		
+		return false;
+	});
+	$(document).click(function(){
+		$(option).hide();	
+		$(on + " .text").removeClass("on");
+	});
+	$(document).trigger('click');
+
+}
+
+//-->
+</script>
+
+<!-- Generated by OsChina.NET (init:0[ms],page:87[ms],ip:24.61.43.117) --><div id="fancybox-tmp"></div><div id="fancybox-loading"><div></div></div><div id="fancybox-overlay"></div><div id="fancybox-wrap"><div id="fancybox-outer"><div class="fancybox-bg" id="fancybox-bg-n"></div><div class="fancybox-bg" id="fancybox-bg-ne"></div><div class="fancybox-bg" id="fancybox-bg-e"></div><div class="fancybox-bg" id="fancybox-bg-se"></div><div class="fancybox-bg" id="fancybox-bg-s"></div><div class="fancybox-bg" id="fancybox-bg-sw"></div><div class="fancybox-bg" id="fancybox-bg-w"></div><div class="fancybox-bg" id="fancybox-bg-nw"></div><div id="fancybox-content"></div><a id="fancybox-close"></a><div id="fancybox-title"></div><a href="javascript:;" id="fancybox-left"><span class="fancy-ico" id="fancybox-left-ico"></span></a><a href="javascript:;" id="fancybox-right"><span class="fancy-ico" id="fancybox-right-ico"></span></a></div></div><div id="topcontrol" style="position: fixed; bottom: 165px; right: 100px; cursor: pointer; " title="回到顶部"><img src="./闭包--从抽象代数及函数式编程角度_files/gotop.gif" style="width:31px; height:31px;"></div><div id="at-view" class="at-view"><ul id="at-view-ul"></ul></div></body></html>

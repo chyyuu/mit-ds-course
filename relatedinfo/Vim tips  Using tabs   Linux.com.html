@@ -1,0 +1,835 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0064)https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="./Vim tips  Using tabs   Linux.com_files/widget106.css" media="all">
+  <!--<base href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs">--><base href=".">
+  
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="linux, Linux, Linux.com, Linux Online, Torvalds, Linus, linux downloads, linux tutorials, linux training, linux support, linux credit card, linux discounts, operating system, UNIX, web, www, software, hardware, support, help, information, resources, drivers, manual, documentation project, LDP, FAQ, miniHOWTO, howto, linux howtos, documentation, Linux Homepage, Linux Home Page, Linus Torvalds, Redhat, Ubuntu, Slackware, Yggdrasil, Debian, LinuxPro, OpenLinux, FTP, download, projects, application, usergroup, user group, mailing list, kernel">
+  <!--a<meta property="og:image" content="https://www.linux.com//var/slashimages/4a5764494f166e380677fa5f2e3aa4ca.png" >-->
+  <meta name="title" content="Vim tips: Using tabs">
+  <meta name="author" content="Joe &#39;Zonker&#39; Brockmeier">
+  <!--a<meta property="og:title" content="Vim tips: Using tabs" >-->
+  <!--a<meta property="og:type" content="article" >-->
+  <!--a<meta property="og:url" content="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs" >-->
+  <meta property="og:site_name" content="Linux.com | The source for Linux Information">
+  <!--a<meta property="fb:admins" content="41911143546" >-->
+  <meta name="description" content="� Before Vim 7. 0 was released last May, I usually had six or seven xterms or Konsole windows open, each with a single Vim session in which I was editing a single file. This takes up a lot of screen">
+  <meta name="generator" content="Joomla! 1.5 - Open Source Content Management">
+  <title>Vim tips: Using tabs | Linux.com</title>
+  <link href="https://www.linux.com/templates/linuxcom_v2/favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/lfnews-plugin.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/comments.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/system.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/general.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/editor.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/typo.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/ja.moomenu.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/template.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/default.css" type="text/css">
+  <link rel="stylesheet" href="./Vim tips  Using tabs   Linux.com_files/universe_nav.css" type="text/css">
+  <style type="text/css">
+    <!--
+
+				#ninjaboard_author_avatar {
+					background: white;
+					border: 1px solid #E6E6E6;
+				}
+				#ninjaboard_author_avatar a.avatar {
+					float:left;
+					padding:10px;
+					background-repeat: no-repeat;
+					background-position:center
+				}
+    -->
+  </style>
+  <script type="text/javascript" async="" src="./Vim tips  Using tabs   Linux.com_files/ados"></script><script type="text/javascript" async="" src="./Vim tips  Using tabs   Linux.com_files/ados.js"></script><script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/mootools.js"></script>
+  <script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/caption.js"></script>
+  <script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/comments.js"></script>
+  <script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/ja.script.js"></script>
+  <script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/ja.moomenu.js"></script>
+  <script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/universe_nav.js"></script><div style="visibility: hidden; height: 1px; width: 1px; position: absolute; z-index: 100000; " id="_atssh"><iframe id="_atssh780" title="AddThis utility frame" style="height: 1px; width: 1px; position: absolute; z-index: 100000; border: 0px; left: 0px; top: 0px; "></iframe></div><script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/core065.js"></script></head><body id="bd" class="leftlayout wide fs3"><div id="dropmenudiv" style="visibility:hidden;width:165px;background-color:#f5f5f5" onmouseover="clearhidemenu()" onmouseout="dynamichide(event)"></div>
+  <script type="text/javascript">
+
+        window.addEvent('domready', function() {
+            $$('.subscribed').addEvent('mouseover', function(event) {
+                event.target.set('html', 'Unsubscribe');
+            }).addEvent('mouseleave', function(event) {
+                event.target.set('html', 'Subscribed');
+            });
+        });
+    
+            window.addEvent('domready', function() {
+                $('rpoohcheck').set('defaultValue', '');
+            });
+            
+	var siteurl = 'https://www.linux.com/';
+										var tmplurl = 'https://www.linux.com/templates/linuxcom_v2';
+var p = "http", d = "static";
+if (document.location.protocol == "https:") {
+	p += "s";
+	d = "engine";
+}
+var z = document.createElement("script");
+z.type = "text/javascript";
+z.async = true;
+z.src = p + "://" + d + ".adzerk.net/ados.js";
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(z, s);
+
+var ados_keywords = ados_keywords || [];
+if (location.protocol == "https:") {
+	ados_keywords.push("T:SSL");
+} else {
+	ados_keywords.push("T:HTTP");
+}
+
+var ados = ados || {};
+ados.run = ados.run || [];
+ados.run.push(function () {
+	ados_add_placement(4669, 20981, "azk85217_rectangle", 5).setZone(16024);
+	ados_setKeywords(ados_keywords.join(", "));
+	ados_load();
+});
+
+  </script>
+  <meta property="og:image" content="https://www.linux.com/component/ninjaboard/avatar/107/thumbnail/large/cache/-62169984000">
+
+
+
+<!--[if lte IE 6]>
+<style type="text/css">
+.clearfix {height: 1%;}
+img {border: none;}
+#ja-cpanel-tools{
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, src=../images/ja-cpanel-switcher.png, sizingMethod=image);
+}
+</style>
+<![endif]-->
+
+<!--[if lte IE 7.0]>
+<style type="text/css">
+#login-linux-top-wrap {position:relative; top:-60px} /* to properly position the login bar */
+</style>
+<![endif]-->
+
+
+<!--[if gt IE 7]>
+<link href="https://www.linux.com/templates/linuxcom_v2/css/ie8.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+
+
+
+
+
+<a name="Top" id="Top"></a>
+<ul class="accessibility">
+	<li><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#ja-content" title="Skip to content">Skip to content</a></li>
+	<li><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#ja-mainnav" title="Skip to main navigation">Skip to main navigation</a></li>
+	<li><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#ja-col1" title="Skip to 1st column">Skip to 1st column</a></li>
+	<li><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#ja-col2" title="Skip to 2nd column">Skip to 2nd column</a></li>
+</ul>
+
+<!-- BEGIN: HEADER -->
+
+<div id="linux-header-wrap-bottom">
+	<div id="linux-header" class="clearfix">
+		<div id="linux-header-left">
+			<ul>
+				<li><a href="http://www.linuxfoundation.org/" class="header-link">Linux Foundation</a></li>
+				<li><a href="http://training.linuxfoundation.org/" class="header-link">Training</a></li>
+				<li><a href="http://events.linuxfoundation.org/" class="header-link">Events</a></li>
+				<li><a href="http://video.linux.com/" class="header-link">Video</a></li> 
+				<!-- <li><a href="#" class="header-link" onClick="return dropdownmenu(this, event, menu2, '100px')" onMouseout="delayhidemenu()">More</a> <img src="https://www.linux.com//includes/js/custom/down.gif" border="0" align="absmiddle" /></li>-->
+			</ul>
+		</div>
+		<div id="linux-header-right">
+					 <div style="margin-top:2px;">
+<a href="http://twitter.com/linuxfoundation" target="_blank"><img src="./Vim tips  Using tabs   Linux.com_files/icon-twitter-trans.png" border="0" title="Follow Linux.com on Twitter"></a>
+¬†
+<a href="http://identi.ca/linuxfoundation" target="_blank"><img src="./Vim tips  Using tabs   Linux.com_files/icon-identica-trans.png" border="0" title="Follow us on Identi.ca"></a>
+¬†
+<a href="http://www.facebook.com/pages/The-Linux-Foundation/41911143546" target="_blank"><img src="./Vim tips  Using tabs   Linux.com_files/icon-facebook-trans.png" border="0" title="Become a Facebook Fan of Linux.com"></a>
+¬†
+<a href="http://www.linkedin.com/groups?gid=48682" target="_blank"><img src="./Vim tips  Using tabs   Linux.com_files/icon-linkedin-trans.png" border="0" title="Join our LinkedIn Group"></a>
+¬†
+<a href="http://www.linux.com/newsletter"><img src="./Vim tips  Using tabs   Linux.com_files/icon-newsletter-trans.png" border="0" title="Get the Linux.com Newsletter"></a>
+¬†
+<a href="https://www.linux.com/news/rss-feeds"><img src="./Vim tips  Using tabs   Linux.com_files/icon-rss-trans.png" border="0" title="RSS Feeds"></a>
+</div>
+
+				</div>
+	</div>
+</div>
+	
+<div id="ja-headerwrap">
+<div id="ja-header" class="clearfix">
+
+      
+		<h1 class="logo">
+		<a href="https://www.linux.com/" title="Linux.com"><span>Linux.com</span></a>
+	</h1>
+	
+		
+		<div id="search-linux-top-wrap">
+	<div id="search-linux-top">
+		<form action="https://www.linux.com/search" method="post">
+	<div class="search">
+		<input name="searchword" id="mod_search_searchword" maxlength="30" alt="Search" class="inputbox" type="text" size="30" value="search linux.com" onblur="if(this.value==&#39;&#39;) this.value=&#39;search linux.com&#39;;" onfocus="if(this.value==&#39;search linux.com&#39;) this.value=&#39;&#39;;">	</div>
+	<input type="hidden" name="task" value="search">
+	<input type="hidden" name="option" value="com_search">
+	<input type="hidden" name="Itemid" value="864">
+</form>
+	</div>
+	</div>
+		
+		<div id="login-linux-top-wrap">
+	<div id="login-linux-top">
+		 <a href="https://www.linux.com/community"><img src="./Vim tips  Using tabs   Linux.com_files/login.png" border="0"></a><a href="https://www.linux.com/community/register"><img src="./Vim tips  Using tabs   Linux.com_files/register.png" border="0"></a><a href="https://www.linux.com/submit-an-article"><img src="./Vim tips  Using tabs   Linux.com_files/submit_article.png" border="0"></a>
+	</div>
+	</div>
+	
+</div>
+</div>
+<!-- END: HEADER -->
+
+<!-- BEGIN: MAIN NAVIGATION -->
+<div id="ja-mainnavwrap">
+<div id="ja-mainnav" class="clearfix">
+	<ul id="ja-cssmenu" class="clearfix">
+<li class=""><a href="https://www.linux.com/" class="menu-item0 first-item" id="menu1" title="Home"><span class="menu-title">Home</span></a></li> 
+<li class="havechild"><a href="https://www.linux.com/news" class="menu-item1" id="menu858" title="News"><span class="menu-title">News</span></a><ul style="height: 0px; left: -999em; "><li class="havesubchild"><a href="https://www.linux.com/news/software" class=" first-item" id="menu670" title="Software"><span class="menu-title">Software</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/software/applications" class=" first-item" id="menu811" title="Applications"><span class="menu-title">Applications</span></a></li> 
+<li><a href="https://www.linux.com/news/software/multimedia" id="menu814" title="Multimedia"><span class="menu-title">Multimedia</span></a></li> 
+<li><a href="https://www.linux.com/news/software/linux-kernel" id="menu815" title="Linux Kernel Development"><span class="menu-title">Linux Kernel Development</span></a></li> 
+<li><a href="https://www.linux.com/news/software/developer" class=" last-item" id="menu816" title="Developer"><span class="menu-title">Developer</span></a></li> 
+</ul></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/hardware" id="menu672" title="Hardware"><span class="menu-title">Hardware</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/hardware/desktops" class=" first-item" id="menu817" title="Desktops"><span class="menu-title">Desktops</span></a></li> 
+<li><a href="https://www.linux.com/news/hardware/laptops" id="menu818" title="Laptops"><span class="menu-title">Laptops</span></a></li> 
+<li><a href="https://www.linux.com/news/hardware/peripherals" id="menu819" title="Peripherals"><span class="menu-title">Peripherals</span></a></li> 
+<li><a href="https://www.linux.com/news/hardware/servers" id="menu820" title="Servers"><span class="menu-title">Servers</span></a></li> 
+<li><a href="https://www.linux.com/news/hardware/drivers" class=" last-item" id="menu821" title="Drivers"><span class="menu-title">Drivers</span></a></li> 
+</ul></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/embedded-mobile" id="menu810" title="Embedded /  Mobile"><span class="menu-title">Embedded /  Mobile</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/embedded-mobile/mobile-linux" class=" first-item" id="menu823" title="Mobile Linux"><span class="menu-title">Mobile Linux</span></a></li> 
+<li><a href="https://www.linux.com/news/embedded-mobile/netbooks" id="menu822" title="Netbooks"><span class="menu-title">Netbooks</span></a></li> 
+<li><a href="https://www.linux.com/news/embedded-mobile/mids" id="menu824" title="MIDs"><span class="menu-title">MIDs</span></a></li> 
+<li><a href="https://www.linux.com/news/embedded-mobile/phones" class=" last-item" id="menu826" title="Phones"><span class="menu-title">Phones</span></a></li> 
+</ul></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/biz-os" id="menu849" title="Business of Open Source"><span class="menu-title">Business of Open Source</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/biz-os/governance" class=" first-item" id="menu850" title="Governance"><span class="menu-title">Governance</span></a></li> 
+<li><a href="https://www.linux.com/news/biz-os/legal" class=" last-item" id="menu880" title="Legal"><span class="menu-title">Legal</span></a></li> 
+</ul></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/enterprise" id="menu809" title="Enterprise Computing"><span class="menu-title">Enterprise Computing</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/enterprise/biz-enterprise" class=" first-item" id="menu881" title="Enterprise Business"><span class="menu-title">Enterprise Business</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/cloud-computing" id="menu827" title="Cloud Computing"><span class="menu-title">Cloud Computing</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/clustering" id="menu832" title="Clustering"><span class="menu-title">Clustering</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/storage" id="menu833" title="Linux Storage"><span class="menu-title">Linux Storage</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/high-performance" id="menu825" title="High Performance"><span class="menu-title">High Performance</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/networking" id="menu834" title="Networking"><span class="menu-title">Networking</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/systems-management" id="menu835" title="Systems Management"><span class="menu-title">Systems Management</span></a></li> 
+<li><a href="https://www.linux.com/news/enterprise/case-studies" class=" last-item" id="menu836" title="Case Studies"><span class="menu-title">Case Studies</span></a></li> 
+</ul></li> 
+<li><a href="https://www.linux.com/news/featured-blogs" id="menu839" title="Featured Blogs"><span class="menu-title">Featured Blogs</span></a></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/technology-feature" id="menu922" title="Technology Feature"><span class="menu-title">Technology Feature</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/technology-feature/security" class=" first-item" id="menu944" title="Security"><span class="menu-title">Security</span></a></li> 
+</ul></li> 
+<li class="havesubchild"><a href="https://www.linux.com/news/special-feature" id="menu971" title="Special Feature"><span class="menu-title">Special Feature</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/news/special-feature/stories-of-linux" class=" first-item" id="menu972" title="Stories of Linux"><span class="menu-title">Stories of Linux</span></a></li> 
+<li><a href="https://www.linux.com/news/special-feature/linux-developers" class=" last-item" id="menu1000" title="Linux Developers"><span class="menu-title">Linux Developers</span></a></li> 
+</ul></li> 
+<li><a href="https://www.linux.com/news/rss-feeds" id="menu905" title="RSS Feeds"><span class="menu-title">RSS Feeds</span></a></li> 
+<li><a href="http://www.linux.com/news/galleries" id="menu973" title="Galleries"><span class="menu-title">Galleries</span></a></li> 
+<li><a href="https://www.linux.com/news/friday-funnies" class=" last-item" id="menu974" title="Friday Funnies"><span class="menu-title">Friday Funnies</span></a></li> 
+</ul></li> 
+<li class="havechild"><a href="https://www.linux.com/community" class="menu-item2" id="menu328" title="Linux Community"><span class="menu-title">Linux Community</span></a><ul style="height: 0px; left: -999em; "><li><a href="https://www.linux.com/community/events" class=" first-item" id="menu694" title="Events"><span class="menu-title">Events</span></a></li> 
+<li><a href="http://www.linux.com/community/forums" id="menu657" title="Forums"><span class="menu-title">Forums</span></a></li> 
+<li class="havesubchild"><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" id="menu914" title="Contests and Polls"><span class="menu-title">Contests and Polls</span></a><ul style="width: 0px; left: -999em; "><li class="havesubchild"><a href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" class=" first-item" id="menu916" title="Contests"><span class="menu-title">Contests</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/community/contests-and-polls/contests/2011-tshirt-design-content-finalists" class=" first-item" id="menu970" title="2011 Tshirt Design Content Finalists"><span class="menu-title">2011 Tshirt Design Content Finalists</span></a></li> 
+<li><a href="https://www.linux.com/community/contests-and-polls/contests/tshirt-design-contest-2012" id="menu999" title="2012 T-shirt Design Contest"><span class="menu-title">2012 T-shirt Design Contest</span></a></li> 
+<li><a href="https://www.linux.com/community/contests-and-polls/contests/2012-t-shirt-design-contest-finalists" class=" last-item" id="menu1002" title="2012 T-shirt Design Contest Finalists"><span class="menu-title">2012 T-shirt Design Contest Finalists</span></a></li> 
+</ul></li> 
+</ul></li> 
+<li><a href="https://www.linux.com/community/join-lf" id="menu837" title="Join the Linux Foundation"><span class="menu-title">Join the Linux Foundation</span></a></li> 
+<li><a href="https://www.linux.com/community/carry-card-support-community" id="menu891" title="Carry the Linux Credit Card"><span class="menu-title">Carry the Linux Credit Card</span></a></li> 
+<li><a href="https://www.linux.com/community/blogs" id="menu995" title="Community Blogs"><span class="menu-title">Community Blogs</span></a></li> 
+<li><a href="https://www.linux.com/community/100-linux-tutorials-video-campaign" class=" last-item" id="menu1003" title="100 Linux Tutorials Video Campaign"><span class="menu-title">100 Linux Tutorials Video Campaign</span></a></li> 
+</ul></li> 
+<li class="havechild active"><a href="https://www.linux.com/learn" class="menu-item3 active" id="menu736" title="Learn Linux"><span class="menu-title">Learn Linux</span></a><ul style="height: 0px; left: -999em; "><li><a href="https://www.linux.com/learn/answers" class=" first-item" id="menu962" title="Linux Answers"><span class="menu-title">Linux Answers</span></a></li> 
+<li class="havesubchild"><a href="https://www.linux.com/learn/docs" id="menu737" title="Linux Documentation"><span class="menu-title">Linux Documentation</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/learn/docs/ldp" class=" first-item" id="menu738" title="Linux How Tos"><span class="menu-title">Linux How Tos</span></a></li> 
+<li><a href="https://www.linux.com/learn/docs/man" class=" last-item" id="menu863" title="Linux Man Pages"><span class="menu-title">Linux Man Pages</span></a></li> 
+</ul></li> 
+<li class="active"><a href="https://www.linux.com/learn/tutorials" class=" active" id="menu864" title="Linux Tutorials"><span class="menu-title">Linux Tutorials</span></a></li> 
+<li><a href="https://www.linux.com/learn/whitepapers" id="menu681" title="Whitepapers"><span class="menu-title">Whitepapers</span></a></li> 
+<li><a href="https://www.linux.com/learn/videos" id="menu890" title="Linux Videos"><span class="menu-title">Linux Videos</span></a></li> 
+<li><a href="https://www.linux.com/learn/new-user-guides" id="menu799" title="Linux New User Guides"><span class="menu-title">Linux New User Guides</span></a></li> 
+<li><a href="https://www.linux.com/learn/linux-career-center" id="menu800" title="Linux Career Center"><span class="menu-title">Linux Career Center</span></a></li> 
+<li class="havesubchild"><a href="https://www.linux.com/learn/linux-training-program-and-classes" class=" last-item" id="menu898" title="Linux Training Program and Classes"><span class="menu-title">Linux Training Program and Classes</span></a><ul style="width: 0px; left: -999em; "><li><a href="https://www.linux.com/learn/android-training" class=" first-item" id="menu955" title="Android Training"><span class="menu-title">Android Training</span></a></li> 
+</ul></li> 
+</ul></li> 
+<li class="havechild"><a href="https://www.linux.com/directory" class="menu-item4" id="menu732" title="Directory"><span class="menu-title">Directory</span></a><ul style="height: 0px; left: -999em; "><li><a href="https://www.linux.com/directory/Distributions" class=" first-item" id="menu892" title="Download Linux"><span class="menu-title">Download Linux</span></a></li> 
+<li><a href="https://www.linux.com/directory/Books" id="menu882" title="Books"><span class="menu-title">Books</span></a></li> 
+<li><a href="https://www.linux.com/directory/Mobile" id="menu883" title="Mobile"><span class="menu-title">Mobile</span></a></li> 
+<li><a href="https://www.linux.com/directory/Components" id="menu884" title="Components"><span class="menu-title">Components</span></a></li> 
+<li><a href="https://www.linux.com/directory/Peripherals" id="menu885" title="Peripherals"><span class="menu-title">Peripherals</span></a></li> 
+<li><a href="https://www.linux.com/directory/Software" id="menu886" title="Software"><span class="menu-title">Software</span></a></li> 
+<li><a href="https://www.linux.com/directory/Software/applications" class=" last-item" id="menu867" title="Linux Applications"><span class="menu-title">Linux Applications</span></a></li> 
+</ul></li> 
+<li><a href="http://jobs.linux.com/" class="menu-item5" id="menu906" title="Jobs"><span class="menu-title">Jobs</span></a></li> 
+<li><a href="http://store.linux.com/" class="menu-item6 last-item" id="menu913" title="Store"><span class="menu-title">Store</span></a></li> 
+</ul>
+	
+		
+</div>
+</div>
+
+<!-- END: MAIN NAVIGATION -->
+
+
+<div id="ja-containerwrap-cm" class="clearfix">
+<div id="ja-container" class="clearfix">
+
+	<!-- BEGIN: CONTENT -->
+	<div id="ja-content">
+		
+			<div id="ja-current-content">
+
+												
+				<div id="ja-pathway">
+					<span class="breadcrumbs pathway">
+<a href="https://www.linux.com/" class="pathway">Home</a> <img src="./Vim tips  Using tabs   Linux.com_files/arrow.png" alt=""> <a href="https://www.linux.com/learn" class="pathway">Learn Linux</a> <img src="./Vim tips  Using tabs   Linux.com_files/arrow.png" alt=""> <a href="https://www.linux.com/learn/tutorials" class="pathway">Linux Tutorials</a> <img src="./Vim tips  Using tabs   Linux.com_files/arrow.png" alt=""> Vim tips: Using tabs</span>
+
+				</div>
+				
+				 				 
+				 				
+			  	 
+	           				
+			  <div class="ja-wrap-center"><div class="ja-wrap-top"><div class="ja-wrap-bot">
+			
+			  				
+					
+					
+<h2 class="contentheading">
+		<a href="./Vim tips  Using tabs   Linux.com_files/Vim tips  Using tabs   Linux.com.html" class="contentpagetitle">
+		Vim tips: Using tabs	</a>
+	</h2>
+
+
+<div class="article-toolswrap">
+<div class="article-tools clearfix">
+	<div class="article-meta">
+			<span class="createdate">
+			Wednesday, 24 January 2007 08:00		</span>
+		
+			<span class="createby">
+			Joe 'Zonker' Brockmeier		</span>
+		
+	<span class="createby">
+			|<img src="./Vim tips  Using tabs   Linux.com_files/exclusive.png">Exclusive	</span>
+	
+		</div>
+
+	
+
+<!-- AddThis Button BEGIN -->
+ <script type="text/javascript">
+    var addthis_config = {data_track_clickback: false}
+</script>
+<div style="clear:both; padding-top:5px" class="addthis_toolbox addthis_default_style " addthis:url="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs" addthis:title="Vim tips: Using tabs">
+<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+<a class="addthis_button_tweet" tw:via="linuxfoundation"></a>
+<a class="addthis_button_google_plusone" g:plusone:size="medium"></a> 
+
+<a class="linkedin_badge" href="http://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.linux.com%2Flearn%2Ftutorials%2F442422-vim-tips-using-tabs&title=Vim%20tips:%20Using%20tabs&ro=false&summary=&source=&counter=horizontal" target="_blank">Submit to Linkedin</a>
+<a class="stmblupn_badge" href="http://www.stumbleupon.com/submit?url=https%3A%2F%2Fwww.linux.com%2Flearn%2Ftutorials%2F442422-vim-tips-using-tabs">Submit to Stumbleupon</a>
+
+</div>
+<script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/addthis_widget.js"></script>
+<!-- AddThis Button END -->		
+		
+	</div>
+</div>
+
+
+<div class="article-content">
+
+<p>
+	&nbsp;</p>
+<p>
+	Before Vim 7.0 was released last May, I usually had six or seven xterms or Konsole windows open, each with a single Vim session in which I was editing a single file. This takes up a lot of screen space, and isn't very efficient. With Vim 7.0, users now have the option of using tabs within Vim. With Vim's tab features you can consolidate all your sessions into one window and move between files more easily.</p>
+<p>
+	&nbsp;</p>
+<p>
+	&nbsp;</p>
+<p>
+	If you're using an version of Vim older than 7.0, you won't have access to this feature. By now, though, most distros have moved to Vim 7.0, so if you're using a recent release you should be OK.</p>
+<p>
+	<strong>Opening a tab</strong></p>
+<p>
+	Let's start by opening a new tab in Vim. There are a few ways to do this. Probably the easiest to remember is to run the <code>:tabnew</code> command while in normal mode. This will open a new tab with an empty buffer. If you want to edit a file in the new tab, you can run <code>:tabnew <em>filename</em> </code> and Vim will load the file in the new tab.</p>
+<p>
+	Another way to do this is to open more than one file at startup using the <code>-p</code> option. If you want to open three files in separate tabs, you'd use this syntax:</p>
+<p>
+	<code>vim -p <em>file1 file2 file3</em> </code></p>
+<p>
+	This will start a Vim session with file1 in the first tab, file2 in the second tab, and file3 in the third.</p>
+<p>
+	Vim will open up as many tabs as you like on startup, up to the maximum number of tabs set in the .vimrc file. The default maximum is 10 tabs, but you can change this by setting the <code>tabpagemax</code> option in your .vimrc, like so:</p>
+<p>
+	<code>set tabpagemax=15</code></p>
+<p>
+	If you exceed the number of tabs allowed by <code>tabpagemax</code> Vim will simply open the maximum number of tabs, and the other files will be open but not displayed. You can edit the remaining files by using the <code>:next</code> or <code>:last</code> command to move to the files that are not displayed in a tab. Note that this setting only applies to the maximum number of tabs Vim will open on startup -- you can still open more tabs during your Vim session.</p>
+<p>
+	The <code>:tabf</code> command allows you to search for a file in your current path and open it in a new tab. For instance, if you want to open a file called inventory.txt that's in your current path, you could run:</p>
+<p>
+	<code>:tabf inven*</code></p>
+<p>
+	That will search for a file that matches the string <code>inven</code> and any number of characters after it. If only one file is found, Vim will open it in a new tab. If you have several files that match, Vim will complain that too many files match, and you'll have to narrow the search a little. The <code>:tabn</code> command will do autocompletion of file names in your path, so you can just type the first few characters of a filename and hit Tab to find the right file.</p>
+<p>
+	&nbsp;</p>
+<table align="left" border="0" cellpadding="3" cellspacing="0" width="30">
+	<tbody>
+		<tr>
+			<td valign="top">
+				<img alt="Figure 1" height="152" src="https://www.linux.com/var/slashimages/4a5764494f166e380677fa5f2e3aa4ca.png" width="356"></td>
+			<td width="12">
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="body">
+				<b>Figure 1 </b></td>
+		</tr>
+	</tbody>
+</table>
+<p>
+	<strong>Moving between tabs</strong></p>
+<p>
+	You can switch between tabs using <code>:tabn</code> and <code>:tabp</code>, or you can use <code>gt</code> while you're in normal mode. Of course, if you're using Vim's GUI, GVim, you can also use the mouse to switch between tabs or use keyboard shortcuts. In GVim, you can also access a context menu for tabs by right-clicking on the tab bar. Here you can open new tabs with a new buffer or an existing file, or close the current tab.</p>
+<p>
+	If you have a lot of tabs open, you can use <code>:tabfirst</code>, or just <code>:tabfir</code>, to jump to the first tab, and <code>:tablast</code> to jump to the last tab that's open.</p>
+<p>
+	By default, the tab labels are shown at the top of the Vim window only when tabs are open. If you want to see the tab bar all the time, you can modify the <code>showtabline</code> option in your .vimrc. To set this to display all of the time, use:</p>
+<p>
+	<code>set showtabline=2</code></p>
+<p>
+	If you want to turn it off altogether, use 0 instead of 2.</p>
+<p>
+	Note that the tabs are still there, even if the tab bar isn't displayed. If you have the tabline option set to 0, you can still see what tabs are open by using the <code>:tabs</code> command, which will provide a summary of open tabs, as you can see in the figure.</p>
+<p>
+	Speaking of setting options, if you don't like the existing shortcuts for the tab commands, you can add your own. For instance, if you want to make it easy to open a new tab, you might insert this into your .vimrc:</p>
+<p>
+	<code>imap ,t &lt;Esc&gt;:tabnew&lt;CR&gt;</code></p>
+<p>
+	This tells Vim to set up a keymap for <code>,t</code> in insert mode, to run <code>Esc</code> to put Vim into normal mode, then <code>:tabnew</code> and a carriage return to run the command. You can set up mappings for all of the tab commands that you use regularly. For more on setting up mappings, see our article <a href="http://www.linux.com/article.pl?sid=06/06/08/1431210">Using Vim mappings and abbreviations</a>.</p>
+<p>
+	<strong>Rearranging tabs</strong></p>
+<p>
+	If you're really meticulous and want to position tabs <em>just so</em> in Vim, you can move the tabs to a specific spot in the tab order using <code>:tabm <em>n</em> </code>, where <code> <em>n</em> </code> is the position number that you want to use. If you don't give the <code>:tabm</code> command an argument, then the current tab will be moved to the last spot.</p>
+<p>
+	Vim starts tab numbering from 0, so if you have six tabs open, you'll have tab 0 through tab 5. So, if you're in the first tab and want to move it to the fourth position, you'd run <code>:tab 3</code>.</p>
+<p>
+	Note that you can still use <a href="http://www.linux.com/article.pl?sid=06/05/04/1544258">viewports</a> normally within tabbed windows, and tabs are useful for doing a quick edit in a file when you have a main Vim window set up with a couple of viewports arranged just right.</p>
+<p>
+	<strong>Running commands in tabs</strong></p>
+<p>
+	Let's say you're editing six or seven files in Vim and realize that you need to replace a variable name with a new one. Using the <code>:tabdo</code> command, you can run a search and replace through all of the tabs at once rather than changing each file individually. For instance, if you want to replace foo with bar, you'd run this:</p>
+<p>
+	<code>:tabdo %s/foo/bar/g</code></p>
+<p>
+	That will run through each open tab and run the search and replace command (<code>%s/foo/bar/g</code>) in each one.</p>
+<p>
+	Tabs can be extremely useful, and it only takes a short while to become proficient with them. For more on working with tabs in Vim, run <code>:help tab-page-intro</code> within Vim.</p><div id="ninjaboard_author_avatar" class="clearfix"><div class="avatar"><a class="avatar" href="https://www.linux.com/component/ninjaboard/person/107" style="background-image: url(/component/ninjaboard/avatar/107/thumbnail/large/cache/-62169984000); height: 100px; width: 100px;"></a></div><h1><a href="https://www.linux.com/community/forums/person/107" itemprop="author">Joe 'Zonker' Brockmeier</a></h1></div></div>
+
+
+
+<span class="article_separator">&nbsp;</span>
+
+<div id="lfcomments" class="lf-comments">
+        <h2 class="heading h2">Comments</h2>
+                            <a data-noasync="" class="rss" href="https://www.linux.com/feeds/comments/article/vim-tips-using-tabs" title="Subscribe to Comments Feed"><span>Subscribe to Comments Feed</span></a>
+                            <ul class="lf-comments-list">
+                                	<li class="depth-1">
+        	            <article id="c123911" class="comment clearfix ">
+        	            <a name="comment-123911" id="comment-123911"></a>
+        	                <header>
+        	                    <h1 class="author">
+        	                    	Skunix        	                    	<span>Said</span>:
+        	                    </h1>
+        	                    <time datetime="2013-01-09 07:46:30">09 Jan</time>
+                                        	                </header>
+        	                        	                    <img class="avatar" src="./Vim tips  Using tabs   Linux.com_files/avatar.png" width="48px" height="48px">        	                        	                
+        	                <p>Super helpful thank you.</p>
+        	                <div class="comment-controls">
+                                                                                                    <a data-noasync="" href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" class="btn" data-action="report" data-id="123911">
+                                        Report                                    </a>
+                                
+                                <a data-noasync="" href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" class="reply btn" data-action="reply" data-id="/123911/">
+                                    Reply                                </a>
+        	                    
+        		                        	                </div>
+        	            </article>
+                   	</li>
+                                	<li class="depth-1">
+        	            <article id="c159553" class="comment clearfix ">
+        	            <a name="comment-159553" id="comment-159553"></a>
+        	                <header>
+        	                    <h1 class="author">
+        	                    	Fabio        	                    	<span>Said</span>:
+        	                    </h1>
+        	                    <time datetime="2013-02-13 11:19:40">5 days ago</time>
+                                        	                </header>
+        	                        	                    <img class="avatar" src="./Vim tips  Using tabs   Linux.com_files/avatar.png" width="48px" height="48px">        	                        	                
+        	                <p>Terrific! Just discovered tabs for me and your intro gave me a rocket start. Thank you!</p>
+        	                <div class="comment-controls">
+                                                                                                    <a data-noasync="" href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" class="btn" data-action="report" data-id="159553">
+                                        Report                                    </a>
+                                
+                                <a data-noasync="" href="https://www.linux.com/learn/tutorials/442422-vim-tips-using-tabs#" class="reply btn" data-action="reply" data-id="/159553/">
+                                    Reply                                </a>
+        	                    
+        		                        	                </div>
+        	            </article>
+                   	</li>
+                            </ul>
+        
+                        <form action="https://www.linux.com/component/lfcomments/comments/?row=442422&table=content" method="post" id="com-lfcomments-comments" class="lf-comments-form clearfix -koowa-form">
+<input type="hidden" name="_token" value="942a42822c82f376996f2b4e63df5f0b">
+
+            
+                            <label for="username">Name :</label>
+                <input type="text" size="40" name="username" value="" required="" class="">
+                <label for="email">Email :</label>
+                <input type="text" size="40" name="email" value="" required="" class="">
+            
+            
+            <label for="poohcheck" class="winnie">Do not enter data:</label><input type="text" size="40" class="winnie" name="poohcheck" value=""><input type="text" size="40" class="winnie" id="rpoohcheck" name="rpoohcheck" value="">
+            <label for="comment">Comment :</label>
+            <textarea name="comment" required="" class=""></textarea>
+            
+            <input type="checkbox" name="subscribe" value="1">
+            <label for="subscribe" class="inline-label">Subscribe to Comments</label>
+
+            <input type="hidden" name="row" value="442422">
+            <input type="hidden" name="table" value="content">
+            <input type="hidden" name="path" value="/">
+
+                        <input type="hidden" name="mollom_id" value="">
+            <input type="hidden" name="timestamp" value="1361201750">
+            <input class="button" type="submit" value="Post Comment">
+                            <input type="hidden" name="feedslug" value="article/vim-tips-using-tabs">
+                        <input type="hidden" name="timestamp" value="1361201750"><input type="hidden" name="timestamp_secret" value="1bca639a508c95641220023701350e62d7fb8c0c">        </form>
+    </div>
+					
+				  
+					
+		        
+									
+				</div></div></div>
+				
+				  						
+		        			        						
+								
+				
+			
+			
+        <!-- BEGIN: JAZIN -->
+                <!-- END: JAZIN -->
+      </div>
+      		
+  		          
+	</div>
+	<!-- END: CONTENT -->
+	
+		<!-- BEGIN: COLUMNS -->
+	<div id="ja-colwrap">
+
+				<!-- BEGIN: MASSCOL -->
+		<div id="ja-colmass" class="clearfix">
+		  		<div class="module">
+			<div>
+				<div>
+					<div>
+											<div style="border: none; margin: 18px auto; text-align: center;">
+	<div id="azk85217_rectangle" style="border: none;"><a href="https://engine.adzerk.net/r?e=eyJ0cyI6MTM2MTIwMTcxNzIzNSwiYXYiOjEzNTI4LCJhdCI6NSwiY20iOjE5OTgzLCJjaCI6NzMxOSwiY3IiOjUzODQzLCJkbSI6MSwiZmMiOjc2OTE4LCJmbCI6Mzg5ODQsImt3IjoiVDpTU0wiLCJudyI6NDY2OSwicmYiOiJodHRwOi8vc3VwZXJ1c2VyLmNvbS9xdWVzdGlvbnMvMzc2MjEzL2luLXZpLWhvdy1kby1pLW1hcC10LWVxdWFsLXRvLXRhYm5ldyIsInJ2IjowLCJwciI6MTc2MjYsInN0IjoyMDk4MSwiZGkiOiI3ZjAyZGRmZWM1MWM0OTQ5ODQ1YjQ5MGE3MGJkYjg1NiIsInVyIjoiaHR0cDovL3RyYWluaW5nLmxpbnV4Zm91bmRhdGlvbi5vcmcvbGludXgtY291cnNlcy9zeXN0ZW0tYWRtaW5pc3RyYXRpb24tdHJhaW5pbmcvbGludXgtc2VjdXJpdHkifQ&s=DlvF9P7mMmnsdE2ppWVMEZbkSfM" rel="nofollow" target="_blank" title=""><img src="./Vim tips  Using tabs   Linux.com_files/a3900082b591447884798dbb2408e699.jpg" title="" alt="" border="0" width="300" height="250"></a><img height="0px" width="0px" src="./Vim tips  Using tabs   Linux.com_files/i.gif"></div></div>					</div>
+				</div>
+			</div>
+		</div>
+	
+		</div>
+		<!-- END: MASSCOL -->
+		
+		<div id="ja-cols" class="clearfix">
+		
+						<div id="ja-col1">
+				<div class="ja-innerpad clearfix ja-movable-container" id="ja-movable1">
+							<div class="module">
+			<div>
+				<div>
+					<div>
+											<h3>Upcoming Training Courses</h3>
+<ol class="upcomingcourses">
+			<li class="upcomingcourses">
+			<a class="title" target="_blank" href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=18" title="See the course details for LF404 Building Embedded Linux with the Yocto Project Crash Course">LF404 Building Embedded Linux with the Yocto Project Crash Course</a><br>
+			<span>23 Feb <strong>»</strong> 24 Feb - San Francisco</span><br>
+			<a href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=18" title="See the course details for LF404 Building Embedded Linux with the Yocto Project Crash Course" class="orange button">Details</a>
+		</li>
+			<li class="upcomingcourses">
+			<a class="title" target="_blank" href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=5" title="See the course details for LF312 Developing Applications For Linux">LF312 Developing Applications For Linux</a><br>
+			<span>25 Feb <strong>»</strong> 01 Mar - Virtual</span><br>
+			<a href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=5" title="See the course details for LF312 Developing Applications For Linux" class="orange button">Details</a>
+		</li>
+			<li class="upcomingcourses">
+			<a class="title" target="_blank" href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=12" title="See the course details for LF331 Developing Linux Device Drivers">LF331 Developing Linux Device Drivers</a><br>
+			<span>04 Mar <strong>»</strong> 08 Mar - Virtual</span><br>
+			<a href="http://training.linuxfoundation.org/index.php?option=com_lfcoursemanager&view=course&id=12" title="See the course details for LF331 Developing Linux Device Drivers" class="orange button">Details</a>
+		</li>
+	</ol>
+<p style="font-weight: bold;"><a href="http://training.linuxfoundation.org/linux-courses/find-linux-training-courses" target="_blank">View All Upcoming Courses</a></p>					</div>
+				</div>
+			</div>
+		</div>
+			<div class="module">
+			<div>
+				<div>
+					<div>
+											<div style="border: 0pt none; text-align: center;"><a href="http://www.linuxfoundation.org/about/join/individual/join" target="_blank"><img src="./Vim tips  Using tabs   Linux.com_files/block_ind300x65.jpg" alt="Become an Individual Member" title="Become an Individual Member" border="0"></a></div>					</div>
+				</div>
+			</div>
+		</div>
+			<div class="module">
+			<div>
+				<div>
+					<div>
+											<div style="border: 0pt none; text-align: center;"><a href="https://www.linux.com/news/friday-funnies/"><img src="./Vim tips  Using tabs   Linux.com_files/adbar.png" border="0" alt="Check out the Friday Funnies" title="Check out the Friday Funnies"></a></div>					</div>
+				</div>
+			</div>
+		</div>
+			<div class="module">
+			<div>
+				<div>
+					<div>
+													<h3>Latest Tutorials</h3>
+											
+<ol class="latestnews">
+
+
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/learn/tutorials/699758-skriptkiddies-kill-star-wars-traceroute" class="latestnews">
+			Star Wars Traceroute Reborn on IPv6 After Skriptkiddies’ Attack </a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/learn/tutorials/700068-monitoring-linux-and-unix-server-temperatures-with-opsview" class="latestnews">
+			Monitoring Linux And Unix Server Temperatures With Opsview</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/learn/tutorials/698725-how-to-install-cyanogenmod-on-an-android-phone" class="latestnews">
+			How to Install CyanogenMod on an Android Phone</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/learn/tutorials/698345-how-to-integrate-dropbox-into-thunar-fedora-18xfce" class="latestnews">
+			How To Integrate DropBox Into Thunar (Fedora 18/XFCE)</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/learn/tutorials/697792-how-to-integrate-clamav-into-pureftpd-for-virus-scanning-on-fedora-18" class="latestnews">
+			How To Integrate ClamAV Into PureFTPd For Virus Scanning On Fedora 18</a></span>
+	</div>
+	</li>
+</ol>
+
+					</div>
+				</div>
+			</div>
+		</div>
+			<div class="module">
+			<div>
+				<div>
+					<div>
+											<div style="border: 0pt none; text-align: center;">
+<h2>Sign Up For the Linux.com Newsletter</h2>
+<p><iframe src="./Vim tips  Using tabs   Linux.com_files/1ATL.html" width="100%" height="210" type="text/html" frameborder="0" allowtransparency="true" style="border: 0;" class="/html/html/html/html/html/html/html/html/html/html/html/html/html/html"></iframe></p>
+</div>					</div>
+				</div>
+			</div>
+		</div>
+			<div class="module">
+			<div>
+				<div>
+					<div>
+													<h3>Latest Software News</h3>
+											
+<ol class="latestnews">
+
+
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/news/software/applications/700736-linux-windows-and-security-fud" class="latestnews">
+			Linux, Windows, and Security FUD</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/news/software/linux-kernel/700788-intel-has-good-drm-driver-changes-in-linux-39" class="latestnews">
+			Intel Has Good DRM Driver Changes In Linux 3.9</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/news/software/applications/700748-git-182-gets-new-features-ported-to-qnx" class="latestnews">
+			Git 1.8.2 Gets New Features, Ported To QNX</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/news/software/linux-kernel/700743-ti-omap-drm-for-linux-39-moves-out-of-staging" class="latestnews">
+			TI OMAP DRM For Linux 3.9 Moves Out Of Staging</a></span>
+	</div>
+	</li>
+	<li class="latestnews" style="margin-bottom: 8px;">
+	<div style="display:block; border:0px; margin-bottom:6px;">
+		<span style="display: inline; border:0px;"><a href="https://www.linux.com/news/software/applications/700073-bottomley-owning-your-windows-8-uefi-platform" class="latestnews">
+			Bottomley: Owning Your Windows 8 UEFI Platform</a></span>
+	</div>
+	</li>
+</ol>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	
+				</div>
+			</div>
+				
+						
+		</div>
+
+	</div><br>
+	<!-- END: COLUMNS -->
+	
+</div></div>
+
+	<!-- BEGIN: BOTTOM SPOTLIGHT -->
+	<div id="ja-botslwrap">	
+	<div id="ja-botsl" class="clearfix">
+
+    <div id="ja-cpanel-bottom">
+    
+            <div class="ja-box-left" style="width: 24.98%;">
+        		<div class="moduletable">
+					<h3>Who we are ?</h3>
+					<p>
+	The Linux Foundation is a non-profit consortium dedicated to the growth of Linux.</p>
+<p>
+	<a href="http://www.linuxfoundation.org/about">More About the foundation... </a></p>
+<p>
+	<a href="http://www.linuxfoundation.org/about/faq" target="_blank" title="Frequent Questions">Frequent Questions</a></p>
+<p>
+	<a href="http://www.linuxfoundation.org/about/join" target="_blank" title="Join the Linux Foundation">Join</a> / <a href="http://training.linuxfoundation.org/">Linux Training</a> / <a href="http://www.linuxfoundation.org/about/board-members" target="_blank" title="Board Members">Board </a></p>		</div>
+	
+      </div>
+            
+            <div class="ja-box-center" style="width: 24.98%;">
+        		<div class="moduletable">
+					<h3>Explore</h3>
+					<p><a href="https://www.linux.com/learn/answers">Answers</a></p><p><a href="https://www.linux.com/community/blogs">Blogs</a></p><p><a href="https://www.linux.com/community/forums">Forums</a></p><p><a href="https://www.linux.com/directory">Directory</a> </p>		</div>
+	
+      </div>
+            
+            <div class="ja-box-center" style="width: 24.98%;">
+        		<div class="moduletable">
+					<h3>Stay Current</h3>
+					<p>
+	<a href="https://www.linux.com/news/embedded-mobile/netbooks" title="Netbooks">Netbooks</a></p>
+<p>
+	<a href="https://www.linux.com/news/enterprise/cloud-computing">Cloud Computing</a></p>
+<p>
+	<a href="https://www.linux.com/news/enterprise">Enterprise</a></p>
+<p>
+	<a href="https://www.linux.com/news/embedded-mobile">Embedded &amp; Mobile</a></p>		</div>
+	
+      </div>
+            
+            <div class="ja-box-right" style="width: 24.98%;">
+        		<div class="moduletable">
+					<h3>About Linux.com</h3>
+					<p>
+	<a href="https://www.linux.com/tour" title="Linux.com Site Tour">How to Participate</a></p>
+<p>
+	<a href="https://www.linux.com/contact">Contact</a> / <a href="https://www.linux.com/about">About</a></p>
+<p>
+	<a href="https://www.linux.com/advertise">Advertise</a></p>
+<p>
+	<a href="https://www.linux.com/privacy">Privacy</a> / <a href="https://www.linux.com/terms">Terms</a> / <a href="https://www.linux.com/editorial">Editorial Policy</a></p>		</div>
+	
+      </div>
+      
+    </div>
+
+	</div></div>
+	<!-- END: BOTTOM SPOTLIGHT -->
+
+
+<!-- BEGIN: FOOTER -->
+<div id="ja-footerwrap" class="clearfix">
+<div id="ja-footer">
+	
+<!-- /mod_php version 1.0.0.Alpha1-J1.5 (c) www.fijiwebdesign.com -->
+ <table>
+<tbody><tr>
+<td><h1 class="footer-logo"><span>The Linux Foundation</span></h1></td>
+<td><small><a href="http://linux.com/" target="blank" title="Linux.com - All Matters Linux">Linux.com</a> © 2012 Linux.com. All rights reserved.<br>
+ The Linux Foundation Symbol is a trademark of the Linux Foundation.<br>
+Linux is a registered <a href="http://www.linuxfoundation.org/programs/legal/trademark" title="Linux Mark Institute">trademark</a> of Linus Torvalds.</small>
+</td>
+</tr>
+</tbody></table>
+
+<!-- mod_php version 1.0.0.Alpha1-J1.5/ -->
+
+	<script type="text/javascript">
+piAId = '7342';
+piCId = '7201';
+
+(function() {
+        function async_load(){
+            var s = document.createElement('script'); s.type = 'text/javascript';
+            s.src = ('https:' == document.location.protocol ? 'https://pi' : 'http://cdn') + '.pardot.com/pd.js';
+            var c = document.getElementsByTagName('script')[0]; c.parentNode.insertBefore(s, c);
+        }
+        if(window.attachEvent) { window.attachEvent('onload', async_load); }
+        else { window.addEventListener('load', async_load, false); }
+    })();
+</script>
+</div>
+</div>
+<!-- END: FOOTER -->
+
+	
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./Vim tips  Using tabs   Linux.com_files/ga.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-831873-8");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+<!-- Start Quantcast tag -->
+<script type="text/javascript">
+_qoptions={
+qacct:"p-81r-qu3bH9XSY"
+};
+</script>
+<script type="text/javascript" src="./Vim tips  Using tabs   Linux.com_files/quant.js"></script>
+<noscript>
+&lt;img src="//pixel.quantserve.com/pixel/p-81r-qu3bH9XSY.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast"/&gt;
+</noscript>
+<!-- End Quantcast tag -->
+
+</body></html>

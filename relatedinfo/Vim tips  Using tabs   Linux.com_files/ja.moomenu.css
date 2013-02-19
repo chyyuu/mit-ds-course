@@ -1,0 +1,195 @@
+/*------------------------------------------------------------------------
+# JA Vauxite for Joomla 1.5 - Version 1.0 - Licence Owner JA85339
+# ------------------------------------------------------------------------
+# Copyright (C) 2004-2008 J.O.O.M Solutions Co., Ltd. All Rights Reserved.
+# @license - Copyrighted Commercial Software
+# Author: J.O.O.M Solutions Co., Ltd
+# Websites:  http://www.joomlart.com -  http://www.joomlancers.com
+# This file may not be redistributed in whole or significant part.
+-------------------------------------------------------------------------*/
+
+
+#ja-cssmenu {
+	float: left;
+	list-style: none;
+	margin: 0;
+	padding-top: 0;
+	background: url(../../images/mainnav-sep.gif) no-repeat left bottom;
+}
+
+#ja-cssmenu ul {
+	margin: 0; /* all lists */
+	padding: 0;
+}
+
+#ja-cssmenu li {
+	background: url(../../images/mainnav-sep.gif) no-repeat right bottom;
+	cursor: pointer;
+	float: left;
+	margin: 0 2px 0 0;
+	padding: 0 2px 0 0;
+}
+
+#ja-cssmenu li ul {
+	width: 16.4em;
+	position: absolute; /* second-level lists */
+	z-index: 99;
+	left: -999em; /* using left instead of display to hide menus because display: none isn't read by screen readers */
+	height: auto;
+	w\idth: 15.9em;
+}
+
+#ja-cssmenu li ul ul {
+	margin: -2em 0 0 15em; /* third-and-above-level lists */
+}
+
+#ja-cssmenu li li {
+	padding: 0 1em 0 0;
+	margin: 0;
+	width: 14.9em;
+}
+
+#ja-cssmenu ul a {
+}
+
+#ja-cssmenu li:hover ul ul, #ja-cssmenu li:hover ul ul ul,
+#ja-cssmenu li.sfhover ul ul, #ja-cssmenu li.havechildsfhover ul ul, #ja-cssmenu li.havechild-activesfhover ul ul, #ja-cssmenu li.activesfhover ul ul,
+#ja-cssmenu li.sfhover ul ul ul, #ja-cssmenu li.havechildsfhover ul ul ul, #ja-cssmenu li.havechild-activesfhover ul ul ul, #ja-cssmenu li.activesfhover ul ul ul {
+	left: -999em;
+}
+
+/* This "unhides" the sub-menus (left: -999em is what hides them) */
+#ja-cssmenu li:hover ul, #ja-cssmenu li li:hover ul, #ja-cssmenu li li li:hover ul,
+#ja-cssmenu li.sfhover ul, #ja-cssmenu li.havechildsfhover ul, #ja-cssmenu li.havechild-activesfhover ul, #ja-cssmenu li.activesfhover ul,
+#ja-cssmenu li li.sfhover ul, #ja-cssmenu li li.havesubchildsfhover ul, #ja-cssmenu li li.havesubchild-activesfhover ul, #ja-cssmenu li li.activesfhover ul,
+#ja-cssmenu li li li.sfhover ul, #ja-cssmenu li li li.havesubchildsfhover ul, #ja-cssmenu li li li.havesubchild-activesfhover ul, #ja-cssmenu li li li.activesfhover ul {
+	left: auto;
+}
+
+/* STYLING THE MENU
+-----------------------------------*/
+/* 1st level */
+#ja-cssmenu li a {
+	display: block;
+	color: #333333;
+	font-size: 12px;
+	text-decoration: none;
+	font-weight: normal;
+}
+
+#ja-cssmenu li a span {
+	display: block;
+	padding: 8px 15px 7px;
+}
+
+#ja-cssmenu li.havechild a:hover,
+#ja-cssmenu li.havechild a:active,
+#ja-cssmenu li.havechild a:focus,
+#ja-cssmenu li:hover a {
+	/*background: url(../../images/tab-right.gif) no-repeat right top #030303;*/
+	color: #333;
+}
+
+#ja-cssmenu li.havechild a:hover span,
+#ja-cssmenu li.havechild a:active span,
+#ja-cssmenu li.havechild a:focus span,
+#ja-cssmenu li:hover a span{
+	/*background: url(../../images/tab-left.gif) no-repeat left top;*/
+}
+
+#ja-cssmenu li.havechild li a:hover,
+#ja-cssmenu li.havechild li a:active,
+#ja-cssmenu li.havechild li a:focus,
+#ja-cssmenu li:hover li a {
+	background:none;
+}
+
+#ja-cssmenu li.havechild li a:hover span,
+#ja-cssmenu li.havechild li a:active span,
+#ja-cssmenu li.havechild li a:focus span,
+#ja-cssmenu li:hover li a span{
+	background:none;
+}
+
+#ja-cssmenu li:hover,
+#ja-cssmenu li.sfhover,
+#ja-cssmenu li.havechildsfhover,
+#ja-cssmenu li.havechild-activesfhover {
+	color: #E37407;
+}
+
+#ja-cssmenu li a.active,
+#ja-cssmenu li a.active:hover,
+#ja-cssmenu li a.active:active,
+#ja-cssmenu li a.active:focus {
+	background:none;
+}
+
+#ja-cssmenu li a.active span,
+#ja-cssmenu li a.active:hover span,
+#ja-cssmenu li a.active:active span,
+#ja-cssmenu li a.active:focus span{
+	background:none;
+	color: #E37407;
+}
+
+/* 2nd level and above */
+#ja-cssmenu li ul {
+	background: #fff;
+	border-left:1px solid #DCDCD4;
+	border-right:1px solid #DCDCD4;
+	border-bottom:1px solid #DCDCD4;
+}
+
+#ja-cssmenu li ul li {
+	border-bottom: 1px solid #DCDCD4;
+	border-right: none;
+	background:url(../../images/menu-li-bg.jpg) repeat-x;
+}
+
+#ja-cssmenu li ul li span {
+	padding: 0;
+}
+
+#ja-cssmenu li ul a {
+	border: none;
+	margin: 0;
+	padding: 8px 10px;
+	line-height: normal;
+	background:none;
+	color: #333;
+	font-weight: normal;
+	text-transform: none;
+	font-size: 92%;
+}
+
+#ja-cssmenu li.havesubchild,
+#ja-cssmenu li.havesubchild-active {
+	background: url(../../images/arrow.png) no-repeat 94% 50%;
+}
+
+#ja-cssmenu li ul a:hover,
+#ja-cssmenu li ul a:active,
+#ja-cssmenu li ul a:focus,
+#ja-cssmenu ul li:hover,
+#ja-cssmenu ul li.sfhover,
+#ja-cssmenu ul li.havesubchildsfhover,
+#ja-cssmenu ul li.havesubchild-activesfhover,
+#ja-cssmenu ul ul li:hover,
+#ja-cssmenu ul ul li.sfhover,
+#ja-cssmenu ul ul li.havesubchildsfhover,
+#ja-cssmenu ul ul li.havesubchild-activesfhover {
+	background: #F5F4F0;
+	color: #E37407;
+}
+
+#ja-cssmenu ul li a.active,
+#ja-cssmenu ul li a.active:hover,
+#ja-cssmenu ul li a.active:active,
+#ja-cssmenu ul li a.active:focus {
+	/*background: none !important;*/
+	color: #E37407;
+	font-weight: normal;
+	text-decoration: none;
+}
+

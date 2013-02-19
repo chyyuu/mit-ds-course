@@ -1,0 +1,7 @@
+from http://www.golangcn.com/bbs/thread-6-1-1.html
+第一步，生成index文件，比如文件名为godoc.index
+    godoc -http=:6060 -index=true -index_files=godoc.index -write_index=true
+复制代码
+第二步，指定index文件
+    godoc -http=:6060 -index=true -index_files=godoc.index
+复制代码

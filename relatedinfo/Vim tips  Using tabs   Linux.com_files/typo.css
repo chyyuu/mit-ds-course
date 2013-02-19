@@ -1,0 +1,380 @@
+/*------------------------------------------------------------------------
+# JA Vauxite for Joomla 1.5 - Version 1.0 - Licence Owner JA85339
+# ------------------------------------------------------------------------
+# Copyright (C) 2004-2008 J.O.O.M Solutions Co., Ltd. All Rights Reserved.
+# @license - Copyrighted Commercial Software
+# Author: J.O.O.M Solutions Co., Ltd
+# Websites:  http://www.joomlart.com -  http://www.joomlancers.com
+# This file may not be redistributed in whole or significant part.
+-------------------------------------------------------------------------*/
+
+pre, .code {
+	background: #E9F4F8;
+	border-left: 5px solid #046380;
+	font: 1em/1.5 "Courier News", monospace;
+	margin: 5px 0 15px;
+	padding: 10px 15px !important;
+	white-space: pre-wrap;       /* css-3 */
+	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+blockquote {
+	padding: 1em 40px 1em 15px;
+}
+
+blockquote span.open {
+	background: url(../images/so-q.gif) no-repeat left top;
+	padding: 0 0 0 15px;
+}
+
+blockquote span.close {
+	background: url(../images/sc-q.gif) no-repeat bottom right;
+	padding: 0 15px 0 0;
+}
+
+blockquote.testimonial {
+	padding: 0 0 10px;
+	border-bottom: 1px solid #E7E8E6;
+}
+
+blockquote.testimonial span.author {
+	background: url(../images/icon-author.gif) no-repeat 5px center;
+	display: block;
+	font-weight: bold;
+	margin-top: 5px;
+	padding-left: 20px;
+}
+
+/* Drropcap */
+.dropcap {
+	color: #046380;
+	display: block;
+	float: left;
+	font: 50px/40px Georgia, Times, serif;
+	padding: 4px 8px 0 0;
+}
+
+/* Tips, Error, Message, Hightlight*/
+p.error {
+	background: url(../images/icon-error.gif) no-repeat top left;
+	color: #CC0000;
+	padding-left: 25px;
+}
+
+p.message {
+	background: url(../images/icon-info.gif) no-repeat top left;
+	color: #046380;
+	padding-left: 25px;
+}
+
+p.tips {
+	background: url(../images/icon-tips.gif) no-repeat top left;
+	color: #E58C00;
+	padding-left: 25px;
+}
+
+p.feed {
+	background: url(../images/icon-feed.gif) no-repeat top left;
+	color: #FF6700;
+	padding-left: 25px;
+}
+
+p.comment {
+	background: url(../images/icon-comment.gif) no-repeat top left;
+	color: #4B4B4B;
+	padding-left: 25px;
+}
+
+.highlight {
+	background: #E9F4F8;
+	font-weight: bold;
+	padding: 1px 5px;
+}
+
+/* Note Style */
+p.stickynote {
+	background: url(../images/sticky-bg.gif) no-repeat 5px 5px #FFFFFF;
+	border: 1px solid #CCCCCC;
+	padding: 12px 0px 12px 60px;
+}
+
+p.download {
+	background: url(../images/download-bg.gif) no-repeat 5px 5px #FFFFFF;
+	border: 1px solid #CCCCCC;
+	padding: 12px 0px 12px 60px;
+}
+
+.blocknumber {
+	clear: both;
+	padding: 5px 15px 10px;
+	position: relative;
+}
+
+/* Check list */
+ul.checklist {
+	list-style: none;
+}
+
+ul.checklist li {
+	background: url(../images/icon-checklist.gif) no-repeat 0 4px;
+	margin-left: 15px;
+	padding: 0 0 0 20px;
+}
+
+/* Check list (star) */
+ul.stars {
+	list-style: none;
+}
+
+ul.stars li {
+	background: url(../images/icon-star.gif) no-repeat 0 5px;
+	margin-left: 15px;
+	padding: 0 0 0 20px;
+}
+
+/* List arrow */
+ul.arrow {
+	list-style: none;
+}
+
+ul.arrow li {
+	background: url(../images/icon-arrow.gif) no-repeat 3px 5px;
+	margin-left: 15px;
+	padding: 0 0 0 20px;
+}
+
+/* Inline Underlist*/
+ul.none-padding {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.none-padding li {
+	margin: 0;
+	padding: 0;
+	background: none;
+}
+
+/* List video */
+a.video {
+	background: url(../images/icon-video.gif) no-repeat 0px 2px;
+	padding: 0 0 0 20px;
+}
+
+/* List Feed RSS */
+a.rss {
+	background: url(../images/icon-rss.png) no-repeat 0px 2px;
+	padding: 0 0 0 15px;
+}
+
+/* List link */
+a.link {
+	background: url(../images/icon-link.png) no-repeat 0px 3px;
+	padding: 0 0 0 20px;
+}
+
+/* Bignumber */
+.bignumber {
+	background: url(../images/ol-bg.gif) no-repeat top left;
+	color: #FFFFFF;
+	display: block;
+	float: left;
+	font: bold 20px/normal Arial, sans-serif;
+	margin-right: 8px;
+	padding: 6px 7px;
+}
+
+/* Big order list number */
+ol.big-ol {
+	margin: 0 !important;
+	padding: 0 !important;
+	list-style: none;
+	display: block;
+}
+
+ol.big-ol li {
+	margin: 0;
+	padding: 0;
+	display: block;
+	float: left;
+}
+
+ol.big-ol li span.index {
+	width: 30px;
+	float: left;
+	font-family: Georgia;
+	font-size: 180%;
+	color: #046380;
+}
+
+ol.big-ol li div.content {
+	float: right;
+	width: 110px;
+}
+
+ol.big-ol li span.note {
+	font-size: 90%;
+}
+
+/* Talking box. Thinking box. */
+div.bubble1, div.bubble2, div.bubble3, div.bubble4 {
+	margin: 15px 0;
+}
+
+div.bubble1 span.author,
+div.bubble2 span.author,
+div.bubble3 span.author,
+div.bubble4 span.author {
+	font-weight: bold;
+	margin-left: 15px;
+	padding-left: 15px;
+	background: url(../images/icon-author.gif) no-repeat 0px 2px;
+}
+
+div.bubble1 div {
+	background: url(../images/bub1-br.gif) no-repeat bottom right;
+	margin: 0;
+	width: 100%;
+}
+
+div.bubble1 div div {
+	background: url(../images/bub1-bl.gif) no-repeat bottom left;
+}
+
+div.bubble1 div div div {
+	background: url(../images/bub1-tr.gif) no-repeat top right;
+}
+
+div.bubble1 div div div div {
+	background: url(../images/bub1-tl.gif) no-repeat top left;
+}
+
+div.bubble1 div div div div div {
+	margin: 0;
+	padding: 10px 15px 20px;
+	width: auto;
+}
+
+div.bubble2 div {
+	background: url(../images/bub2-br.gif) no-repeat bottom right;
+	margin: 0;
+	width: 100%;
+}
+
+div.bubble2 div div {
+	background: url(../images/bub2-bl.gif) no-repeat bottom left;
+}
+
+div.bubble2 div div div {
+	background: url(../images/bub2-tr.gif) no-repeat top right;
+}
+
+div.bubble2 div div div div {
+	background: url(../images/bub2-tl.gif) no-repeat top left;
+}
+
+div.bubble2 div div div div div {
+	margin: 0;
+	padding: 10px 15px 25px;
+	width: auto;
+}
+
+div.bubble3 div {
+	background: url(../images/bub3-br.gif) no-repeat bottom right;
+	margin: 0;
+	width: 100%;
+}
+
+div.bubble3 div div {
+	background: url(../images/bub3-bl.gif) no-repeat bottom left;
+}
+
+div.bubble3 div div div {
+	background: url(../images/bub3-tr.gif) no-repeat top right;
+}
+
+div.bubble3 div div div div {
+	background: url(../images/bub3-tl.gif) no-repeat top left;
+}
+
+div.bubble3 div div div div div {
+	margin: 0;
+	padding: 10px 15px 45px;
+	width: auto;
+}
+
+div.bubble4 div {
+	background: url(../images/bub4-br.gif) no-repeat bottom right;
+	margin: 0;
+	width: 100%;
+}
+
+div.bubble4 div div {
+	background: url(../images/bub4-bl.gif) no-repeat bottom left;
+}
+
+div.bubble4 div div div {
+	background: url(../images/bub4-tr.gif) no-repeat top right;
+}
+
+div.bubble4 div div div div {
+	background: url(../images/bub4-tl.gif) no-repeat top left;
+}
+
+div.bubble4 div div div div div {
+	margin: 0;
+	padding: 10px 15px 45px;
+	width: auto;
+}
+
+/* Legend */
+.legend-title {
+	background: #FFFFFF;
+	color: #046380;
+	display: block;
+	float: left;
+	font-weight: bold;
+	font-size: 120%;
+	left: 7px;
+	margin: 0;
+	padding: 0 3px;
+	position: absolute;
+	top: -10px;
+}
+
+.legend {
+	border: 1px solid #CCCCCC;
+	margin: 20px 0;
+	padding: 0 10px;
+	position: relative;
+}
+
+/* Highslide */
+.highslide-header {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.highslide-header li {
+	background: none;
+}
+
+.highslide-body {
+	padding: 10px 0 !important;
+}
+
+.highslide {
+	margin: 0;
+}
+
+.highslide img {
+	padding: 2px;
+	border: 1px solid #CCCCCC;
+}
+
+.highslide:hover img {
+	border: 1px solid #ABABAB !important;
+}

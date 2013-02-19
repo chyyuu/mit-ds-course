@@ -37,6 +37,7 @@ type View struct {
   Viewnum uint
   Primary string
   Backup string
+  //Idle string  //idle server
 }
 
 // clients should send a Ping RPC this often,
@@ -47,6 +48,7 @@ const PingInterval = time.Millisecond * 100
 // this many Ping RPCs in a row.
 const DeadPings = 5
 
+const DeadLine = DeadPings * PingInterval
 //
 // Ping(): called by a primary/backup server to tell the
 // view service it is alive, to indicate whether p/b server

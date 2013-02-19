@@ -1,0 +1,192 @@
+lab2a design
+
+NOTICE:
+==============================
+Condition:
+----------------
+when the viewservice first starts, it should accept any server at all as the first primary. The backup in a view can be any server (other than the primary), or can be altogether missing if no server is available.
+
+An idle server (neither primary nor backup) should send Pings with an argument of zero.
+
+Each key/value server should send a Ping RPC once per PingInterval (see viewservice/common.go). The view service replies to the Ping with a description of the current view. The acknowledgment rule prevents the view service from getting more than one view ahead of the key/value servers. 
+
+Important Structure
+====================
+type ViewServer struct {
+  ....
+  dead bool
+  me string
+  // Your declarations here.
+  pingtime      map[string]time.Time   // server id: ping time
+  viewnum       map[string]uint        // server id: viewnum
+  curview       View                   // the current view from view server
+  psack         bool                   // the pri srv acked?  according the pingargs.viewnum 
+  nextviewnum   uint                   // the next server's viewnum
+  nextprisrv    string                 // the next primary server
+  nextbaksrv    string                 // the next backup server
+}
+
+active Case
+================
+Initial stage
+  vs.pingtime = map[string]time.Time{}
+  vs.viewnum = map[string]uint{}
+  vs.curview.Viewnum = 0
+  vs.curview.Primary = ""
+  vs.curview.Backup = ""
+  vs.psack = false
+  vs.nextviewnum=0
+
+
+control flow
+=====================
+
+vs.Ping control logic
+=====================
+vs.Ping will control vs.pack, and record the ping info, reply vs.curview 
+---------------------------------
+ 1: if (vs.curview.Primary == args.Me || vs.nextprisrv == args.Me) &&
+           vs.viewnum[vs.curview.Primary] == vs.curview.Viewnum  
+    then
+      vs.pack =true
+
+    ##vs's curr view(vs.curview.Viewnum) == Pri srv's Viewnum means vs and pri srv see the same view,
+    ##vs.curview.Primary == args.Me means pri srv response the vs's reply 
+    ##vs.nextprisrv == args.Me means maybe NO pri now, but the candidate of pri srv response the vs's reply 
+
+2: if  vs.viewnum[vs.curview.Primary] == 0 && vs.curview.Viewnum == args.Viewnum 
+   then
+      vs.pack = true
+   ##  vs.viewnum[vs.curview.Primary] == 0 means pri srv first run or restarted
+   ##  vs.curview.Viewnum == args.Viewnum means the restarted pri srv response the vs's reply 
+
+3: record tis ping info
+  vs.pingtime[args.Me] = time.Now()
+  vs.viewnum[args.Me]  = args.Viewnum
+  reply.View = vs.curview
+
+vs.tick control logic
+=======================
+vs.tick will record the potential next pri/bak srv, change the cur pri/back srv
+---------------------------------
+1: if no pri but  there are candidate (according the vs.pingtime )
+   then 
+      vs.nextprisrv = this candidate
+      vs.nextviewnum = vs.curview.Viewnum +1
+      vs.pack = false 
+   in next tick, if vs.pack = true, then vs.tick will change vs.curview 
+
+2: ifno bak but there are candidate, then the same process for bak
+   NOTICE: the finded candidate should not be the pri srv
+   
+3: check pri srv deead or restart
+   if vs.curview.Primary != "" && 
+     (time.Now().Sub(vs.pingtime[vs.curview.Primary]) > DeadLine || 
+	  vs.viewnum[vs.curview.Primary] == 0) 
+    then
+       pridead = true
+
+   ## time.Now().Sub(vs.pingtime[vs.curview.Primary]) > DeadLine means the pri srv may be dead, 
+   ## vs.viewnum[vs.curview.Primary] == 0) means the pri srv restart quickly
+
+4: check bak srv deead or restart, the same process 
+
+5: if pri srv dead or restart, we need change pri srv 
+   if vs.curview.Backup existed, 
+   then 
+      set vs.nextprisrv = this Backup srv
+      vs.nextciewnum = vs.curview.viewnum
+      vs.psck = false
+
+
+6: if bak srv dead or restart, we need change bak srv, the same process
+
+
+7: if vs.psack == true, we can change the curview of vs
+   
+  if vs.psack == true && vs.nextviewnum != vs.curview.Viewnum { 
+       if nextprisrv != cur.Pri then change curview.pri 
+
+
+  same process for nextbaksrv
+
+
+General Instance
+===================
+1 no pri, no bak srv
+----------------
+ck Ping vs is a impportant signal to info: there are idle server (if there are no pri or bak srv )
+
+vs:tick:BEG curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+vs:tick:END curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+psack: false || nvnum :0 || nextps:  || nextbs:  || 
+Test: First primary ...
+
+==ck1.Ping(0)
+
+vs:ping: curview: {%!t(uint=0) %!t(string=) %!t(string=)} ||
+vs: psack: true end
+## in ping FUN,  the cond2 (vs.viewnum[vs.curview.Primary] == 0 && vs.curview.Viewnum == args.Viewnum) is OK, so vs.pack= true, 
+## and vs[ck1].pingtime, viewnum, will bed recorded 
+
+vs:tick:BEG curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+vs:tick:END curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+psack: false || nvnum :1 || nextps: /var/tmp/824-1000/viewserver-3688-1 || nextbs:  || 
+
+## Now, vs.pack=true, and vs.curview.Primary==""&&vs.curview.Viewnum == vs.nextviewnum , so vs.tick will record the next pri srv in vs.nextps, and vs.pack=false.
+## so vs.curview didn't change
+
+==ck1.Ping(0)
+
+vs:ping: curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+vs: psack: true end
+
+vs:tick:BEG curview: {%!t(uint=0) %!t(string=) %!t(string=)} end
+vs:tick:END curview: {%!t(uint=1) %!t(string=/var/tmp/824-1000/viewserver-3688-1) %!t(string=)} end
+psack: true || nvnum :1 || nextps:  || nextbs:  || 
+
+## now vs.psack == true && vs.nextviewnum != vs.curview.Viewnum , so vs.tick will chage curciew to vs.next_pri
+
+==ck1.Ping(0)
+
+vs:ping: curview: {%!t(uint=1) %!t(string=/var/tmp/824-1000/viewserver-3688-1) %!t(string=)} end
+  ... Passed
+
+
+other Test
+------------
+1 viewserver wait for ack of previous view before starting the next one?
+
+
+1 Test: First primary ...
+
+2 Test: First backup ...
+
+3 Test: Backup takes over if primary fails ...
+
+The view service proceeds to a new view when either it hasn't received a Ping from the primary or backup for DeadPings PingIntervals, or if there is no backup and there's an idle server (a server that's been Pinging but is neither the primary nor the backup). But the view service must not change views until the primary from the current view acknowledges that it is operating in the current view (by sending a Ping with the current view number). If the view service has not yet received an acknowledgment for the current view from the primary of the current view, the view service should not change views even if it thinks that the primary or backup has died.
+
+  // in ping rpc
+       ping[srv]-- 
+      
+  // in tick
+       if ( ping[srv] <-5)  then srv dead
+          if srv is pri then back srv = pri
+  
+4 Test: Restarted server becomes backup ...
+  //
+
+5 Test: Idle third server becomes backup if primary fails ...
+  // An idle server (neither primary nor backup) should send Pings with an argument of zero.
+
+6 Test: Restarted primary treated as dead ...
+  // kill and immediately restart the primary -- does viewservice
+  // conclude primary is down even though it's pinging?
+  
+7 Test: Viewserver waits for primary to ack view ...
+  // does viewserver wait for ack of previous view before
+  // starting the next one?
+
+8 Test: Uninitialized server can't become primary ...
+  // if old servers die, check that a new (uninitialized) server
+  // cannot take over.

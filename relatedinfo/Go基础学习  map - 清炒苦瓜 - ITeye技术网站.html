@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0034)http://bpbp.iteye.com/blog/1500843 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Go基础学习: map - 清炒苦瓜 - ITeye技术网站</title>
+    <meta name="description" content="记录下Go的基础学习笔记，仅供自己参考，如果能帮到您，那是我的荣幸 map，Go里面称之为映射，一种像脚本语言使用数组的方式 常规用法示例:   	m := map[string] int {  		&quot;aa&quot;:100,  		&quot;bb&quot;:100,  		&quot;cc&quot;:100,  	}  	fmt.Printf(&quot;%d--%d\n&amp;quo ...">
+    <meta name="keywords" content="go, golang Go基础学习: map">
+    <link rel="shortcut icon" href="http://bpbp.iteye.com/images/favicon.ico" type="image/x-icon">
+    <link rel="search" type="application/opensearchdescription+xml" href="http://bpbp.iteye.com/open_search.xml" title="ITeye">
+    <link href="http://bpbp.iteye.com/rss" rel="alternate" title="清炒苦瓜" type="application/rss+xml">
+    <link href="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/blog.css" media="screen" rel="stylesheet" type="text/css">
+<link href="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/black.css" media="screen" rel="stylesheet" type="text/css">
+    <script type="text/javascript" async="" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/ga.js"></script><script src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/application.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-535605-1']);
+  _gaq.push(['_setDomainName', 'iteye.com']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+      <link href="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/SyntaxHighlighter.css" media="screen" rel="stylesheet" type="text/css">
+  <script src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/shCoreCommon.js" type="text/javascript"></script>
+<script src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/hotkey.js" type="text/javascript"></script>
+  <script src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/code_favorites.js" type="text/javascript"></script>
+<script src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/weiboshare.js" type="text/javascript"></script>
+  <style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style><style type="text/css">.dp-default .number { color: #C00000; }</style></head>
+  <body>
+    <div id="header">
+      <div id="blog_site_nav">
+  <a href="http://www.iteye.com/" class="homepage">首页</a>
+  <a href="http://www.iteye.com/news">资讯</a>
+  <a href="http://www.iteye.com/magazines">精华</a>
+  <a href="http://www.iteye.com/forums">论坛</a>
+  <a href="http://www.iteye.com/ask">问答</a>
+  <a href="http://www.iteye.com/blogs">博客</a>
+  <a href="http://www.iteye.com/blogs/subjects">专栏</a>
+  <a href="http://www.iteye.com/groups">群组</a>
+  <a href="http://bpbp.iteye.com/blog/1500843#" onclick="return false;" id="msna"><u>更多</u> <small>▼</small></a>
+  <div class="quick_menu" style="display:none;">
+    <a target="_blank" href="http://job.iteye.com/iteye">招聘</a>
+    <a href="http://www.iteye.com/search">搜索</a>
+  </div>
+</div>
+
+      <div id="user_nav">
+      <a href="http://bpbp.iteye.com/login" class="welcome" title="登录">您还未登录 !</a>
+    <a href="http://bpbp.iteye.com/login">登录</a>
+    <a href="http://bpbp.iteye.com/signup" class="nobg">注册</a>
+  </div>
+
+    </div>
+
+    <div id="page">
+      <div id="branding" class="clearfix">
+        <div id="blog_name">
+          <h1><a href="http://bpbp.iteye.com/">清炒苦瓜</a></h1>
+        </div>
+        <div id="fd"></div>
+        <div id="blog_navbar">
+          <ul>
+            <li class="blog_navbar_for"><a href="http://bpbp.iteye.com/"><strong>博客</strong></a></li>
+            <li><a href="http://bpbp.iteye.com/weibo">微博</a></li>
+            <li><a href="http://bpbp.iteye.com/album">相册</a></li>
+            <li><a href="http://bpbp.iteye.com/link">收藏</a></li>
+            <li><a href="http://bpbp.iteye.com/blog/guest_book">留言</a></li>
+            <li><a href="http://bpbp.iteye.com/blog/profile">关于我</a></li>
+          </ul>
+    
+          <div class="search">
+            <form action="http://bpbp.iteye.com/blog/search" method="get">
+              <input class="search_text" id="query" name="query" style="margin-left: 10px;width: 110px;" type="text" value="">
+              <input class="submit_search" type="submit" value="">
+            </form>
+          </div> 
+          <div id="fd"></div>         
+        </div>
+      </div>
+      
+      <div id="content" class="clearfix">
+        <div id="main">
+          
+
+
+
+          
+
+
+<div class="blog_main">
+  <div class="blog_title">
+    <h3>
+      <a href="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/Go基础学习  map - 清炒苦瓜 - ITeye技术网站.html">Go基础学习: map</a>
+      <em class="actions">      </em>
+    </h3>
+    <ul class="blog_categories"><strong>博客分类：</strong> <li><a href="http://bpbp.iteye.com/category/218773">golang</a></li> </ul>
+        <div class="news_tag"><a href="http://www.iteye.com/blogs/tag/go">go</a><a href="http://www.iteye.com/blogs/tag/golang">golang</a>&nbsp;</div>
+  </div>
+
+  <div id="blog_content" class="blog_content">
+    记录下Go的基础学习笔记，仅供自己参考，如果能帮到您，那是我的荣幸
+<br>
+<br>map，Go里面称之为映射，一种像脚本语言使用数组的方式
+<br>常规用法示例:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A100%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09fmt.Printf(%22%25d--%25d%5Cn%22%2C%20len(m)%2Cm%5B%22aa%22%5D)%3B%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>fmt.Printf(<span class="string">"%d--%d\n"</span><span>,&nbsp;len(m),m[</span><span class="string">"aa"</span><span>]);&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="0" title="Go基础学习: map">	m := map[string] int {
+		"aa":100,
+		"bb":100,
+		"cc":100,
+	}
+	fmt.Printf("%d--%d\n", len(m),m["aa"]);
+</pre>
+<br>输出:
+<br>3--100
+<br>
+<br>要注意的是，如果取一个不存在的索引，会返回对应类型零值:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A100%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09fmt.Printf(%22%25d%5Cn%22%2C%20m%5B%22xx%22%5D)%3B%2F%2F%E4%B8%8D%E5%AD%98%E5%9C%A8%EF%BC%8C%E8%AF%A5map%E5%AF%B9%E5%BA%94%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%98%AFint%EF%BC%8C%E6%89%80%E4%BB%A5%E8%BF%94%E5%9B%9Eint%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%9B%B6%E5%80%BC%3A0%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>fmt.Printf(<span class="string">"%d\n"</span><span>,&nbsp;m[</span><span class="string">"xx"</span><span>]);//不存在，该map对应的类型是int，所以返回int类型的零值:</span><span class="number">0</span><span>&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="1" title="Go基础学习: map">	m := map[string] int {
+		"aa":100,
+		"bb":100,
+		"cc":100,
+	}
+	fmt.Printf("%d\n", m["xx"]);//不存在，该map对应的类型是int，所以返回int类型的零值:0
+</pre>
+<br>输出:
+<br>0
+<br>
+<br>你可能就要问了，我们日常开发中，经常要检测有没有这个索引时，如何做啊？总不能判为0时，就表示不存在吧，因为有可能我的值就是0啊，放心，GO都想到了，这样即可:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A0%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09n%2C%20ok%20%3A%3D%20m%5B%22aa%22%5D%0A%09if%20ok%20%7B%0A%09%09fmt.Printf(%22found%20aa%3A%25d%20%5Cn%22%2Cn)%3B%0A%09%7Delse%7B%0A%09%09fmt.Printf(%22not%20found%20aa%20%5Cn%22)%3B%0A%09%7D%0A%09n%2C%20ok%20%3D%20m%5B%22xx%22%5D%0A%09if%20ok%20%7B%0A%09%09fmt.Printf(%22found%20xx%3A%25d%20%5Cn%22%2Cn)%3B%0A%09%7Delse%7B%0A%09%09fmt.Printf(%22not%20found%20xx%20%5Cn%22)%3B%0A%09%7D%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">0</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>n,&nbsp;ok&nbsp;:=&nbsp;m[<span class="string">"aa"</span><span>]&nbsp;&nbsp;</span></span></li><li><span>if&nbsp;ok&nbsp;{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"found&nbsp;aa:%d&nbsp;\n"</span><span>,n);&nbsp;&nbsp;</span></span></li><li><span>}else{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"not&nbsp;found&nbsp;aa&nbsp;\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>n,&nbsp;ok&nbsp;=&nbsp;m[<span class="string">"xx"</span><span>]&nbsp;&nbsp;</span></span></li><li><span>if&nbsp;ok&nbsp;{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"found&nbsp;xx:%d&nbsp;\n"</span><span>,n);&nbsp;&nbsp;</span></span></li><li><span>}else{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"not&nbsp;found&nbsp;xx&nbsp;\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="2" title="Go基础学习: map">	m := map[string] int {
+		"aa":0,
+		"bb":100,
+		"cc":100,
+	}
+	n, ok := m["aa"]
+	if ok {
+		fmt.Printf("found aa:%d \n",n);
+	}else{
+		fmt.Printf("not found aa \n");
+	}
+	n, ok = m["xx"]
+	if ok {
+		fmt.Printf("found xx:%d \n",n);
+	}else{
+		fmt.Printf("not found xx \n");
+	}
+</pre>
+<br>输出:
+<br>found aa:0
+<br>not found xx
+<br>
+<br>还有一种情况，我只想判断有没有存在，而不想取里面的值，可以吗？
+<br>可以的，这样即可:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A0%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09_%2C%20ok%20%3A%3D%20m%5B%22aa%22%5D%2F%2F%E4%BD%BF%E7%94%A8_%E8%A1%A8%E7%A4%BA%E4%B8%80%E4%B8%AA%E7%A9%BA%E7%99%BD%E6%A0%87%E8%AF%86%EF%BC%8C%E5%8F%AF%E4%BB%A5%E7%90%86%E8%A7%A3%E4%B8%BA%E6%94%BE%E5%BC%83%E8%BF%99%E4%B8%AA%E8%BF%94%E5%9B%9E%E5%80%BC%0A%09if%20ok%20%7B%0A%09%09fmt.Printf(%22found%20aa%5Cn%22)%3B%0A%09%7Delse%7B%0A%09%09fmt.Printf(%22not%20found%20aa%20%5Cn%22)%3B%0A%09%7D%0A%09_%2C%20ok%20%3D%20m%5B%22xx%22%5D%0A%09if%20ok%20%7B%0A%09%09fmt.Printf(%22found%20xx%5Cn%22)%3B%0A%09%7Delse%7B%0A%09%09fmt.Printf(%22not%20found%20xx%20%5Cn%22)%3B%0A%09%7D%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">0</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>_,&nbsp;ok&nbsp;:=&nbsp;m[<span class="string">"aa"</span><span>]//使用_表示一个空白标识，可以理解为放弃这个返回值&nbsp;&nbsp;</span></span></li><li><span>if&nbsp;ok&nbsp;{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"found&nbsp;aa\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}else{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"not&nbsp;found&nbsp;aa&nbsp;\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>_,&nbsp;ok&nbsp;=&nbsp;m[<span class="string">"xx"</span><span>]&nbsp;&nbsp;</span></span></li><li><span>if&nbsp;ok&nbsp;{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"found&nbsp;xx\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}else{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"not&nbsp;found&nbsp;xx&nbsp;\n"</span><span>);&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="3" title="Go基础学习: map">	m := map[string] int {
+		"aa":0,
+		"bb":100,
+		"cc":100,
+	}
+	_, ok := m["aa"]//使用_表示一个空白标识，可以理解为放弃这个返回值
+	if ok {
+		fmt.Printf("found aa\n");
+	}else{
+		fmt.Printf("not found aa \n");
+	}
+	_, ok = m["xx"]
+	if ok {
+		fmt.Printf("found xx\n");
+	}else{
+		fmt.Printf("not found xx \n");
+	}
+</pre>
+<br>输出:
+<br>found aa
+<br>not found xx
+<br>
+<br>定义完map后，还可以加值吗？可以的:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A0%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09m%5B%22xx%22%5D%20%3D%20111%0A%09fmt.Printf(%22%25d%5Cn%22%2C%20m%5B%22xx%22%5D)%3B%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">0</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>m[<span class="string">"xx"</span><span>]&nbsp;=&nbsp;</span><span class="number">111</span><span>&nbsp;&nbsp;</span></span></li><li><span>fmt.Printf(<span class="string">"%d\n"</span><span>,&nbsp;m[</span><span class="string">"xx"</span><span>]);&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="4" title="Go基础学习: map">	m := map[string] int {
+		"aa":0,
+		"bb":100,
+		"cc":100,
+	}
+	m["xx"] = 111
+	fmt.Printf("%d\n", m["xx"]);
+</pre>
+<br>输出:
+<br>111
+<br>
+<br>如何删除里map里面的某个索引及对应的值:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22aa%22%3A0%2C%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09m%5B%22xx%22%5D%20%3D%20111%0A%09delete(m%2C%22xx%22)%0A%09fmt.Printf(%22%25d%5Cn%22%2C%20m%5B%22xx%22%5D)%3B%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"aa"</span><span>:</span><span class="number">0</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>m[<span class="string">"xx"</span><span>]&nbsp;=&nbsp;</span><span class="number">111</span><span>&nbsp;&nbsp;</span></span></li><li><span>delete(m,<span class="string">"xx"</span><span>)&nbsp;&nbsp;</span></span></li><li><span>fmt.Printf(<span class="string">"%d\n"</span><span>,&nbsp;m[</span><span class="string">"xx"</span><span>]);&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="5" title="Go基础学习: map">	m := map[string] int {
+		"aa":0,
+		"bb":100,
+		"cc":100,
+	}
+	m["xx"] = 111
+	delete(m,"xx")
+	fmt.Printf("%d\n", m["xx"]);
+</pre>
+<br>输出:
+<br>0
+<br>
+<br>如何遍历map:
+<br><div class="dp-highlighter" id=""><div class="bar"><div class="tools">Go代码 <embed wmode="transparent" src="/javascripts/syntaxhighlighter/clipboard_new.swf" width="14" height="15" flashvars="clipboard=%09m%20%3A%3D%20map%5Bstring%5D%20int%20%7B%0A%09%09%22bb%22%3A100%2C%0A%09%09%22cc%22%3A100%2C%0A%09%7D%0A%09m%5B%22xx%22%5D%20%3D%20111%0A%09for%20k%2Cv%20%3A%3D%20range%20m%7B%0A%09%09fmt.Printf(%22%25s%3D%25d%5Cn%22%2Ck%2Cv)%3B%0A%09%7D%0A" quality="high" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;<a href="javascript:void()" title="收藏这段代码" onclick="code_favorites_do_favorite(this);return false;"><img class="star" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_star.png" alt="收藏代码"><img class="spinner" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/spinner.gif" style="display:none"></a></div></div><ol start="1" class="dp-default"><li><span><span>m&nbsp;:=&nbsp;map[string]&nbsp;int&nbsp;{&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"bb"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"cc"</span><span>:</span><span class="number">100</span><span>,&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li><li><span>m[<span class="string">"xx"</span><span>]&nbsp;=&nbsp;</span><span class="number">111</span><span>&nbsp;&nbsp;</span></span></li><li><span>for&nbsp;k,v&nbsp;:=&nbsp;range&nbsp;m{&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;fmt.Printf(<span class="string">"%s=%d\n"</span><span>,k,v);&nbsp;&nbsp;</span></span></li><li><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="go" style="display: none; " codeable_id="1500843" codeable_type="Blog" source_url="http://bpbp.iteye.com/blog/1500843" pre_index="6" title="Go基础学习: map">	m := map[string] int {
+		"bb":100,
+		"cc":100,
+	}
+	m["xx"] = 111
+	for k,v := range m{
+		fmt.Printf("%s=%d\n",k,v);
+	}
+</pre>
+<br>输出:
+<br>bb=100
+<br>cc=100
+<br>xx=111
+<br>
+<br>
+<br>
+  </div>
+
+  
+
+
+  <div>
+      <script type="text/javascript"><!--
+      google_ad_client = "ca-pub-1778456182083064";
+      google_ad_slot = "4680213081";
+      google_ad_width = 468;
+      google_ad_height = 60;
+      //--></script>
+      <script type="text/javascript" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/show_ads.js">
+      </script><ins style="display:inline-table;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:468px"><ins id="aswift_0_anchor" style="display:block;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:468px"><iframe width="468" height="60" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;"></iframe></ins></ins>
+    </div>
+  
+  <div id="bottoms" class="clearfix">
+    
+    <div id="share_weibo">分享到：
+      <a data-type="sina" href="javascript:;" title="分享到新浪微博"><img src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/sina.jpg"></a>
+      <a data-type="qq" href="javascript:;" title="分享到腾讯微博"><img src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/tec.jpg"></a>
+    </div>
+  </div>
+
+  <div class="blog_nav">
+    <div class="pre_next">
+      <a href="http://bpbp.iteye.com/blog/1501200" class="next" title="[转]Go基础学习: 控制语句，变量声明等">[转]Go基础学习: 控制语句，变量声明等</a>
+      |
+      <a href="http://bpbp.iteye.com/blog/1494962" class="pre" title="Go环境搭建(CentOS6.2 i386)">Go环境搭建(CentOS6.2 i386)</a>
+    </div>
+  </div>
+  <div class="blog_bottom">
+    <ul>
+      <li>2012-04-27 10:05</li>
+      <li>浏览 266</li>
+      <li><a href="http://bpbp.iteye.com/blog/1500843#comments">评论(0)</a></li>
+      
+      
+      <li>分类:<a href="http://www.iteye.com/blogs/category/language">编程语言</a></li>      
+      <li class="last"><a href="http://www.iteye.com/wiki/blog/1500843" target="_blank" class="more">相关推荐</a></li>
+    </ul>
+  </div>
+
+  <div class="blog_comment">
+    <h5>评论</h5>
+    <a id="comments" name="comments"></a>
+    
+    
+    
+  </div>
+
+  <div class="blog_comment">
+    <h5>发表评论</h5>
+            <p style="text-align:center; margin-top:30px;margin-bottom:0px;"><a href="http://bpbp.iteye.com/login" style="background-color:white;"> <img src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/login_icon.png" style="vertical-align:middle; margin-right: 10px;"></a><a href="http://bpbp.iteye.com/login">  您还没有登录,请您登录后再发表评论 </a></p>
+      </div>
+</div>
+
+
+<script type="text/javascript">
+  dp.SyntaxHighlighter.HighlightAll('code', true, true);
+
+  $$('#main .blog_content pre[name=code]').each(function(pre, index){ // blog content
+    var post_id = 1500843;
+    var location = window.location;
+    source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+    pre.writeAttribute('codeable_id', post_id);
+    pre.writeAttribute('codeable_type', "Blog");
+    pre.writeAttribute('source_url', source_url);
+    pre.writeAttribute('pre_index', index);
+    pre.writeAttribute('title', 'Go基础学习: map');
+  });
+
+  fix_image_size($$('div.blog_content img'), 700);
+
+  function processComment() {
+    $$('#main .blog_comment > div').each(function(comment){// comment
+      var post_id = comment.id.substr(2);
+      $$("#"+comment.id+" pre[name=code]").each(function(pre, index){
+        var location = window.location;
+        source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+        source_url += "#" + comment.id;
+        pre.writeAttribute('codeable_id', post_id);
+        pre.writeAttribute('codeable_type', "BlogComment");
+        pre.writeAttribute('source_url', source_url);
+        pre.writeAttribute('pre_index', index);
+        pre.writeAttribute('title', 'Go基础学习: map');
+      });
+    });
+  }
+
+  function quote_comment(id) {
+    new Ajax.Request('/editor/quote', {
+      parameters: {'id':id, 'type':'BlogComment'},
+      onSuccess:function(response){editor.bbcode_editor.textarea.insertAfterSelection(response.responseText);
+        Element.scrollTo(editor.bbcode_editor.textarea.element);}
+    });
+  }
+
+  code_favorites_init();
+  processComment();
+  new WeiboShare({share_buttons: $('share_weibo'), img_scope: $('blog_content')});
+</script>
+
+
+
+
+        </div>
+
+        <div id="local">
+          <div class="local_top"></div>
+          <div id="blog_owner">
+  <div id="blog_owner_logo"><a href="http://bpbp.iteye.com/"><img alt="balsampears的博客" class="logo" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/88c93aba-2db3-3b0a-a621-1c5ca220d909.jpg" title="balsampears的博客: 清炒苦瓜"></a></div>
+  <div id="blog_owner_name">balsampears</div>
+</div>
+
+          <div id="blog_actions">
+            <ul>
+              <li>浏览: 4539 次</li>
+              <li>性别: <img alt="Icon_minigender_1" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/icon_minigender_1.gif" title="男"></li>
+              
+              <li><img src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/offline.gif"></li>
+              
+            </ul>
+          </div>
+          <div id="user_visits" class="clearfix">
+            <h5>最近访客 <span style="font-weight:normal;font-size:12px;padding-left:30px;"><a href="http://bpbp.iteye.com/blog/user_visits">更多访客&gt;&gt;</a></span></h5>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://kicool.iteye.com/" target="_blank"><img alt="KICOOL的博客" class="logo" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/user-logo-thumb.gif" title="KICOOL的博客: "></a></div>
+                <div class="left"><a href="http://kicool.iteye.com/" target="_blank" title="KICOOL">KICOOL</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://njbble.iteye.com/" target="_blank"><img alt="njbble的博客" class="logo" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/user-logo-thumb.gif" title="njbble的博客: njbble"></a></div>
+                <div class="left"><a href="http://njbble.iteye.com/" target="_blank" title="njbble">njbble</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://wayne-chen.iteye.com/" target="_blank"><img alt="wayne_chen的博客" class="logo" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/user-logo-thumb.gif" title="wayne_chen的博客: "></a></div>
+                <div class="left"><a href="http://wayne-chen.iteye.com/" target="_blank" title="wayne_chen">wayne_chen</a></div>
+              </div>
+            
+              <div class="user_visit">
+                <div class="logo"><a href="http://yukaizhao.iteye.com/" target="_blank"><img alt="yukaizhao的博客" class="logo" src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/017ca1ce-0ff2-3f64-9a11-39861e2f2384-thumb.jpg" title="yukaizhao的博客: yukaizhao"></a></div>
+                <div class="left"><a href="http://yukaizhao.iteye.com/" target="_blank" title="yukaizhao">yukaizhao</a></div>
+              </div>
+            
+          </div>
+
+          
+
+                      <div id="blog_menu">
+              <h5>文章分类</h5>
+              <ul>
+                <li><a href="http://bpbp.iteye.com/">全部博客 (11)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/218773">golang (9)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/218774">php (1)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/218775">linux (0)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/218776">nosql (0)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/218777">c (1)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/228908">python (3)</a></li>
+                
+                  <li><a href="http://bpbp.iteye.com/category/245684">杂项 (1)</a></li>
+                
+              </ul>
+            </div>
+            <div id="month_blogs">
+              <h5>社区版块</h5>
+              <ul>
+                <li><a href="http://bpbp.iteye.com/blog/news">我的资讯</a> (0)</li>
+                <li>
+                  <a href="http://bpbp.iteye.com/blog/post">我的论坛</a> (0)
+                </li>
+                <li><a href="http://bpbp.iteye.com/blog/answered_problems">我的问答</a> (0)</li>
+              </ul>
+            </div>
+            <div id="month_blogs">
+              <h5>存档分类</h5>
+              <ul>
+                
+                  <li><a href="http://bpbp.iteye.com/blog/monthblog/2012-09">2012-09</a> (1)</li>
+                
+                  <li><a href="http://bpbp.iteye.com/blog/monthblog/2012-08">2012-08</a> (2)</li>
+                
+                  <li><a href="http://bpbp.iteye.com/blog/monthblog/2012-07">2012-07</a> (3)</li>
+                
+                <li><a href="http://bpbp.iteye.com/blog/monthblog_more">更多存档...</a></li>
+              </ul>
+            </div>
+            
+            
+
+            <div id="guest_books">
+              <h5>最新评论</h5>
+              <ul>
+                
+              </ul>
+            </div>
+
+            <div class="local_bottom"></div>
+          
+        </div>
+      </div>
+
+      <div id="footer" class="clearfix">
+        <div id="copyright">
+          <hr>
+          声明：ITeye文章版权属于作者，受法律保护。没有作者书面许可不得转载。若作者同意转载，必须以超链接形式标明文章原始出处和作者。<br>
+          © 2003-2012 ITeye.com.   All rights reserved.  [ 京ICP证110151号  京公网安备110105010620 ]
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+  document.write("<img src='http://stat.iteye.com/?url="+ encodeURIComponent(document.location.href) + "&referrer=" + encodeURIComponent(document.referrer) + "&user_id=' width='0' height='0' />");
+</script><img src="./Go基础学习  map - 清炒苦瓜 - ITeye技术网站_files/saved_resource" width="0" height="0">
+
+    
+    
+  
+
+</body></html>
