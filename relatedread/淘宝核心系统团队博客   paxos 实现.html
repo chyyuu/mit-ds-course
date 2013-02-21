@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)http://rdc.taobao.com/blog/cs/?p=162 -->
+<html lang="zh-CN"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>淘宝核心系统团队博客  | paxos 实现</title>
+
+<link rel="stylesheet" type="text/css" media="all" href="./淘宝核心系统团队博客   paxos 实现_files/style.css">
+<link rel="pingback" href="http://rdc.taobao.com/blog/cs/xmlrpc.php">
+<link rel="pingback" href="http://rdc.taobao.com/blog/cs/xmlrpc.php">
+
+
+<link rel="alternate" type="application/rss+xml" title="淘宝核心系统团队博客 » Feed" href="http://rdc.taobao.com/blog/cs/?feed=rss2">
+<link rel="alternate" type="application/rss+xml" title="淘宝核心系统团队博客 » 评论 Feed" href="http://rdc.taobao.com/blog/cs/?feed=comments-rss2">
+<link rel="alternate" type="application/rss+xml" title="淘宝核心系统团队博客 » paxos 实现 评论 Feed" href="http://rdc.taobao.com/blog/cs/?feed=rss2&p=162">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://rdc.taobao.com/blog/cs/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://rdc.taobao.com/blog/cs/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="夸父驱动造成内核panic的解决手记" href="http://rdc.taobao.com/blog/cs/?p=168">
+<link rel="next" title="Cassandra测试结果" href="http://rdc.taobao.com/blog/cs/?p=198">
+<meta name="generator" content="WordPress 3.5">
+<link rel="canonical" href="./淘宝核心系统团队博客   paxos 实现_files/淘宝核心系统团队博客   paxos 实现.html">
+<meta id="syntaxhighlighteranchor" name="syntaxhighlighter-version" content="3.1.3">
+
+<script type="text/javascript" async="" id="tb-beacon" exparams="category=&amp;userid=&amp;tid=&amp;channel=112&amp;&amp;stats_show=" src="./淘宝核心系统团队博客   paxos 实现_files/atp.js"></script><script type="text/javascript" async="" id="tb-beacon-ac" exparams="category=&amp;userid=&amp;channel=112&amp;&amp;stats_show=" src="./淘宝核心系统团队博客   paxos 实现_files/ac.js"></script></head>
+<body class="single single-post postid-162 single-format-standard col-2-right fixed title-paxos-%e5%ae%9e%e7%8e%b0 category-%e7%ae%97%e6%b3%95 tag-%e7%ae%97%e6%b3%95 author-duanfei browser-chrome">
+<script type="text/javascript">
+(function (d) {
+var ta=d.createElement("script");ta.type="text/javascript";ta.async=true;ta.id="tb-beacon";
+ta.setAttribute("exparams","category=&userid=&tid=&channel=112&&stats_show=");
+ta.src=("https:"==d.location.protocol?"https://s":"http://a")+".tbcdn.cn/s/atp.js";
+d.getElementsByTagName("head")[0].appendChild(ta);
+})(document);
+</script>
+
+<script type="text/javascript">
+(function (d) {
+var ta=d.createElement("script");ta.type="text/javascript";ta.async=true;ta.id="tb-beacon-ac";
+ta.setAttribute("exparams","category=&userid=&channel=112&&stats_show=");
+ta.src=("https:"==d.location.protocol?"https://s":"http://a")+".tbcdn.cn/s/ac.js";
+d.getElementsByTagName("head")[0].appendChild(ta);
+})(document);
+</script>
+
+
+ 
+ <!-- page -->
+ <div id="page">
+
+    <div id="page-ext">
+
+    <!-- header -->
+    <div id="header">
+      <div class="page-content">
+        <div id="site-title" class="clear-block">
+          <div id="logo"><a href="http://rdc.taobao.com/blog/cs">淘宝核心系统团队博客</a></div>          <div class="headline">基础   极致   分享</div>        </div>
+      </div>
+
+      <div class="shadow-left page-content">
+        <div class="shadow-right nav nav-main">
+          <div class="menu-menu-pages-container"><ul id="menu-menu-pages" class="menu fadeThis clear-block"><li class="home "><a href="http://rdc.taobao.com/blog/cs/" title="Home Page">Home<span class="p"></span></a></li><li class="page-%e6%8b%9b%e8%81%98%e4%bf%a1%e6%81%af"><a href="http://rdc.taobao.com/blog/cs/?page_id=419">招聘信息<span class="p"></span></a></li><li class="page-%e5%85%b3%e4%ba%8e"><a href="http://rdc.taobao.com/blog/cs/?page_id=2">淘宝核心系统团队介绍<span class="p"></span></a></li></ul></div>        </div>
+      </div>
+
+    </div>
+    <!-- /header -->
+
+    <!-- main -->
+    <div id="main" class="page-content">
+      <div id="main-ext" class="clear-block">
+
+  <!-- main content: primary + sidebar(s) -->
+  <div id="mask-3" class="clear-block">
+    <div id="mask-2">
+      <div id="mask-1">
+
+        <!-- primary content -->
+        <div id="primary-content">
+
+          
+          
+          
+          <div class="post-links clear-block">
+            <div class="alignleft">« <a href="http://rdc.taobao.com/blog/cs/?p=168" rel="prev">夸父驱动造成内核panic的解决手记</a></div>
+            <div class="alignright"><a href="http://rdc.taobao.com/blog/cs/?p=198" rel="next">Cassandra测试结果</a> »</div>
+          </div>
+
+          <!-- post -->
+          <div id="post-162" class="post-162 post type-post status-publish format-standard hentry category-28 tag-28 primary count-1 odd author-duanfei first">
+
+                        <h1 class="title">paxos 实现</h1>
+            
+            <div class="post-content clear-block">
+             <p>本文主要介绍zookeeper中zookeeper Server leader的选举，zookeeper在选举leader的时候采用了paxos算法(主要是fast paxos)，这里主要介绍其中两种：LeaderElection 和FastLeaderElection.</p>
+<h2><strong>我们先要清楚以下几点</strong></h2>
+<ul>
+<li>一个Server是如何知道其它的Server</li>
+</ul>
+<p><span id="more-162"></span><br>
+在zookeeper中,一个zookeeper集群有多少个Server是固定，每个Server用于选举的IP和PORT都在配置文件中</p>
+<ul>
+<li>除了IP和PORT能标识一个Server外，还有没有别的方法</li>
+</ul>
+<p>每一个Server都有一个数字编号，而且是唯一的，我们根据配置文件中的配置来对每一个Server进行编号，这一步在部署时需要人工去做，需要在存储数据文件的目录中创建一个文件叫myid的文件，并写入自己的编号,这个编号在处理我提交的value相同很有用</p>
+<ul>
+<li>成为Leader的必要条件</li>
+</ul>
+<p>获得n/2 + 1个Server同意(这里意思是n/2 + 1个Server要同意拥有zxid是所有Server最大的哪个Server)</p>
+<ul>
+<li>zookeeper中选举采用UDP还是TCP</li>
+</ul>
+<p>zookeeper中选举主要是采用UDP，也一种实现是采用TCP，在这里介绍的两种实现采用的是UDP</p>
+<ul>
+<li>zookeeper中有哪几种状态</li>
+</ul>
+<p>LOOKING 初始化状态</p>
+<p>LEADING&nbsp; 领导者状态</p>
+<p>FOLLOWING&nbsp; 跟随者状态</p>
+<ul>
+<li>如果所有zxid都相同(例如: 刚初始化时),此时有可能不能形成n/2+1个Server，怎么办</li>
+</ul>
+<p>zookeeper中每一个Server都有一个ID,这个ID是不重复的，而且按大小排序，如果遇到这样的情况时，zookeeper就推荐ID最大的哪个Server作为Leader</p>
+<ul>
+<li>zookeeper中Leader怎么知道Fllower还存活，Fllower怎么知道Leader还存活</li>
+</ul>
+<p>Leader定时向Fllower发ping消息，Fllower定时向Leader发ping消息，当发现Leader无法ping通时，就改变自己的状态(LOOKING)，发起新的一轮选举</p>
+<h2><strong>名词解释</strong></h2>
+<p>zookeeer Server： zookeeper中一个Server,以下简称Server</p>
+<p>zxid(zookeeper transtion id)： zookeeper 事务id，他是选举过程中能否成为leader的关键因素，它决定当前Server要将自己这一票投给谁(也就是我在选举过程中的value,这只是其中一个,还有id)</p>
+<p>myid/id(zookeeper server id)： zookeeper server id ，他也是能否成为leader的一个因素</p>
+<p>epoch/logicalclock：他主要用于描述leader是否已经改变,每一个Server中启动都会有一个epoch,初始值为0,当 开始新的一次选举时epoch加1,选举完成时  epoch加1。</p>
+<p>tag/sequencer：消息编号</p>
+<p>xid：随机生成的一个数字，跟epoch功能相同</p>
+<h2>Fast Paxos消息流向图与Basic Paxos的对比</h2>
+<h3>消息流向图</h3>
+<ul>
+<li>basic paxos 消息流向图</li>
+</ul>
+<pre>Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X--------&gt;|          |  |  |       |  |  Request
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(N)//向所有Server提议
+   |         |&lt;---------X--X--X       |  |  Promise(N,{Va,Vb,Vc})//向提议人回复是否接受提议(如果不接受回到上一步)
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(N,Vn)//向所有人发送接受提议消息
+   |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(N,Vn)//向提议人回复自己已经接受提议)
+   |&lt;---------------------------------X--X  Response
+   |         |          |  |  |       |  |
+</pre>
+<ul>
+<li>fast paxos消息流向图</li>
+</ul>
+<p>没有冲突的选举过程</p>
+<pre>Client    Leader         Acceptor      Learner
+   |         |          |  |  |  |       |  |
+   |         X---------&gt;|-&gt;|-&gt;|-&gt;|       |  |  Any(N,I,Recovery)
+   |         |          |  |  |  |       |  |
+   X-------------------&gt;|-&gt;|-&gt;|-&gt;|       |  |  Accept!(N,I,W)//向所有Server提议，所有Server收到消息后，接受提议
+   |         |&lt;---------X--X--X--X------&gt;|-&gt;|  Accepted(N,I,W)//向提议人发送接受提议的消息
+   |&lt;------------------------------------X--X  Response(W)
+   |         |          |  |  |  |       |  |
+</pre>
+<h2><strong>第一种实现: LeaderElection </strong></h2>
+<p>LeaderElection是Fast paxos最简单的一种实现，每个Server启动以后都询问其它的Server它要投票给谁，收到所有Server回复以后，就计算出zxid最大的哪个Server，并将这个Server相关信息设置成下一次要投票的Server<strong> </strong></p>
+<p><strong><br>
+</strong></p>
+<p>每个Server都有一个response线程和选举线程,我们先看一下每个线程是做一些什么事情</p>
+<h3>response线程</h3>
+<p>它主要功能是被动的接受对方法的请求，并根据当前自己的状态作出相应的回复，每次回复都有自己的Id，以及xid，我们根据他的状态来看一看他都回复了哪些内容</p>
+<p>LOOKING状态：</p>
+<p>自己要推荐的Server相关信息(id,zxid)</p>
+<p>LEADING状态</p>
+<p>myid,上一次推荐的Server的id</p>
+<p>FLLOWING状态:</p>
+<p>当前Leader的id，以及上一次处理的事务ID(zxid)</p>
+<h3>选举线程</h3>
+<p>选举线程由当前Server发起选举的线程担任，他主要的功能对投票结果进行统计，并选出推荐的Server。选举线程首先向所有Server发起一次询问(包括自己)，被询问方，根据自己当前的状态作相应的回复，选举线程收到回复后，验证是否是自己发起的询问(验证 xid是否一致)，然后获取对方的id(myid)，并存储到当前询问对象列表中，最后获取对方提议的leader相关信息(id,zxid)，并将这些 信息存储到当次选举的投票记录表中，当向所有Server都询问完以后，对统计结果进行筛选并进行统计，计算出当次询问后获胜的是哪一个 Server，并将当前zxid最大的Server设置为当前Server要推荐的Server(有可能是自己，也有可以是其它的Server，根据投票 结果而定，但是每一个Server在第一次投票时都会投自己)，如果此时获胜的Server获得n/2 + 1的Server票数，  设置当前推荐的leader为获胜的Server，将根据获胜的Server相关信息设置自己的状态。每一个Server都重复以上流程，直到选出 leader</p>
+<p>了解每个线程的功能以后，我们来看一看选举过程</p>
+<ul>
+<li>选举过程中，Server的加入</li>
+</ul>
+<p>当一个Server启动时它都会发起一次选举，此时由选举线程发起相关流程，那么每个Server都会获得当前zxid最大的哪个Server是谁，如果当次最大的Server没有获得n/2+1个票数，那么下一次投票时，他将向zxid最大的Server投票，重复以上流程，最后一定能选举出一个Leader</p>
+<ul>
+<li>选举过程中，Server的退出</li>
+</ul>
+<p>只要保证n/2+1个Server存活就没有任何问题，如果少于n/2+1个Server存活就没办法选出Leader</p>
+<ul>
+<li>选举过程中，Leader死亡</li>
+</ul>
+<p>当选举出Leader以后，此时每个Server应该是什么状态(FLLOWING)都已经确定，此时由于Leader已经死亡我们就不管它，其它的Fllower按正常的流程继续下去，当完成这个流程以后，所有的Fllower都会向Leader发送Ping消息，如果无法ping通，就改变自己的状态为(FLLOWING ==&gt; LOOKING)，发起新的一轮选举</p>
+<ul>
+<li>选举完成以后，Leader死亡</li>
+</ul>
+<p>这个过程的处理跟选举过程中Leader死亡处理方式一样，这里就不再描述</p>
+<h2><strong>第二种实现: FastLeaderElection </strong></h2>
+<p>fastLeaderElection是标准的fast paxos的实现，它首先向所有Server提议自己要成为leader，当其它Server收到提议以后，解决epoch和zxid的冲突，并接受对方的提议，然后向对方发送接受提议完成的消息<strong><br>
+</strong></p>
+<h3><strong>数据结构<br>
+</strong></h3>
+<p>本地消息结构：</p>
+<p>static public class Notification {<br>
+long leader;&nbsp; //所推荐的Server id</p>
+<p>long zxid;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //所推荐的Server的zxid(zookeeper transtion id)</p>
+<p>long epoch;&nbsp;&nbsp; //描述leader是否变化(每一个Server启动时都有一个logicalclock，初始值为0)</p>
+<p>QuorumPeer.ServerState state;&nbsp;&nbsp; //发送者当前的状态<br>
+InetSocketAddress addr;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //发送者的ip地址<br>
+}</p>
+<p>网络消息结构：</p>
+<p>static public class ToSend {</p>
+<p>int type;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //消息类型<br>
+long leader;&nbsp; //Server id<br>
+long zxid;&nbsp;&nbsp;&nbsp;&nbsp; //Server的zxid<br>
+long epoch;&nbsp; //Server的epoch<br>
+QuorumPeer.ServerState state; //Server的state<br>
+long tag;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //消息编号</p>
+<p>InetSocketAddress addr;</p>
+<p>}</p>
+<h3><strong>Server具体的实现</strong></h3>
+<p>每个Server都一个接收线程池(3个线程)和一个发送线程池  (3个线程),在没有发起选举时，这两个线程池处于阻塞状态，直到有消息到来时才解除阻塞并处理消息，同时每个Server都有一个选举线程(可以发起  选举的线程担任)；我们先看一下每个线程所做的事情，如下：</p>
+<p><strong>被动接收消息端(接收线程池)的处理:</strong></p>
+<p>notification： 首先检测当前Server上所被推荐的zxid,epoch是否合法(currentServer.epoch &lt;= currentMsg.epoch &amp;&amp; (currentMsg.zxid &gt; currentServer.zxid || (currentMsg.zxid == currentServer.zxid &amp;&amp; currentMsg.id &gt; currentServer.id))) 如果不合法就用消息中的zxid,epoch,id更新当前Server所被推荐的值，此时将收到的消息转换成Notification消息放入接收队列中，将向对方发送ack消息</p>
+<p>ack:&nbsp;&nbsp; 将消息编号放入ack队列中，检测对方的状态是否是LOOKING状态，如果不是说明此时已经有Leader已经被选出来，将接收到的消息转发成Notification消息放入接收对队列</p>
+<p><strong>主动发送消息端(发送线程池)的处理:</strong></p>
+<p>notification: 将要发送的消息由Notification消息转换成ToSend消息，然后发送对方，并等待对方的回复,如果在等待结束没有收到对方法回复，重做三次,如果重做次还是没有收到对方的回复时检测当前的选举(epoch)是否已经改变，如果没有改变，将消息再次放入发送队列中，一直重复直到有Leader选出或者收到对方回复为止</p>
+<p>ack: 主要将自己相关信息发送给对方</p>
+<p><strong>主动发起选举端(选举线程)的处理:</strong></p>
+<p>首先自己的epoch 加1，然后生成notification消息,并将消息放入发送队列中，系统中配置有几个Server就生成几条消息，保证每个Server都能收到此消息,如果当前Server的状态是LOOKING就一直循环检查接收队列是否有消息，如果有消息，根据消息中对方的状态进行相应的处理。</p>
+<p>LOOKING状态:</p>
+<p>首先检测消息中epoch是否合法，是否比当前Server的大,如果比较当前Server的epoch大时，更新epoch，检测是消息中的zxid,id是否比当前推荐的Server大，如果是更新相关值，并新生成notification消息放入发关队列，清空投票统计表； 如果消息小的epoch则什么也不做； 如果相同检测消息中zxid,id是否合法,如果消息中的zxid，id大，那么更新当前Server相关信息，并新生成notification消息放入发送队列，将收到的消息的IP和投票结果放入统计表中，并计算统计结果，根据结果设置自己相应的状态</p>
+<p>LEADING状态:</p>
+<p>将收到的消息的IP和投票结果放入统计表中(这里的统计表是独立的)，并计算统计结果，根据结果设置自己相应的状态</p>
+<p>FOLLOWING状态:</p>
+<p>将收到的消息的IP和投票结果放入统计表中(这里的统计表是独立的)，并计算统计结果，根据结果设置自己相应的状态</p>
+<p>了解每个线程的功能以后，我们来看一看选举过程,选举过程跟第一程一样</p>
+<ul>
+<li>选举过程中，Server的加入</li>
+</ul>
+<p>当一个Server启动时它都会发起一次选举，此时由选举线程发起相关流程，通过将自己的zxid和epoch告诉其它Server，最后每个Server都会得zxid值最大的哪个Server的相关信息，并且在下一次投票时就投zxid值最大的哪个Server，重复以上流程，最后一定能选举出一个Leader</p>
+<ul>
+<li>选举过程中，Server的退出</li>
+</ul>
+<p>只要保证n/2+1个Server存活就没有任何问题，如果少于n/2+1个Server存活就没办法选出Leader</p>
+<ul>
+<li>选举过程中，Leader死亡</li>
+</ul>
+<p>当选举出Leader以后，此时每个Server应该是什么状态 (FLLOWING)都已经确定，此时由于Leader已经死亡我们就不管它，其它的Fllower按正常的流程继续下去，当完成这个流程以后，所有的 Fllower都会向Leader发送Ping消息，如果无法ping通，就改变自己的状态为(FLLOWING ==&gt;  LOOKING)，发起新的一轮选举</p>
+<ul>
+<li>选举完成以后，Leader死亡</li>
+</ul>
+<p>这个过程的处理跟选举过 程中Leader死亡处理方式一样，这里就不再描述</p>
+            </div>
+
+            
+                        <div class="post-tags clear-block">
+              <a href="http://rdc.taobao.com/blog/cs/?tag=%e7%ae%97%e6%b3%95" rel="tag">算法</a>            </div>
+            
+
+            
+            <div class="post-meta">
+
+              <div class="details">
+                <p>
+                This entry was posted by <a href="http://rdc.taobao.com/blog/cs/?author=3" title="Posts by 段飞 ">段飞</a> on 2010年06月2日 at 17:31, and is filed under <a href="http://rdc.taobao.com/blog/cs/?cat=28" title="查看 算法 中的全部文章" rel="category">算法</a>. Follow any responses to this post through <a href="http://rdc.taobao.com/blog/cs/?feed=rss2&p=162" title="RSS 2.0">RSS 2.0</a>.
+                You can <a href="http://rdc.taobao.com/blog/cs/?p=162#commentform">leave a response</a> or <a href="http://rdc.taobao.com/blog/cs/wp-trackback.php?p=162" rel="trackback">trackback</a> from your own site.                </p>
+               </div>
+
+            </div>
+            
+            <div class="controls">
+                          </div>
+
+          </div>
+          <!-- /post -->
+
+          
+          
+
+<h3 class="title">
+  27 comments</h3>
+
+<ul id="comments">
+  
+<!-- comment entry -->
+<li>
+  <div id="comment-77" class="comment even thread-even depth-1 clear-block with-avatars reader name-aoxiang_bin">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/7148679df52e21a0193243640d5051ff" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">aoxiang_bin</span> <span class="d">(987 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-77">
+       <div class="comment-content clear-block" id="comment-content-77">
+
+         
+         <div class="comment-text">
+           <p>很赞！有时间看看。o(∩_∩)o</p>
+         </div>
+
+         <a id="comment-reply-77"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=77#respond" onclick="return addComment.moveForm(&quot;comment-content-77&quot;, &quot;77&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-179" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90-paxos%e7%9a%84%e7%81%b5%e9%ad%82-trend-micro-cdc-spn-team">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.spnguru.com/?p=232" rel="external nofollow" class="url">Zookeeper全解析——Paxos的灵魂 | Trend Micro CDC SPN Team</a></span> <span class="d">(923 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-179">
+       <div class="comment-content clear-block" id="comment-content-179">
+
+         
+         <div class="comment-text">
+           <p>[...] 又一个问题产生了，总统怎么选出来的？oh, my god! It’s a long story. 在淘宝核心系统团队的Blog上面有一篇文章是介绍如何选出总统的，有兴趣的可以去看看：http://rdc.taobao.com/blog/cs/?p=162 [...]</p>
+         </div>
+
+         <a id="comment-reply-179"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=179#respond" onclick="return addComment.moveForm(&quot;comment-content-179&quot;, &quot;179&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-694" class="comment even thread-even depth-1 clear-block with-avatars reader name-%e6%98%86%e4%bb%91">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/02055d3f3e44a4a6e0006162045ae3cd" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.searchtb.com/" rel="external nofollow" class="url">昆仑</a></span> <span class="d">(778 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-694">
+       <div class="comment-content clear-block" id="comment-content-694">
+
+         
+         <div class="comment-text">
+           <p>在研究代码时发现了这篇文章,写的很到位,已经在自己的文章中引用了这篇文章,赞下</p>
+         </div>
+
+         <a id="comment-reply-694"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=694#respond" onclick="return addComment.moveForm(&quot;comment-content-694&quot;, &quot;694&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-715" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-%e5%a4%a7%e8%b1%a1%e6%a3%ae%e6%9e%97">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.huaxionline.info/2011/01/zookeeper-research/" rel="external nofollow" class="url">Zookeeper研究和应用 « 大象|森林</a></span> <span class="d">(777 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-715">
+       <div class="comment-content clear-block" id="comment-content-715">
+
+         
+         <div class="comment-text">
+           <p>[...] 介绍完了Paoxs算法, 分布式选举几乎是顺理成章的, 因为分布式选举不过是Paoxs算法的一次或者若干次执行, 所不同的只是proposal内容为:”谁是Leader”.下面这两个图解释了zookeeper集群在正常工作和选举时各个节点状态的异同:  zookeeper采用org.apache.zookeeper.server.quorum.FastLeaderElection作为其缺省选举算法,关于这个算法的具体执行流程可以参考淘宝核心系统段飞同学的文章“paxos 实现”.或者也可以直接阅读源代码. zookeeper源代码量不大,结构清晰,注释充分,阅读体验超好~ 我就不在这里越俎代庖了. [...]</p>
+         </div>
+
+         <a id="comment-reply-715"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=715#respond" onclick="return addComment.moveForm(&quot;comment-content-715&quot;, &quot;715&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-774" class="pingback even thread-even depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-webguo%e7%9a%84%e7%a7%91%e6%8a%80%e5%8d%9a%e5%ae%a2">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.webguo.com/2011/01/18/zookeeper_intro.html" rel="external nofollow" class="url">Zookeeper研究和应用 - webguo的科技博客</a></span> <span class="d">(764 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-774">
+       <div class="comment-content clear-block" id="comment-content-774">
+
+         
+         <div class="comment-text">
+           <p>[...] Zookeeper研究和应用  January 18th, 2011  发表评论 阅读评论    zookeeper简介zookeeper是一个开源分布式的服务,它提供了分布式协作,分布式同步,配置管理等功能. 其实现的功能与google的chubby基本一致.zookeeper的官方网站已经写了一篇非常经典的概述性文章,请大家参阅:ZooKeeper: A Distributed Coordination Service for Distributed Applications在此我仅花少量笔墨介绍下本文相关的内容。在zookeeper的集群中，各个节点共有下面3种角色和4种状态：角色：leader,follower,observer状态：leading,following,observing,looking除了observer和observing之外,其它的角色和状态与下面将要介绍的Paoxs算法中的角色与状态一一对应,我们将在下文中具体描述.observer是zookeeper-3.3版本新添加的一个角色,在这里有相关的介绍. 他们的引入是为了解决zookeeper集群扩大后,由于网络可靠性下降可能导致的拜占庭将军问题. observer的行为在大多数情况下与follower完全一致, 但是他们不参加选举和投票, 而仅仅接受(observing)选举和投票的结果.zookeeper实现了一个层次名字空间(hierarchal name space)的数据模型, 它特别象一个文件系统, 每个文件被称为znode, 一个znode除了自己包含一些数据外,还能拥有孩子节点.存在下述的3种类型znode:Persistent Nodes: 永久有效地节点,除非client显式的删除,否则一直存在Ephemeral Nodes: 临时节点,仅在创建该节点client保持连接期间有效,一旦连接丢失,zookeeper会自动删除该节点Sequence Nodes: 顺序节点,client申请创建该节点时,zk会自动在节点路径末尾添加递增序号,这种类型是实现分布式锁,分布式queue等特殊功能的关键Zookeeper Watch&nbsp;定义如下:A watch event is one-time trigger, sent to the client that set the watch, which occurs when the data for which the watch was set changes.在我看来,watch可以理解为一个分布式的回调,当client关心的znodes发生变化时,zookeeper将会把消息传回到client,并导致client的消息处理函数得到调用.zk的任何一个读操作都能够设置watch,例如:getData(), getChildren(),and&nbsp;exists()可以watch的event包括如下的二种:KeeperState:Disconnected,SyncConnected,ExpiredEventType:None,NodeCreated,NodeDeleted,NodeDataChanged,NodeChildrenChanged这些状态是很容易理解的. watch的实现只言片语没法说清楚,后面我可能会专门写一篇文章讲述这个实现.Paoxs算法说到zookeeper,我们不得不提起Paoxs算法和Lesile Lamport.Paoxs算法是zookeeper的灵魂,这个算法是Leslie Lamport在1990年提出的一种基于消息传递的一致性算法.Paxos 算法解决的问题是一个分布式系统如何就某个值（决议）达成一致。一个典型的场景就是:”在zookeeper cluster中谁是leader?”。该算法由Leslie于1990年在文章The Part-Time Parliament中首次提出,但是这篇文章相当的晦涩难懂(也有一些轶事,可以看文章链接中Leslie自己写的内容),于是,Lesilie在2001年写下了Paxos Made Simple.他对此解释道:At the PODC 2001 conference, I got tired of everyone saying how difficult it was to understand the Paxos algorithm, published in [122]. Although people got so hung up in the pseudo-Greek names that they found the paper hard to understand, the algorithm itself is very simple. So, I cornered a couple of people at the conference and explained the algorithm to them orally, with no paper. When I got home, I wrote down the explanation as a short note, which I later revised based on comments from Fred Schneider and Butler Lampson. The current version is 13 pages long, and contains no formula more complicated than n1 &gt; n2.Paxos Made Simple的abstract只有一句话:The Paxos algorithm, when presented in plain English, is very simple.可见这位Lamport老兄是多么的有意思. 顺便说一句,这位老哥就是LaTex中的”La”.在上文中是这样描述Paoxs算法执行过程的:Phase 1.(a)&nbsp;A proposer selects a proposal number n and sends a prepare request with number n to a majority of acceptors.(b)&nbsp;If an acceptor receives a prepare request with number n greater than that of any prepare request to which it has already responded, then it responds to the request with a promise not to accept any more proposals numbered less than n and with the highest-numbered proposal (if any) that it has accepted.Phase 2.(a)&nbsp;If the proposer receives a response to its prepare requests (numbered n) from a majority of acceptors, then it sends an accept request to each of those acceptors for a proposal numbered n with a value v, where v is the value of the highest-numbered proposal among the responses, or is any value if the responses reported no proposals.(b)&nbsp;If an acceptor receives an accept request for a proposal numbered n, it accepts the proposal unless it has already responded to a prepare request having a number greater than n.这几乎就是Paxos的全部了.具体的执行过程举例可以在Zookeeper全解析——Paxos作为灵魂中找到,在此不再赘述.Zookeeper完全实现了Paoxs算法,zk cluster中每个节点都保持了一份完整的数据模型,当任何一个client通过某集群节点向集群发起读写请求时,该节点会向Leader节点发出投票请求,如果投票通过(超过一半节点同意)则该请求被执行,否则该请求被驳回. 通过paoxs算法,zookeeper的保持了数据模型的一致性,同时保持了任何操作的原子性.分布式选举介绍完了Paoxs算法, 分布式选举几乎是顺理成章的, 因为分布式选举不过是Paoxs算法的一次或者若干次执行, 所不同的只是proposal内容为:”谁是Leader”.下面这两个图解释了zookeeper集群在正常工作和选举时各个节点状态的异同:zookeeper状态示意图zookeeper采用org.apache.zookeeper.server.quorum.FastLeaderElection作为其缺省选举算法,关于这个算法的具体执行流程可以参考淘宝核心系统段飞同学的文章“paxos 实现”.或者也可以直接阅读源代码. zookeeper源代码量不大,结构清晰,注释充分,阅读体验超好~ 我就不在这里越俎代庖了.zookeeper应用拥有了zookeeper如此强大的分布式协作系统后,我们可以很容易的实现大量的分布式应用,包括了分布式锁,分布式队列,分布式Barrier,双阶段提交等等. 这些应用可以帮我们改进很多复杂系统的协作方式,将这些系统的实现变得更加优雅而高效.鉴于篇幅,本文仅介绍分布式锁的实现.利用了前文提到的sequence nodes可以非常容易的实现分布式锁. 实现分布式锁的基本步骤如下(这些步骤需要在所有需要锁的客户端执行):client调用create()创建名为”_locknode_/lock-”的节点,注意需要设置sequence和ephemeral属性client调用getChildren(“_locknode_”),注意不能设置watch,这样才能避免羊群效应如果步骤1中创建的节点序号最低,则该client获得锁,开始执行其它程序client对lock-xxx中序号仅次于自己创建节点的那个节点调用exists(),并设置watch如果exist()返回false(节点不存在)则回到步骤2,否则等待步骤4中的watch被触发并返回步骤2分布式锁在zookeeper的源代码中已经有实现,可以参考org.apache.zookeeper.recipes.lock下面是一个使用分布式锁的样例,这段程序摘自一个hadoop reduce的configure函数, 使用分布式锁的目的是确保一台机器上的所有reduce进程中,只有一个reduce进程会执行某些初始化代码. 同时其它reduce在总和初始化完成之前不会继续执行. class zkWatcher implements Watcher { //watch回调函数 public void process(WatchedEvent event) { if (event.getType() == EventType.NodeCreated) { if (event.getPath() == "balbalbal.init_done" //如果回调信息是节点创建,且创建的节点是init成功节点,则触发latch gcihInitLatch.countDown(); } else if (event.getState() == KeeperState.SyncConnected) { //server连接成功,触发连接成功latch zkConnectedLatch.countDown(); } } } public void configure(String conf) { try { //zookeeper服务器列表,节点间用,分隔 String keepers = "zk_server0:port,zk_server1:port,zk_server2:port"; String Init_Done = "/full-dump-gcih/" + InetAddress.getLocalHost().getHostName() + ".init_done"; String HostName = InetAddress.getLocalHost().getHostName(); // 初始化一个Watch zkWatcher zkw = new zkWatcher(); //异步创建连接, 并设置zkw为watch回调 ZooKeeper zk = new ZooKeeper(keepers, 5000, zkw); //等待zookeeper创建连接成功 zkConnectedLatch.await(); //创建分布式锁 WriteLock gcih_lock = new WriteLock(zk, "/full-dump-gcih/" + HostName, null); //检测初始化成功标识是否存在,并设置watch if (null == zk.exists(Init_Done, true)) { // if the init_done node not exists we try to init if (gcih_lock.lock()) { //获取锁成功,初始化数据 initializeData(conf); //创建初始化成功标识,注意这个标志是永久节点 zk.create(Init_Done, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT); //工作完成,释放锁 gcih_lock.unlock(); } else { //未获取锁,说明已经有reduce在做初始化了,释放锁 gcih_lock.unlock(); if (!gcihInitLatch.await(30, TimeUnit.MINUTES)) throw new IOException( "Init UDP time out, critical error"); else { //latch成功返回,说明the one 初始化成功了 initializeData(null); } } } else {// if init_done exists we simply load data from gcih initializeData(null); } } catch (Exception e) { ….. } }多个reduce分别获取锁后,加锁节点的子节点信息如下所示[zk: localhost:2181(CONNECTED) 31] ls /full-dump-gcih/xxxxx.cm2[x-84692699318388014-0000000001, x-84692699318387993-0000000000]这些节点全部是Sequence+Ephemeral 属性的节点, 其中x-84692699318388014-000000000name-zk_session_id-sequence_number这个节点名称是org.apache.zookeeper.recipes.lock中使用的名称,可以根据需要自己重新实现相关代码,进而设计一个专用的锁.关于Zookeeper更多的应用请参阅ZooKeeper Recipes and Solutions    分类:  系统架构  标签:  architecture&nbsp; large-scale&nbsp;    相关文章 [...]</p>
+         </div>
+
+         <a id="comment-reply-774"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=774#respond" onclick="return addComment.moveForm(&quot;comment-content-774&quot;, &quot;774&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-782" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-%e6%90%9c%e7%b4%a2%e6%8a%80%e6%9c%af%e5%8d%9a%e5%ae%a2%ef%bc%8d%e6%b7%98%e5%ae%9d">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.searchtb.com/2011/01/zookeeper-research.html" rel="external nofollow" class="url">Zookeeper研究和应用 « 搜索技术博客－淘宝</a></span> <span class="d">(758 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-782">
+       <div class="comment-content clear-block" id="comment-content-782">
+
+         
+         <div class="comment-text">
+           <p>[...] zookeeper采用org.apache.zookeeper.server.quorum.FastLeaderElection作为其缺省选举算法,关于这个算法的具体执行流程可以参考淘宝核心系统段飞同学的文章“paxos 实现”.或者也可以直接阅读源代码. zookeeper源代码量不大,结构清晰,注释充分,阅读体验超好~ 我就不在这里越俎代庖了. [...]</p>
+         </div>
+
+         <a id="comment-reply-782"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=782#respond" onclick="return addComment.moveForm(&quot;comment-content-782&quot;, &quot;782&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-846" class="comment even thread-even depth-1 clear-block with-avatars reader name-herry">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/6c0fa267d9b8042529200eb90c5f72f1" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://xn--5tzm5g/" rel="external nofollow" class="url">herry</a></span> <span class="d">(728 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-846">
+       <div class="comment-content clear-block" id="comment-content-846">
+
+         
+         <div class="comment-text">
+           <p>问题1：<br>
+xid：随机生成的一个数字，跟epoch功能相同<br>
+为什么需要xid和epoch才能确定leader是否发生了变化?<br>
+问题2：<br>
+当向所有Server都询问完以后，对统计结果进行筛选并进行统计，计算出当次询问后获胜的是哪一个 Server，并将当前zxid最大的Server设置为当前Server要推荐的Server(有可能是自己，也有可以是其它的Server，根据投票 结果而定，但是每一个Server在第一次投票时都会投自己)，如果此时获胜的Server获得n/2 + 1的Server票数， 设置当前推荐的leader为获胜的Server，将根据获胜的Server相关信息设置自己的状态。每一个Server都重复以上流程，直到选出 leader</p>
+<p>描述中zxid是如何生成的？<br>
+这里有点不太明白的是，是否获得n/2+1票数的Server一定是zxid最大的Server？另外最后一句，为什么每个Server都需要重复以上流程？</p>
+         </div>
+
+         <a id="comment-reply-846"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=846#respond" onclick="return addComment.moveForm(&quot;comment-content-846&quot;, &quot;846&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-869" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e7%ae%80%e4%bb%8b%e4%b8%8e%e5%ae%89%e8%a3%85-%e6%b0%b8%e6%97%a0%e6%ad%a2%e5%a2%83">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://syncall.wordpress.com/2011/03/05/zookeeper%e7%ae%80%e4%bb%8b%e4%b8%8e%e5%ae%89%e8%a3%85/" rel="external nofollow" class="url">Zookeeper简介与安装 « 永无止境</a></span> <span class="d">(715 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-869">
+       <div class="comment-content clear-block" id="comment-content-869">
+
+         
+         <div class="comment-text">
+           <p>[...] paxos 实现 [...]</p>
+         </div>
+
+         <a id="comment-reply-869"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=869#respond" onclick="return addComment.moveForm(&quot;comment-content-869&quot;, &quot;869&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-965" class="comment even thread-even depth-1 clear-block with-avatars reader name-roger">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/40643c82d9c6318357aba33ff37d9d99" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://xn--5tzm5g/" rel="external nofollow" class="url">Roger</a></span> <span class="d">(664 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-965">
+       <div class="comment-content clear-block" id="comment-content-965">
+
+         
+         <div class="comment-text">
+           <p>博主,”第一种实现”中的”Response”线程中的”FOLLOWING状态”有错别字</p>
+         </div>
+
+         <a id="comment-reply-965"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=965#respond" onclick="return addComment.moveForm(&quot;comment-content-965&quot;, &quot;965&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-1167" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-jacobs-wu">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/d0e0d96850c0fd51a754017eeefdce09" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://blog.sina.com.cn/u/1793692835" rel="external nofollow" class="url">Jacobs Wu</a></span> <span class="d">(595 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-1167">
+       <div class="comment-content clear-block" id="comment-content-1167">
+
+         
+         <div class="comment-text">
+           <p>调研代码受益于本文，感谢。我增加了FastLeaderElection分析和时序图，请参考我的博客：http://blog.sina.com.cn/u/1793692835</p>
+         </div>
+
+         <a id="comment-reply-1167"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=1167#respond" onclick="return addComment.moveForm(&quot;comment-content-1167&quot;, &quot;1167&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-1336" class="pingback even thread-even depth-1 clear-block with-avatars reader name-zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90-paxos%e4%bd%9c%e4%b8%ba%e7%81%b5%e9%ad%82-web%e5%bc%80%e5%8f%91">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.w3ccollege.org/index/zookeeper-full-resolution-paxos-as-the-soul.html" rel="external nofollow" class="url">Zookeeper全解析——Paxos作为灵魂 | web开发</a></span> <span class="d">(572 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-1336">
+       <div class="comment-content clear-block" id="comment-content-1336">
+
+         
+         <div class="comment-text">
+           <p>[...] 又一个问题产生了，总统怎么选出来的？oh, my god! It’s a long story. 在淘宝核心系统团队的Blog上面有一篇文章是介绍如何选出总统的，有兴趣的可以去看看：http://rdc.taobao.com/blog/cs/?p=162 [...]</p>
+         </div>
+
+         <a id="comment-reply-1336"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=1336#respond" onclick="return addComment.moveForm(&quot;comment-content-1336&quot;, &quot;1336&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-1597" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-coffeebearit">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/87f7aaed3785ee5eb00e9eee11c71df9" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://xn--5tzm5g/" rel="external nofollow" class="url">coffeeBearIT</a></span> <span class="d">(541 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-1597">
+       <div class="comment-content clear-block" id="comment-content-1597">
+
+         
+         <div class="comment-text">
+           <p>有个问题请教：fast paxos算法是有coordinator角色的，在fastLeaderElection本身就是选leader，这个coordinator的角色在代码中体现在哪里呢？<br>
+另外，一个关于paxos算法的问题，classic paxos用leader来防止活锁，但是到了fast paxos却允许proposer绕过leader直接提案，那么在fast paxos中活锁是怎么避免的呢？</p>
+         </div>
+
+         <a id="comment-reply-1597"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=1597#respond" onclick="return addComment.moveForm(&quot;comment-content-1597&quot;, &quot;1597&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-1869" class="comment even thread-even depth-1 clear-block with-avatars reader name-holy">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/63cf4ef23406fa813919f2b729c362a3" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://xn--5tzm5g/" rel="external nofollow" class="url">holy</a></span> <span class="d">(501 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-1869">
+       <div class="comment-content clear-block" id="comment-content-1869">
+
+         
+         <div class="comment-text">
+           <p>配置了奇数个zk servers,但只有偶数个活的的zk servers,此时怎么选举出leader?</p>
+         </div>
+
+         <a id="comment-reply-1869"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=1869#respond" onclick="return addComment.moveForm(&quot;comment-content-1869&quot;, &quot;1869&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-1946" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-%e9%ad%8f%e8%ae%b2%e6%96%87">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/c6f93ee7ccaf22da7ffc877f7a05cc70" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">魏讲文</span> <span class="d">(479 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-1946">
+       <div class="comment-content clear-block" id="comment-content-1946">
+
+         
+         <div class="comment-text">
+           <p>FastLeaderElection根本不是Paxos，也不是Fast Paxos的实现。<br>
+FastLeaderElection源码与Paxos的论文相去甚远。</p>
+<p>Paxos与 FastPaxos算法中也有一个leader选举的问题。</p>
+<p>FastLeaderElection对于zookeeper来讲，只是相当于Paxos中的leader选举。</p>
+<p>如果我说的不清楚，欢迎发邮件到我的邮箱讨论！</p>
+         </div>
+
+         <a id="comment-reply-1946"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=1946#respond" onclick="return addComment.moveForm(&quot;comment-content-1946&quot;, &quot;1946&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2283" class="pingback even thread-even depth-1 clear-block with-avatars reader name-webguo%e5%9c%a8%e8%b7%af%e4%b8%8a-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.webguo.com/?p=87002" rel="external nofollow" class="url">webguo在路上 » Zookeeper研究和应用</a></span> <span class="d">(411 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2283">
+       <div class="comment-content clear-block" id="comment-content-2283">
+
+         
+         <div class="comment-text">
+           <p>[...] zookeeper采用org.apache.zookeeper.server.quorum.FastLeaderElection作为其缺省选举算法,关于这个算法的具体执行流程可以参考淘宝核心系统段飞同学的文章“paxos 实现”.或者也可以直接阅读源代码. zookeeper源代码量不大,结构清晰,注释充分,阅读体验超好~ 我就不在这里越俎代庖了. [...]</p>
+         </div>
+
+         <a id="comment-reply-2283"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2283#respond" onclick="return addComment.moveForm(&quot;comment-content-2283&quot;, &quot;2283&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2448" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-sunday">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/41e1d30a00ece133c585bfc3cd85803a" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">sunday</span> <span class="d">(373 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2448">
+       <div class="comment-content clear-block" id="comment-content-2448">
+
+         
+         <div class="comment-text">
+           <p>博主，你好，看了下选举代码，有个问题：totalOrderPredicate中self.getQuorumVerifier().getWeight(newId)这个判断是什么意思呢？</p>
+         </div>
+
+         <a id="comment-reply-2448"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2448#respond" onclick="return addComment.moveForm(&quot;comment-content-2448&quot;, &quot;2448&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2654" class="comment even thread-even depth-1 clear-block with-avatars reader name-fding">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/81b31e6fe44d3732d5646dfb3924f811" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://abc/" rel="external nofollow" class="url">fding</a></span> <span class="d">(309 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2654">
+       <div class="comment-content clear-block" id="comment-content-2654">
+
+         
+         <div class="comment-text">
+           <p>QuorumVerifier是用来即是验证“投票通过”的接口，目前zk中有两种verifier,即QuorumMaj和QuorumHierarchical, 其中QuorumHierarchical对服务器分组加权，以实现权值过半才能算通过，而不是QuorumMaj中的机器数过半算通过。<br>
+权值为0的节点是不能成为leader的。</p>
+         </div>
+
+         <a id="comment-reply-2654"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2654#respond" onclick="return addComment.moveForm(&quot;comment-content-2654&quot;, &quot;2654&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2697" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90-paxos%e4%bd%9c%e4%b8%ba%e7%81%b5%e9%ad%82-%e7%81%ab%e7%89%9b%e2%97%8f%e5%8d%9a">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.ifireox.com/nfs/150.html" rel="external nofollow" class="url">Zookeeper全解析——Paxos作为灵魂 | 火牛●博</a></span> <span class="d">(297 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2697">
+       <div class="comment-content clear-block" id="comment-content-2697">
+
+         
+         <div class="comment-text">
+           <p>[...] 又一个问题产生了，总统怎么选出来的？oh, my god! It’s a long story. 在淘宝核心系统团队的Blog上面有一篇文章是介绍如何选出总统的，有兴趣的可以去看看：http://rdc.taobao.com/blog/cs/?p=162 [...]</p>
+         </div>
+
+         <a id="comment-reply-2697"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2697#respond" onclick="return addComment.moveForm(&quot;comment-content-2697&quot;, &quot;2697&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2815" class="comment even thread-even depth-1 clear-block with-avatars reader name-%e9%ad%8f%e8%ae%b2%e6%96%87">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/c6f93ee7ccaf22da7ffc877f7a05cc70" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">魏讲文</span> <span class="d">(247 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2815">
+       <div class="comment-content clear-block" id="comment-content-2815">
+
+         
+         <div class="comment-text">
+           <p>org.apache.zookeeper.server.quorum.FastLeaderElection 里面并不是Paxos算法。详细的论证请看：https://dl.dropbox.com/u/64148846/Thoughts%20On%20Zookeeper.pdf</p>
+         </div>
+
+         <a id="comment-reply-2815"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2815#respond" onclick="return addComment.moveForm(&quot;comment-content-2815&quot;, &quot;2815&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-2831" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-pingyuyue">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/c9511b3b1dd6b4c71d53f5ac47dbf3a9" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">pingyuyue</span> <span class="d">(239 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-2831">
+       <div class="comment-content clear-block" id="comment-content-2831">
+
+         
+         <div class="comment-text">
+           <p>关于：“ Fllower怎么知道Leader还存活 ?</p>
+<p>回答：当发现Leader无法ping通时，就改变自己的状态(LOOKING)，发起新的一轮选举”</p>
+<p>假如是这种情况呢，Leader还存活着，只是Fllower与Leader之间的通信出了问题，那么这个Fllower便发起选举？这样不太合适</p>
+<p>另外，其它的Fllower 都还可以ping通 leader 是否他们就可以 不响应这次选举？</p>
+         </div>
+
+         <a id="comment-reply-2831"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=2831#respond" onclick="return addComment.moveForm(&quot;comment-content-2831&quot;, &quot;2831&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-3037" class="comment even thread-even depth-1 clear-block with-avatars reader name-gavin">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/95e408f0b40e5c804fc79885795e53f3" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">gavin</span> <span class="d">(157 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-3037">
+       <div class="comment-content clear-block" id="comment-content-3037">
+
+         
+         <div class="comment-text">
+           <p>博主：    zookeeper中选举采用UDP还是TCP</p>
+<p>zookeeper中选举主要是采用UDP，也一种实现是采用TCP，在这里介绍的两种实现采用的是UDP</p>
+<p>对你的这个说法有疑问，你写的这个应该3.4以前的版本，现在3.4.3默认都是TCP了，</p>
+         </div>
+
+         <a id="comment-reply-3037"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=3037#respond" onclick="return addComment.moveForm(&quot;comment-content-3037&quot;, &quot;3037&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-3038" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-repls">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/dbdc7577f6374320fcc548c2802a7a60" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">repls</span> <span class="d">(156 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-3038">
+       <div class="comment-content clear-block" id="comment-content-3038">
+
+         
+         <div class="comment-text">
+           <p>请教一个问题：在文章中你说“但是每一个Server在第一次投票时都会投自己”，那么当在第二次（包括第二次）以后的投票中，每一个Server是根据一个什么算法进行投票呢？也就是说用一个什么理由来决定我需要将这票投给你。<br>
+帮忙解答一下这个疑惑，谢谢</p>
+         </div>
+
+         <a id="comment-reply-3038"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=3038#respond" onclick="return addComment.moveForm(&quot;comment-content-3038&quot;, &quot;3038&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-3039" class="comment even thread-even depth-1 clear-block with-avatars reader name-%e6%ae%b5%e9%a3%9e">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/852b01436d18f4e01081b96b0beff53a" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">段飞</span> <span class="d">(156 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-3039">
+       <div class="comment-content clear-block" id="comment-content-3039">
+
+         
+         <div class="comment-text">
+           <p>使用TCP还是UDP可以根据自己的需要进行配置</p>
+         </div>
+
+         <a id="comment-reply-3039"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=3039#respond" onclick="return addComment.moveForm(&quot;comment-content-3039&quot;, &quot;3039&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-3048" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper-election-%e9%80%89%e4%b8%be">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://lory-yang.com/2012/09/26/zookeeper-election/" rel="external nofollow" class="url">zookeeper election 选举</a></span> <span class="d">(147 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-3048">
+       <div class="comment-content clear-block" id="comment-content-3048">
+
+         
+         <div class="comment-text">
+           <p>[...] 这块从：http://rdc.taobao.com/blog/cs/?p=162抄过来的： [...]</p>
+         </div>
+
+         <a id="comment-reply-3048"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=3048#respond" onclick="return addComment.moveForm(&quot;comment-content-3048&quot;, &quot;3048&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-4422" class="comment even thread-even depth-1 clear-block with-avatars reader name-scott">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/a74424bf5963043dc93c1100c1e32336" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">Scott</span> <span class="d">(22 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-4422">
+       <div class="comment-content clear-block" id="comment-content-4422">
+
+         
+         <div class="comment-text">
+           <p>你的邮箱是多少？</p>
+         </div>
+
+         <a id="comment-reply-4422"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=4422#respond" onclick="return addComment.moveForm(&quot;comment-content-4422&quot;, &quot;4422&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-4461" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-scsldb">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/852b01436d18f4e01081b96b0beff53a" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">scsldb</span> <span class="d">(22 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-4461">
+       <div class="comment-content clear-block" id="comment-content-4461">
+
+         
+         <div class="comment-text">
+           <p>发给你了</p>
+         </div>
+
+         <a id="comment-reply-4461"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=4461#respond" onclick="return addComment.moveForm(&quot;comment-content-4461&quot;, &quot;4461&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li>
+  <div id="comment-4500" class="comment even thread-even depth-1 clear-block with-avatars reader name-metaboy">
+
+        <div class="avatar">
+      <img alt="" src="./淘宝核心系统团队博客   paxos 实现_files/3a5aa539361f3fdfe047d7806f7bcca0" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.wangyuxiong.com/" rel="external nofollow" class="url">metaboy</a></span> <span class="d">(21 天)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-4500">
+       <div class="comment-content clear-block" id="comment-content-4500">
+
+         
+         <div class="comment-text">
+           <p>刚好正在弄Zookeeper,学习了….</p>
+         </div>
+
+         <a id="comment-reply-4500"></a>
+       </div>
+
+       <div class="controls">
+                  <a class="comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162&replytocom=4500#respond" onclick="return addComment.moveForm(&quot;comment-content-4500&quot;, &quot;4500&quot;, &quot;respond&quot;, &quot;162&quot;)">Reply <span>↓</span></a>       </div>
+
+    </div>
+
+  </div>
+</li>
+</ul>
+
+
+
+								<div id="respond">
+				<h3 id="reply-title">发表评论 <small><a rel="nofollow" id="cancel-comment-reply-link" href="http://rdc.taobao.com/blog/cs/?p=162#respond" style="display:none;">取消回复</a></small></h3>
+									<form action="http://rdc.taobao.com/blog/cs/wp-comments-post.php" method="post" id="commentform">
+																			<p class="comment-notes">电子邮件地址不会被公开。 必填项已用 <span class="required">*</span> 标注</p>							<p class="comment-form-author"><label for="author">姓名 <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">电子邮件 <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">站点</label><input id="url" name="url" type="text" value="" size="30"></p>
+												<p class="comment-form-comment"><label for="comment">评论</label><textarea id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea></p>						<p class="form-allowed-tags">您可以使用这些 <abbr title="HyperText Markup Language">HTML</abbr> 标签和属性： <code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></p>						<p class="form-submit">
+							<input name="submit" type="submit" id="submit" value="发表评论">
+							<input type="hidden" name="comment_post_ID" value="162" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+						</p>
+						<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="cb7d3d197f"></p>					</form>
+							</div><!-- #respond -->
+						
+          
+
+        </div>
+        <!-- /primary content -->
+
+        
+  <!-- 1st sidebar -->
+  <div id="sidebar">
+
+    <ul class="blocks">
+
+      <li class="block"><div class="block-content block-widget_tag_cloud clear-block" id="instance-tag_cloud-5"><div class="title"><h3>标签</h3><div class="bl"></div><div class="br"></div></div><div class="tagcloud"><a href="http://rdc.taobao.com/blog/cs/?tag=beanstalkd" class="tag-link-132" title="2 个话题" style="font-size: 11.2307692308pt;">beanstalkd</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=bugfix" class="tag-link-10" title="4 个话题" style="font-size: 15.1794871795pt;">BugFix</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=cache" class="tag-link-44" title="4 个话题" style="font-size: 15.1794871795pt;">cache</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=cdn" class="tag-link-20" title="2 个话题" style="font-size: 11.2307692308pt;">CDN</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=cpu" class="tag-link-46" title="3 个话题" style="font-size: 13.3846153846pt;">CPU</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=epoll" class="tag-link-25" title="3 个话题" style="font-size: 13.3846153846pt;">epoll</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=flashcache" class="tag-link-113" title="3 个话题" style="font-size: 13.3846153846pt;">flashcache</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=gdb" class="tag-link-88" title="3 个话题" style="font-size: 13.3846153846pt;">gdb</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=http" class="tag-link-73" title="2 个话题" style="font-size: 11.2307692308pt;">http</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=innodb" class="tag-link-37" title="2 个话题" style="font-size: 11.2307692308pt;">InnoDB</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=kvm" class="tag-link-14" title="2 个话题" style="font-size: 11.2307692308pt;">kvm</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=l1" class="tag-link-45" title="2 个话题" style="font-size: 11.2307692308pt;">L1</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=linux" class="tag-link-7" title="11 个话题" style="font-size: 22pt;">Linux</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=memcached" class="tag-link-146" title="2 个话题" style="font-size: 11.2307692308pt;">memcached</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=mysql" class="tag-link-47" title="9 个话题" style="font-size: 20.5641025641pt;">mysql</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=oceanbase" class="tag-link-97" title="3 个话题" style="font-size: 13.3846153846pt;">OceanBase</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=overview" class="tag-link-62" title="2 个话题" style="font-size: 11.2307692308pt;">overview</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=pstack" class="tag-link-87" title="2 个话题" style="font-size: 11.2307692308pt;">pstack</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=qemu" class="tag-link-13" title="1 个话题" style="font-size: 8pt;">qemu</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=redis" class="tag-link-151" title="3 个话题" style="font-size: 13.3846153846pt;">redis</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=sheepdog" class="tag-link-167" title="3 个话题" style="font-size: 13.3846153846pt;">Sheepdog</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=smp" class="tag-link-18" title="2 个话题" style="font-size: 11.2307692308pt;">smp</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=ssd" class="tag-link-161" title="3 个话题" style="font-size: 13.3846153846pt;">ssd</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=systemtap" class="tag-link-56" title="4 个话题" style="font-size: 15.1794871795pt;">systemtap</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=tair" class="tag-link-8" title="2 个话题" style="font-size: 11.2307692308pt;">Tair</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=tcp" class="tag-link-23" title="2 个话题" style="font-size: 11.2307692308pt;">tcp</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=tfs" class="tag-link-9" title="6 个话题" style="font-size: 17.8717948718pt;">TFS</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=traffic-server" class="tag-link-60" title="10 个话题" style="font-size: 21.2820512821pt;">traffic server</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=unix" class="tag-link-21" title="2 个话题" style="font-size: 11.2307692308pt;">unix</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e4%b8%bb%e4%bb%8e%e5%90%8c%e6%ad%a5" class="tag-link-109" title="2 个话题" style="font-size: 11.2307692308pt;">主从同步</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e4%ba%8b%e5%8a%a1" class="tag-link-38" title="2 个话题" style="font-size: 11.2307692308pt;">事务</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e4%bb%a3%e7%90%86" class="tag-link-65" title="3 个话题" style="font-size: 13.3846153846pt;">代理</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%88%86%e5%b8%83%e5%bc%8f%e6%9e%b6%e6%9e%84" class="tag-link-81" title="8 个话题" style="font-size: 19.6666666667pt;">分布式架构</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%88%86%e6%9e%90" class="tag-link-99" title="2 个话题" style="font-size: 11.2307692308pt;">分析</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%a4%9a%e7%ba%bf%e7%a8%8b" class="tag-link-92" title="2 个话题" style="font-size: 11.2307692308pt;">多线程</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%a4%b8%e7%88%b6" class="tag-link-17" title="2 个话题" style="font-size: 11.2307692308pt;">夸父</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%af%b9%e8%b1%a1" class="tag-link-67" title="2 个话题" style="font-size: 11.2307692308pt;">对象</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%bc%80%e5%8f%91%e6%a8%a1%e5%bc%8f" class="tag-link-5" title="1 个话题" style="font-size: 8pt;">开发模式</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e5%bc%80%e6%ba%90" class="tag-link-3" title="11 个话题" style="font-size: 22pt;">开源</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e6%8c%87%e5%8d%97" class="tag-link-61" title="2 个话题" style="font-size: 11.2307692308pt;">指南</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e7%ae%97%e6%b3%95" class="tag-link-28" title="3 个话题" style="font-size: 13.3846153846pt;">算法</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e7%ae%a1%e7%90%86%e5%91%98" class="tag-link-63" title="2 个话题" style="font-size: 11.2307692308pt;">管理员</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e7%bc%93%e5%ad%98" class="tag-link-66" title="4 个话题" style="font-size: 15.1794871795pt;">缓存</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e7%bd%91%e7%bb%9c" class="tag-link-100" title="2 个话题" style="font-size: 11.2307692308pt;">网络</a>
+<a href="http://rdc.taobao.com/blog/cs/?tag=%e8%99%9a%e6%8b%9f%e5%8c%96" class="tag-link-165" title="2 个话题" style="font-size: 11.2307692308pt;">虚拟化</a></div>
+</div></li><li class="block"><div class="block-content block-widget_categories clear-block" id="instance-categories-3"><div class="title"><h3>分类目录</h3><div class="bl"></div><div class="br"></div></div>		<ul>
+	<li class="cat-item cat-item-10"><a href="http://rdc.taobao.com/blog/cs/?cat=10" title="查看 BugFix 下的所有文章">BugFix</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://rdc.taobao.com/blog/cs/?cat=4" title="查看 Cassandra 下的所有文章">Cassandra</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="http://rdc.taobao.com/blog/cs/?cat=20" title="查看 CDN 下的所有文章">CDN</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://rdc.taobao.com/blog/cs/?cat=11" title="查看 Dynamo 下的所有文章">Dynamo</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://rdc.taobao.com/blog/cs/?cat=12" title="查看 hypertable 下的所有文章">hypertable</a>
+</li>
+	<li class="cat-item cat-item-128"><a href="http://rdc.taobao.com/blog/cs/?cat=128" title="Taobao JVM优化实践">JVM</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://rdc.taobao.com/blog/cs/?cat=6" title="查看 Linux开发 下的所有文章">Linux开发</a>
+</li>
+	<li class="cat-item cat-item-47"><a href="http://rdc.taobao.com/blog/cs/?cat=47" title="查看 mysql 下的所有文章">mysql</a>
+</li>
+	<li class="cat-item cat-item-97"><a href="http://rdc.taobao.com/blog/cs/?cat=97" title="查看 OceanBase 下的所有文章">OceanBase</a>
+</li>
+	<li class="cat-item cat-item-32"><a href="http://rdc.taobao.com/blog/cs/?cat=32" title="查看 Performance 下的所有文章">Performance</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://rdc.taobao.com/blog/cs/?cat=8" title="查看 Tair 下的所有文章">Tair</a>
+</li>
+	<li class="cat-item cat-item-158"><a href="http://rdc.taobao.com/blog/cs/?cat=158" title="查看 Tengine 下的所有文章">Tengine</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://rdc.taobao.com/blog/cs/?cat=9" title="查看 TFS 下的所有文章">TFS</a>
+</li>
+	<li class="cat-item cat-item-160"><a href="http://rdc.taobao.com/blog/cs/?cat=160" title="查看 优化 下的所有文章">优化</a>
+</li>
+	<li class="cat-item cat-item-81"><a href="http://rdc.taobao.com/blog/cs/?cat=81" title="查看 分布式架构 下的所有文章">分布式架构</a>
+</li>
+	<li class="cat-item cat-item-82"><a href="http://rdc.taobao.com/blog/cs/?cat=82" title="查看 底层架构 下的所有文章">底层架构</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://rdc.taobao.com/blog/cs/?cat=5" title="查看 开发模式 下的所有文章">开发模式</a>
+</li>
+	<li class="cat-item cat-item-39"><a href="http://rdc.taobao.com/blog/cs/?cat=39" title="查看 数据库 下的所有文章">数据库</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://rdc.taobao.com/blog/cs/?cat=1" title="查看 未分类 下的所有文章">未分类</a>
+</li>
+	<li class="cat-item cat-item-28"><a href="http://rdc.taobao.com/blog/cs/?cat=28" title="查看 算法 下的所有文章">算法</a>
+</li>
+		</ul>
+</div></li><li class="block"><div class="block-content block-widget_meta clear-block" id="instance-meta-6"><div class="title"><h3>功能</h3><div class="bl"></div><div class="br"></div></div>			<ul>
+						<li><a href="http://rdc.taobao.com/blog/cs/wp-login.php">登录</a></li>
+			<li><a href="http://rdc.taobao.com/blog/cs/?feed=rss2" title="使用 RSS 2.0 订阅本站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://rdc.taobao.com/blog/cs/?feed=comments-rss2" title="使用 RSS 订阅本站点的所有文章的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://cn.wordpress.org/" title="基于 WordPress，一个优美、先进的个人信息发布平台。">WordPress.org</a></li>
+						</ul>
+</div></li><li class="block"><div class="block-content block-widget_links clear-block" id="linkcat-2"><div class="title"><h3>业界同行</h3><div class="bl"></div><div class="br"></div></div>
+	<ul class="xoxo blogroll">
+<li><a href="http://blog.webshuo.com/" title="腾讯搜搜web开发团队主页">搜搜web开发</a></li>
+
+	</ul>
+</div></li>
+<li class="block"><div class="block-content block-widget_links clear-block" id="linkcat-84"><div class="title"><h3>成员个人博客</h3><div class="bl"></div><div class="br"></div></div>
+	<ul class="xoxo blogroll">
+<li><a href="http://dinglin.javaeye.com/" title="丁奇同学的个人博客">丁奇个人博客</a></li>
+<li><a href="http://donghao.org/" title="三百同学的个人博客">三百个人博客</a></li>
+<li><a href="http://blog.coly.li/" title="伯松同学的个人博客">伯松个人博客</a></li>
+<li><a href="http://www.flyinfo.net/" title="千石同学的个人博客">千石个人博客</a></li>
+<li><a href="http://mqzhuang.iteye.com/" title="华庭同学的个人博客">华庭个人博客</a></li>
+<li><a href="http://blog.zhuzhaoyuan.com/" title="叔度同学的个人博客">叔度个人博客</a></li>
+<li><a href="http://blog.sina.com.cn/halmo" title="坤谷同学的个人博客">坤谷个人博客</a></li>
+<li><a href="http://rednaxelafx.iteye.com/" target="_blank">撒迦个人博客</a></li>
+<li><a href="http://nosql-wiki.org/wiki/bin/view" title="无施同学的个人博客">无施个人博客</a></li>
+<li><a href="http://nosqlnotes.net/" title="日照同学的个人博客">日照个人博客</a></li>
+<li><a href="http://blog.lifeibo.com/" title="李子同学的个人博客">李子个人博客</a></li>
+<li><a href="http://blog.sina.com.cn/kern0612" title="正祥老大的个人博客">正祥个人博客</a></li>
+<li><a href="http://www.imagerabit.com/" title="永攀同学的个人博客">永攀个人博客</a></li>
+<li><a href="http://www.cnblogs.com/FrankTan" title="茂七同学的个人博客">茂七个人博客</a></li>
+<li><a href="http://yufeng.info/" title="褚霸同学的个人博客">褚霸个人博客</a></li>
+<li><a href="http://blog.neveray.info/" title="那岩同学的个人博客">那岩个人博客</a></li>
+<li><a href="http://likai.appspot.com/" title="郁白同学的个人博客">郁白个人博客</a></li>
+<li><a href="http://www.pagefault.info/" title="雕梁同学的个人博客">雕梁个人博客</a></li>
+
+	</ul>
+</div></li>
+<li class="block"><div class="block-content block-widget_links clear-block" id="linkcat-16"><div class="title"><h3>淘宝其他官方博客</h3><div class="bl"></div><div class="br"></div></div>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.taobaodba.com/" title="淘宝DBA部门博客">淘宝DBA</a></li>
+<li><a href="http://rdc.taobao.com/team/jm/" title="淘宝JAVA中间件团队博客">淘宝JAVA中间件</a></li>
+<li><a href="http://ued.taobao.com/" title="淘宝UED部门技术博客">淘宝UED</a></li>
+<li><a href="http://job.taobao.com/" title="淘宝网招聘页面">淘宝招聘</a></li>
+<li><a href="http://www.searchtb.com/" title="淘宝搜索技术官方博客">淘宝搜索技术博客</a></li>
+<li><a href="http://rdc.taobao.com/blog/dw" title="淘宝数据平台技术博客">淘宝数据平台</a></li>
+<li><a href="http://rdc.taobao.com/blog/qa/" title="淘宝技术保障团队博客">淘宝质量保障</a></li>
+
+	</ul>
+</div></li>
+    </ul>
+
+  </div>
+  <!-- /1st sidebar -->
+
+      </div>
+    </div>
+  </div>
+  <!-- /main content -->
+
+
+   </div>
+ </div>
+ <!-- /main -->
+
+ 
+ <!-- footer -->
+ <div class="shadow-left page-content">
+   <div class="shadow-right">
+
+     <div id="footer">
+
+       <div id="copyright">
+
+         <a href="http://rdc.taobao.com/blog/cs/" title="淘宝核心系统团队博客" rel="home"><strong>淘宝核心系统团队博客</strong></a>
+
+         © 2010 |
+
+         Powered by <a href="http://wordpress.org/">WordPress</a> and Mystique theme by <a href="http://digitalnature.eu/themes/mystique/">digitalnature</a>
+         <br>
+
+         23 queries in 1.28 seconds
+         (23.80M)                 
+
+       </div>
+
+     </div>
+
+   </div>
+ </div>
+ <!-- /footer -->
+
+ <a class="go-top" href="http://rdc.taobao.com/blog/cs/?p=162#page">Go to Top</a>
+
+ </div>
+ <!-- /page-ext -->
+
+ </div>
+ <!-- page -->
+
+ <!-- 23 queries in 1.28 seconds -->
+ 
+
+</body></html>

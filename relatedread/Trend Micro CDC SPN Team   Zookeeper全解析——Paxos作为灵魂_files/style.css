@@ -1,0 +1,1549 @@
+/*
+Theme Name: Mystique
+Theme URI: http://digitalnature.eu/projects/mystique/
+Description: This is the light version of the popular <a href="http://digitalnature.eu/projects/mystique">Mystique</a> theme. Extensive customization trough the dashboard and additional features are now only available in the ATOM-powered version, which you can download from the official project page. Designed and developed by <a href="http://digitalnature.eu/">digitalnature</a>.
+Version: 2.5.1
+Author: digitalnature
+Author URI: http://digitalnature.eu/
+Tags: light, white, two-columns, fixed-width, right-sidebar, threaded-comments, translation-ready, editor-style
+License: GPL
+License URI: http://www.opensource.org/licenses/gpl-license.
+
+	Theme designed by digitalnature. See the project page for more info and updates
+
+	Both the design and code are released under GPL.
+    http://www.opensource.org/licenses/gpl-license.
+
+*/
+
+
+/* reset */
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,legend,label,input,textarea,p,blockquote,table,th,td{margin:0;padding:0;}
+
+html,body{
+  height: 100%;
+  min-height:100%;
+}
+
+body{
+  font-family:"Segoe UI",Calibri,"Myriad Pro",Myriad,"Trebuchet MS",Helvetica,Arial,sans-serif;
+  font-size: 13px;
+  color:#333;
+  background-color: #000;
+}
+
+
+/*** MAIN GRAPHICS ***/
+
+#page{background:transparent url(images/header.jpg) no-repeat center top;}
+#page-ext{background:transparent url(images/bg.png) repeat-x center bottom;}
+
+#page{
+  position: relative;
+  min-height: 100%;
+}
+
+.shadow-left{
+  background:url(images/shadow.png) no-repeat left bottom;
+}
+
+.shadow-right{
+  background:url(images/shadow.png) no-repeat right bottom;
+  padding-bottom: 21px;
+}
+
+.page-content{
+  max-width:1200px; /* option overrides it */
+  min-width:400px;
+  margin:0 auto !important;
+  position:relative;
+}
+
+/* fluid width page */
+body.fluid .page-content{
+  padding:0 10px;
+  width:auto;
+}
+
+/* fixed width page - 960gs */
+body.fixed .page-content{
+  width:960px;
+}
+
+
+
+/*** GENERAL ELEMENTS: LINKS ***/
+
+a{
+  text-decoration:none;
+  outline:none;
+  color:#2d8ac7;
+}
+
+a:hover{
+  text-decoration:underline;
+  color:#ed1e24;
+}
+
+
+
+/*** GENERAL ELEMENTS: HEADINGS ***/
+
+h1,h2,h3,h4,h5,h6{
+  font-weight:normal;
+  margin:.75em 0 .25em;
+  padding:0;
+}
+
+h1{
+  font-size:250%;
+  letter-spacing:-.04em;
+}
+
+h2{
+  font-size:200%;
+  letter-spacing:-0.03em;
+}
+
+h3{
+  font-size:160%;
+  letter-spacing:-0.02em;
+}
+
+h4{
+  font-size:140%;
+  font-weight:bold;
+  letter-spacing:-0.02em;
+}
+
+h5{
+  font-size:130%;
+  font-weight:bold;
+  letter-spacing:-0.02em;
+}
+
+h6{
+  font-size:120%;
+  text-transform:uppercase;
+}
+
+
+
+/*** GENERAL ELEMENTS: TABLES ***/
+
+table{
+  margin:1em 0 2em 0;
+  width:100%;
+  border-collapse:collapse;
+  border-spacing:0;
+}
+
+td, th{
+  padding:5px;
+  border:2px solid #fff;
+}
+
+th{
+  font-weight:bold;
+  background:#ddd;
+}
+
+td{background:#efefef;}
+caption, th{text-align:left;}
+
+
+
+/*** GENERAL ELEMENTS: FORMS ***/
+
+form{margin:10px 0 20px 0;}
+
+input, select, textarea{
+  font:normal normal 100% "Segoe UI",Calibri,"Myriad Pro",Myriad,"Trebuchet MS",Helvetica,Arial,sans-serif;
+  display:block;
+  margin-bottom:5px;
+  padding:5px 10px;
+}
+
+optgroup{
+  color: #ddd;
+  font-style: italic;
+  font-weight: normal;
+}
+
+textarea{
+  width:75%;
+  height: 160px;
+}
+
+input[type="checkbox"], input[type="radio"]{
+  padding: 0;
+  display:inline;
+  vertical-align:-1px;
+}
+
+input[type="submit"]{cursor:pointer;}
+
+label{
+  font-weight:normal;
+  margin-top:5px;
+  margin-right: 5px;
+}
+
+fieldset{
+  margin:1em 0 2em 0;
+  padding:10px;
+  border:1px solid #ddd;
+  background:#fff;
+}
+
+legend{
+  border:1px solid #ddd;
+  padding:5px 10px;
+  font-size:115%;
+  font-style:italic;
+}
+
+
+
+/*** GENERAL ELEMENTS: LISTS ***/
+
+ul, ol{
+  list-style-type:disc;
+  list-style-position:outside;
+  margin:0 0 10px 15px;
+  line-height: 150%;
+}
+
+ol{
+  list-style-type: decimal;
+}
+
+
+dl{margin:1em 0 2em 0;}
+dt{font-weight:bold;}
+
+
+
+/*** GENERAL ELEMENTS: OTHER ***/
+
+p{
+  margin:.25em 0 .75em 0;
+  line-height:150%;
+}
+
+img{border:0;}
+small{font-size:80%;}
+
+code{
+  font:12px "Courier New", Courier, "Lucida Console", Monaco, "DejaVu Sans Mono", "Nimbus Mono L", "Bitstream Vera Sans Mono", monospace;
+  background: #ddd;
+  text-shadow: 0px 1px 1px #fff;
+  padding: 0 4px;
+}
+
+pre{
+  font:12px "Courier New", Courier, "Lucida Console", Monaco, "DejaVu Sans Mono", "Nimbus Mono L", "Bitstream Vera Sans Mono", monospace;
+  overflow:auto;
+  white-space:pre-wrap;/* <- css3 */
+  white-space:0;/* <- ff */
+  margin:.25em 0 .75em 0;
+  background:#fff;
+  padding:10px;
+  border:1px solid #ddd;
+}
+
+blockquote {
+  margin:1.5em 10px;
+  padding:.5em 10px;
+  quotes:"\201C""\201D""\2018""\2019";
+  background:#f9f9f9;
+  border-left:10px solid #ccc;
+  quotes:"\201C""\201D""\2018""\2019";
+}
+
+blockquote:before {
+  content:open-quote;
+  font-size:4em;
+  line-height:.1em;
+  margin-right:.25em;
+  vertical-align:-.4em;
+  color:#ccc;
+}
+
+blockquote p{
+  display:inline;
+  font-style:italic;
+}
+
+hr{
+  color:#b4aca1;
+  background-color:#b4aca1;
+  border-bottom:1px solid #f6f4eb;
+}
+
+
+
+/*** MAIN LAYOUT ***/
+
+#main{
+  border-top: 1px solid #fff;
+  background: #fff url(images/bg-main-r.jpg) no-repeat right top;
+  min-height: 700px;
+}
+
+#main-ext{
+  background: transparent url(images/bg-main-l.jpg) no-repeat left top;
+  padding:10px 0;
+}
+
+
+/* Masks are required to make sidebars extend all the way down (useful if they have a background).
+   All content outside this area is hidden - need to find a way without overflow, because some stupid plugins might
+   add absolute positioned "tooltips" somehwere inside the content area, instead of appending them to the body... */
+#mask-3{
+  position:relative;
+  z-index:2;
+  overflow:hidden;
+}
+
+#mask-1,
+#mask-2{
+  float:left;
+  position:relative;
+  right:0;
+  width:100%;
+}
+
+#primary-content, #sidebar, #sidebar2{
+  width:100%;
+  top:0;
+  left:0;
+  position:relative;
+  overflow: hidden;
+  float:left;
+  min-height:150px;
+}
+
+#primary-content{min-height:540px;}
+
+
+
+/*** LOGO & HEADLINE ***/
+
+#site-title{padding:40px 0 10px 0;}
+
+#logo{
+  font:normal bold 300% "Arial Black", "Helvetica Black", Gadget, sans-serif;
+  letter-spacing:-6px;
+  margin:10px 0 25px 0;
+  padding:0;
+  float: left;
+}
+
+#logo a{
+  color:#fff;
+  text-decoration:none;
+  text-shadow:0px -1px -1px #000;
+  display: block;
+  text-transform: uppercase;
+}
+
+#logo a:hover{color:#dde90d;}
+
+#logo span.alt{
+  font-style: normal;
+  display: inline;
+}
+
+#logo a:hover span.alt{color:#f2b428;}
+
+#site-title .headline{
+  font-size: 110%;
+  border-left: 1px solid #ccc;
+  color: #fff;
+  float: left;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  padding: 10px 0px 10px 20px;
+  margin: 20px 0 0 20px;
+}
+
+
+
+/* NAVIGATION: COMMON */
+
+.nav{position:relative;}
+.nav ul, .nav li{
+  list-style-type:none;
+  padding:0;
+  margin:0;
+}
+
+.nav li{
+  position:relative;
+  float:left;
+  line-height: normal;
+}
+
+.nav a{
+  display:block;
+  position:relative;
+}
+
+.nav a:hover{
+  text-decoration: none;
+}
+
+.nav ul ul{
+  position:absolute;
+  z-index:15;
+  display:none;
+  width:300px;
+  top:29px;
+  -moz-box-shadow:0px 8px 15px rgba(0,0,0,0.25);
+  -webkit-box-shadow:0px 8px 15px rgba(0,0,0,0.25);
+  box-shadow:0px 8px 15px rgba(0,0,0,0.25);
+}
+
+/* level 3+ */
+.nav ul ul ul{
+  top:10px;
+  left:280px;
+}
+
+.nav li li{float: none;}
+
+.nav li:hover ul ul, .nav li:hover ul ul ul, .nav li:hover ul ul ul ul{display:none;}
+.nav li:hover ul, .nav li li:hover ul, .nav li li li:hover ul, .nav li li li li:hover ul{display:block;}
+
+/* add extra padding on menus with children, to make space for the arrows we're inserting with jquery (we just need this for 1st level horizontal menus)  */
+.nav .extends a{padding-right: 30px;}
+
+.nav .arrow{
+  position:absolute;
+  right:10px;
+  top:15px;
+  height:8px;
+  width:8px;
+  /* graphic -- styles should override if necessary */
+  background:transparent url(images/a.gif) no-repeat 0 0;
+}
+
+.nav li li .arrow{top: 10px;}
+
+.nav .current-menu-item > a .arrow,
+.nav .current-menu-ancestor > a .arrow,
+.nav li.active > a .arrow,
+.nav li:hover > a .arrow{background-position:0 -8px;}
+
+.nav li li .arrow{background-position:-16px 0;}
+.nav li .current-menu-item > a .arrow,
+.nav li .current-menu-ancestor > a .arrow,
+.nav li li.active > a .arrow,
+.nav li li:hover > a .arrow{background-position:-16px -8px;}
+
+
+
+/*** NAVIGATION: TOP ***/
+
+.nav-top{
+  background:#000 url(images/bg-nav-d.png) repeat-x center top;
+  z-index: 25;
+  border-bottom: 1px solid #121212;
+}
+
+.nav-top li li{
+  margin:0;
+  padding: 0px 10px;
+}
+
+.nav-top a{
+  color:#666;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 9px 15px 10px;
+  text-shadow:0px -1px 0px #000;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .block .title h3{text-shadow:0 0 0 transparent, 0px -1px 0px #000;}
+
+
+.nav-top .current-menu-item > a,
+.nav-top .current-menu-ancestor > a,
+.nav-top li.active > a,
+.nav-top li:hover > a{
+  color:#fff;
+  background:#333 url(images/o1b.png) repeat-x center top;
+}
+
+/* submenus */
+.nav-top ul ul{
+  background:#333;
+  padding: 10px 0;
+  top: 35px;
+}
+.nav-top li li a{
+  font-size: 100%;
+  font-weight: normal;
+  padding: 5px;
+  color: #999;
+  border-top: 1px solid #454545;
+  text-transform: none;
+}
+
+.nav-top li:first-child a{border: 0 !important;}
+
+.nav-top li .current-menu-item > a,
+.nav-top li .current-menu-ancestor > a,
+.nav-top li li.active > a,
+.nav-top li li:hover > a{
+  background:#555;
+  color:#fff;
+}
+
+
+
+/*** NAVIGATION: MAIN (below header) ***/
+
+.nav-main{
+  z-index: 10;
+}
+
+.nav-main ul{
+  background: #cecece url(images/bg-nav.png) repeat-x center top;
+}
+
+.nav-main li{
+  background: transparent url(images/nav-div.png) repeat-y right top;
+  padding-right: 2px;
+  border-top: 1px solid #fff;
+}
+
+.nav-main a{
+  color:#4e4e4e;
+  font-size: 115%;
+  padding:5px 15px 7px;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 0px 1px 1px #fff;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .nav-main a{text-shadow:0 0 0 transparent, 0px 1px 1px #fff;}
+
+/* home icon */
+.nav-main .home a{
+  background: transparent url(images/icons.png) no-repeat -46px -56px;
+  padding-left: 32px;
+}
+
+/* home icon */
+.nav-main .home.current-menu-item > a,
+.nav-main .home.current-menu-ancestor > a{
+  background: transparent url(images/icons.png) no-repeat -46px -6px;
+}
+
+.nav-main .current-menu-item,
+.nav-main .current-menu-ancestor{
+  background: #000 url(images/nav-a.png) no-repeat left top;
+  border-color: #888888;
+}
+
+.nav-main .current-menu-item > a,
+.nav-main .current-menu-ancestor > a{
+  color:#fff;
+  text-shadow: none;
+}
+
+.nav-main .current-menu-item > a span.p,
+.nav-main .current-menu-ancestor > a span.p{
+  background: transparent url(images/nav-a.png) no-repeat center bottom;
+  position: absolute;
+  width: 100%;
+  bottom: -7px;
+  left: 0;
+  height: 7px;
+  z-index: 15;
+}
+
+.nav-main li.active,  /* javascript triggered class (maintain the hover style during menu hide delay) */
+.nav-main li:hover{
+  background-color:#fff;
+}
+
+.nav-main li.active > a,  /* javascript triggered class (maintain the hover style during menu hide delay) */
+.nav-main li:hover > a{
+  color:#2d8ac7;
+  text-shadow: none;
+}
+
+/* submenus */
+.nav-main ul ul{
+  top:32px;
+  background:#fff;
+  padding: 10px 0;
+}
+
+.nav-main li .current-menu-item > a span.p,
+.nav-main li .current-menu-ancestor > a span.p{
+  display: none;
+}
+
+/* level 3+ */
+.nav-main ul ul ul{top:10px;}
+
+
+.nav-main .current-menu-item ul,
+.nav-main .current-menu-ancestor ul{
+  background: #000;
+}
+
+.nav-main .current-menu-item li,
+.nav-main .current-menu-ancestor li,
+.nav-main li li{
+  border:0;
+  background: none;
+  margin-bottom: 2px;
+  padding: 0px 10px;
+}
+
+.nav-main li li a{
+  padding:5px;
+  line-height:125%;
+  font-size: 125%;
+  background: none;
+  border-top: 1px dotted #666;
+  font-weight:normal;
+  text-shadow:none;
+  text-transform: none;
+}
+
+.nav-main .current-menu-item li a,
+.nav-main .current-menu-ancestor li a{
+  color: #ccc;
+  border-color: #454545;
+}
+
+.nav-main li li:first-child a, .nav-main li li.first a{border:0;}
+
+.nav-main li li.active > a,
+.nav-main li li:hover > a{
+  background: #eee;
+}
+
+.nav-main .current-menu-item li.active > a,
+.nav-main .current-menu-ancestor li.active > a,
+.nav-main .current-menu-item li:hover > a,
+.nav-main .current-menu-ancestor li:hover > a{
+  background: #212121;
+  border-color: #000;
+}
+
+.nav-main li .current-menu-item > a,
+.nav-main li .current-menu-ancestor > a{
+  background: none;
+  color: #356AA0;
+  font-weight: bold;
+}
+
+.nav-main .arrow{display:none;}
+
+.nav-main li li .arrow{
+  display:block;
+  top:11px;
+}
+
+.nav-main li .current-menu-item > a .arrow,
+.nav-main li .current-menu-ancestor > a .arrow,
+.nav-main li li.active > a .arrow,
+.nav-main li li:hover > a .arrow{background-position:-16px 0px;}
+
+
+
+/** NAVIGATION: FOOTER ***/
+
+.nav-bottom{
+  background:#eee;
+  z-index: 25;
+  border-bottom: 1px solid #fff;
+}
+
+.nav-bottom li{
+  margin-left: 10px;
+  padding: 10px 0;
+}
+
+.nav-bottom li li{
+  margin:0;
+  padding: 0px 10px;
+}
+
+.nav-bottom a{
+  color:#666;
+  font-size: 85%;
+  font-weight: bold;
+  padding: 4px 10px;
+  -moz-border-radius:20px;
+  -webkit-border-radius:20px;
+  border-radius:20px;
+  text-decoration: none;
+}
+
+.nav-bottom .current-menu-item > a,
+.nav-bottom .current-menu-ancestor > a,
+.nav-bottom li.active > a,
+.nav-bottom li:hover > a{
+  color:#fff;
+  background:#abd91d;
+}
+
+/* submenus */
+.nav-bottom ul ul{
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+  background:#302f2f;
+  padding: 10px 0;
+  bottom:48px;
+  top:auto;
+}
+
+/* level 3+ */
+.nav-bottom ul ul ul{
+  bottom:10px;
+  top:auto;
+  left:280px;
+}
+
+.nav-bottom li li a{
+  font-size: 100%;
+  font-weight: normal;
+  line-height: 125%;
+  padding: 5px;
+  color: #827f7f;
+  border-top: 1px solid #666;
+  -moz-border-radius:0px;
+  -webkit-border-radius:0px;
+  border-radius:0px;
+}
+
+.nav-bottom li li:first-child a, .nav-bottom li li.first a{border:0;}
+
+.nav-bottom li li.active > a,
+.nav-bottom li li:hover > a{
+  background:#504e53;
+  color:#fff;
+}
+
+.nav-bottom li .current-menu-item > a,
+.nav-bottom li .current-menu-ancestor > a{
+  background: none;
+  color: #ece8e0;
+  font-weight: bold;
+}
+
+.nav-bottom .extends a{padding-right: 24px;}
+
+.nav-bottom .arrow{
+  background-position: -8px 0;
+  top: 7px;
+}
+
+.nav-bottom .current-menu-item > a .arrow,
+.nav-bottom .current-menu-ancestor > a .arrow,
+.nav-bottom li.active > a .arrow,
+.nav-bottom li:hover > a .arrow{background-position:-8px -8px;}
+
+.nav-bottom li li .arrow{background-position:-16px 0;}
+
+.nav-bottom li .current-menu-item > a .arrow,
+.nav-bottom li .current-menu-ancestor > a .arrow,
+.nav-bottom li li.active > a .arrow,
+.nav-bottom li li:hover > a .arrow{background-position:-16px -8px;}
+
+
+
+/*** BLOCKS (usually widgets) ***/
+
+.blocks, .block{
+  list-style-type:none;
+  padding:0;
+}
+
+.blocks{margin:1em 0 0 0;}
+.block{margin:0 0 2em 0;}
+
+.block .title{
+  position: relative;
+}
+
+.block .title h3{
+  background:transparent url(images/block-t.png) no-repeat center top;
+  margin: 0;
+  padding: 5px 10px 2px;
+  border-top-left-radius: 7px;
+  -moz-border-radius-topleft: 7px;
+  -webkit-border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  -moz-border-radius-topright: 7px;
+  -webkit-border-top-right-radius: 7px;
+  font-weight:bold;
+  font-size:130%;
+  color:#fff;
+  text-shadow:0px -1px 0px rgba(0,0,0, 0.5);
+  text-transform:uppercase;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .block .title h3{text-shadow:0 0 0 transparent, 0px -1px 0px rgba(0,0,0, 0.5);}
+
+
+.block .title .br{
+  background:transparent url(images/block-t.png) no-repeat bottom left;
+  height: 22px;
+  margin-right: 60px;
+}
+
+.block .title .bl{
+  background:transparent url(images/block-t.png) no-repeat bottom right;
+  height: 22px;
+  width: 60px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+/* remove styling on nested blocks (eg. in tabs or arbitrary widgets inside posts, pages etc.) */
+.block .block{
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  border: 0 !important;
+}
+
+
+
+
+
+/*** POST ***/
+
+.hentry{
+  margin-bottom: 2em;
+  padding-bottom:20px;
+  position: relative;
+  border-bottom:1px dotted #e8e8e8;
+}
+
+.hentry.sticky{
+  font-size: 125%;
+}
+
+/* using shrinkwrap method - thanks Ray: http://www.css-lab.com/lab-work/auto-width/shrink-wrap-col.html */
+.hentry .post-details{overflow:hidden;}
+.hentry.thumb-left .post-details, .hentry.thumb-right .post-details{min-height:140px;} /* adjust this dynamically? */
+
+/* thumbnail-only based post previews (looks pretty cool) */
+.hentry.thumb-only{
+  float:left;
+  border:0;
+  padding:0;
+  margin:0;
+}
+
+/* post titles */
+.hentry h2.title{
+  margin:0;
+  padding:0 0 5px 0;
+  font-size:170%;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: normal;
+}
+
+.hentry h2.title a{color:#4e4e4e;}
+
+.hentry h2.title a:hover{
+  color:#ed1e24;
+  text-decoration:none;
+}
+
+/* large title on sticky posts */
+.hentry.sticky h2.title{
+  font-weight:bold;
+  font-size: 300%;
+}
+
+.hentry .post-thumb{
+  border: 5px solid #f2f2f2;
+}
+
+.hentry.thumb-left .post-thumb{
+  float:left;
+  margin-right:10px;
+}
+
+.hentry.thumb-right .post-thumb{
+  float:right;
+  margin-left:10px;
+}
+
+/* float is moved to the parent element in thumb-only mode */
+.hentry.thumb-only .post-thumb{
+  float:none !important;
+  margin:0 10px 10px 0;
+  display:block;
+  border: 0;
+}
+
+.hentry .post-thumb img{display:block;}
+
+/* main info bar */
+.hentry .post-std{
+  overflow: hidden; /* shrinkwrap */
+}
+
+.hentry .post-info{
+  background:transparent url(images/post-std.png) no-repeat right top;
+  height: 42px;
+  line-height: 32px;
+  display: block;
+  padding-left: 10px;
+  overflow: hidden;
+  color:#bbb;
+  text-shadow:1px 1px 1px #fff;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .post-info{text-shadow:0 0 0 transparent, 1px 1px 1px #fff;}
+
+.post-info a{
+  font-weight:bold;
+  color:#999;
+}
+
+.post-info a:hover{color:#ed1e24;}
+
+.hentry .post-date{
+  background:transparent url(images/post-std.png) no-repeat left -42px;
+  padding-left: 10px;
+  float: left;
+}
+
+.hentry .post-date .ext{
+  background:transparent url(images/post-std.png) no-repeat right -42px;
+  padding-right: 15px;
+  height: 42px;
+  line-height: 32px;
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+}
+
+.hentry .post-content{line-height:130%;}
+
+.hentry .post-tags a{
+  font-size:85%;
+  padding-top:5px;
+  color:#aaa;
+  border:1px solid #eee;
+  padding:1px 5px 2px 5px;
+  margin-bottom:2px;
+  -moz-border-radius:10px;
+  -webkit-border-radius:10px;
+  border-radius:10px;
+  display:inline-block;
+}
+
+.hentry .post-tags a:hover{
+  background-color:#666;
+  border-color:#666;
+  text-decoration:none;
+  color:#fff;
+}
+
+/* comments link */
+.hentry .comments{
+  background:transparent url(images/icons.png) no-repeat -55px -154px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 42px;
+  height: 42px;
+  text-align: center;
+  line-height: 31px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+  text-shadow: 0px 1px 1px #fff;
+  float:right;
+}
+
+.hentry .comments:hover{
+  background-position: -55px -200px;
+  color: #fff;
+  text-shadow: 0px -1px -1px rgba(0,0,0, 0.25);
+}
+
+
+/* this class should not have any graphic styles on it, because the element that has it could be empty */
+.hentry .controls{
+  display: none;
+  position: absolute;
+  z-index: 5;
+  right: 10px;
+  bottom: 30px;
+}
+
+.single .hentry .controls{
+  bottom: auto;
+  top: 10px;
+}
+
+
+.hentry:hover > .controls{display:block;}
+
+
+
+/*** COMMENTS/PINGS ***/
+
+#comments,
+#comments li.entry,
+#comments .navi{
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
+
+#comments{margin:10px 0 20px 0;}
+
+li .comment{
+  margin:10px 0 0 0;
+  position:relative;
+  background: #f6f6f6;
+  border-bottom-left-radius: 10px;
+  -moz-border-radius-bottomleft: 10px;
+  -webkit-border-bottom-left-radius: 10px;
+}
+
+/* level 2+ */
+li li .comment{margin:10px 0 0 40px;}
+
+
+
+/* in moderation queue */
+.comment.awaiting-moderation{background:#fefedf;}
+
+.comment div.avatar{
+  position:absolute;
+  width: 58px;
+  height: 58px;
+  top:7px;
+  left:7px;
+  background:#fff;
+  border-bottom:1px solid #ccc;
+}
+
+.comment .avatar img{padding:5px;}
+
+.comment .avatar img{display:block;}
+.comment.with-avatars .comment-head .ext{padding-left:90px;}
+.comment.with-avatars .comment-body{margin-left:70px;}
+
+.comment .comment-head{
+  background:#5e5e5e url(images/comment.png) no-repeat left bottom;
+  color:#ccc;
+  font-size: 110%;
+  text-shadow: 0px -1px -1px rgba(0,0,0, 0.25);
+  border-top-right-radius: 10px;
+  -moz-border-radius-topright: 10px;
+  -webkit-border-top-right-radius: 10px;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .comment .comment-head{text-shadow:0 0 0 transparent, 0px -1px -1px rgba(0,0,0, 0.25);}
+
+.comment.role-administrator > .comment-head,
+.comment.bypostauthor > .comment-head{
+  background-color: #b3dd33;
+  background-position: -1000px bottom;
+  color: #fff;
+}
+
+.comment .comment-head .ext{
+  background:transparent url(images/comment.png) no-repeat -3000px bottom;
+  padding:10px 10px 25px;
+}
+
+
+/* in moderation queue */
+.comment.awaiting-moderation > .comment-head .ext{
+  background-position: -2000px bottom;
+}
+
+.comment .comment-head a{
+  color: #fff;
+  font-weight: bold;
+}
+
+.comment .comment-head .d{
+  text-transform: uppercase;
+  font-style: italic;
+  font-size: 85%;
+  margin-left: 10px;
+}
+
+
+.comment .comment-content{
+  position:relative;
+  min-height:40px;
+  height:68px;
+  height:auto !important;
+  padding: 0 10px;
+}
+
+
+.comment .controls{
+  display:none;
+  position:absolute;
+  right:15px;
+  bottom:15px;
+  z-index: 15;
+}
+
+.comment:hover .controls{display:block;}
+
+
+
+/*** SINGLE PAGES ***/
+
+h1.title{
+  margin:.25em 0 .5em 0;
+  font-size:300%;
+  font-weight: bold;
+  text-shadow:#fff 1px 1px 1px;
+  line-height: 100%;
+  letter-spacing: -1px;
+}
+
+h5.title{
+  padding: 5px 10px;
+  margin: 10px 0 20px 0;
+  background: #eee;
+  color: #333;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-shadow:#fff 1px 1px 1px;
+}
+
+
+/*** NEXT/PREV POST LINKS ***/
+
+.post-links div{
+  display:block;
+  max-width:45%;
+  line-height:normal;
+  color:#ccc;
+}
+
+.post-links .alignright{text-align:right;}
+
+.post-links a{
+  font-size:85%;
+  border:0;
+  background-color:transparent;
+  padding:2px 4px;
+  color:#ccc;
+  text-shadow:1px 1px 1px #fff;
+  text-decoration:none;
+}
+
+.browser-chrome .post-links a{text-shadow:0 0 0 transparent, 1px 1px 1px #fff;}
+
+.post-links a:hover{color:#ed1e24;}
+
+
+
+/*** POST META ***/
+
+.post-meta{
+  margin:1em 0 0 0;
+  padding: 10px 10px 10px 0;
+  overflow: hidden;
+  border-top:1px solid #ddd;
+  background-color:#f6f6f6;
+  color:#999;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+}
+
+.post-meta .details{
+  font-size:85%;
+  overflow: hidden;
+}
+
+.post-meta .details p{
+  margin:0;
+  padding: 0 0 0 10px;
+  line-height:125%;
+}
+
+
+
+/*** PAGE/COMMENT NAVIGATION ***/
+
+.page-navi{
+  padding:5px 0px;
+  color:#333;
+  font-size:115%;
+  font-weight:bold;
+}
+
+.page-navi a, .page-navi .current, .page-navi .dots, .page-navi .pages{
+  padding:5px 10px;
+  margin:2px;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+}
+
+.page-navi a, .page-navi .pages{
+  text-decoration:none;
+  border:1px solid #ddd;
+  background-color:#fff;
+  font-weight:normal;
+  color: #999;
+}
+
+.page-navi a:hover{
+  border:1px solid #ed1e24;
+  color:#fff;
+  background-color:#ed1e24;
+}
+
+.page-navi .pages{color:#999;}
+
+.page-navi .current{
+  border:1px solid #000;
+  color:#fff;
+  background:#999 url(images/bg-nav-d.png) repeat-x center -2px;
+}
+
+.page-navi .loading{
+  width: 16px;
+  height: 16px;
+  background:transparent url(images/lc16w.gif) no-repeat center center;
+}
+
+/* align to right on col-3-left layout, looks better */
+.col-3-left .page-navi{float:right;}
+.page-navi a, .page-navi .current, .page-navi .dots, .page-navi .pages{float:left;}
+
+
+
+/*** FOOTER ***/
+
+#footer{
+  background: #ddd;
+}
+
+/* copyright & other info */
+#footer #copyright{
+  background: #cdcdcd;
+  padding:1em 0;
+  font-size: 110%;
+  line-height:150%;
+  text-align:center;
+  text-shadow:0px 1px 1px #fff;
+}
+
+#footer a.rss{
+  background:transparent url(images/icons.png) no-repeat -52px -115px;
+  padding-left:30px;
+}
+
+
+
+
+
+/*** SEARCH FORM ***/
+
+.search-form{
+  overflow:hidden;
+  margin: 0;
+}
+
+.search-form fieldset{
+  background:transparent url(images/search.png) no-repeat left top;
+  height: 34px;
+  margin:0;
+  padding: 0 0 0 34px;
+  border:0;
+  overflow:hidden;
+  display:block;
+}
+
+.search-form input.text{
+  border: 0;
+  padding: 0;
+  margin: 7px 0 0 0;
+  width: 90%;
+  background: none;
+  outline:none;
+  font-size:120%;
+}
+
+.search-form a.submit{
+  background:transparent url(images/search.png) no-repeat right top;
+  text-indent:-9999px;
+  width: 55px;
+  height: 34px;
+  line-height: 22px;
+  float:right;
+}
+
+.search-form a.submit:hover{background-position:right bottom;}
+
+
+
+/*** TAG CLOUD ***/
+
+.tagcloud{
+  text-align:justify;
+  line-height:150%;
+  padding: 10px 0;
+}
+
+.tagcloud a{
+  vertical-align:middle;
+  text-decoration:none;
+  padding:0 0.2em;
+  letter-spacing:-0.02em;
+  color:#666; /* options override this */
+  text-shadow:0px 1px 1px #fff;
+}
+
+.tagcloud a:hover{
+  background:#abd91d;
+  color:#000 !important; /* to override the inline color styles */
+  text-decoration: none;
+}
+
+.browser-chrome .tagcloud a{text-shadow:0 0 0 transparent, 0px 1px 1px #fff;}
+
+
+
+/*** MISC ***/
+
+/* rss */
+a.rss-block{
+  margin-top: 10px;
+  background:#efefef url(images/icons.png) no-repeat -56px -110px;
+  font-size:85%;
+  color:#aaa;
+  padding: 3px 5px 3px 24px;
+  color: #5e5e5e;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  text-shadow: 0 1px 1px #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid #5e5e5e;
+  cursor: pointer;
+}
+
+a.rss-block:hover{
+  color:#fff;
+  text-decoration:none;
+  text-shadow: none;
+  border-color:#565459;
+  background-color:#565459;
+}
+
+
+/* buttons, used for various things... */
+.controls a{
+  background: #cecece url(images/bg-nav.png) repeat-x center top;
+  font-weight: bold;
+  padding: 5px 10px;
+  color: #5e5e5e;
+  margin-left: 2px;
+  text-decoration: none;
+  font-size:100%;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0 1px 3px #999;
+  -moz-box-shadow: 0 1px 3px #999;
+  -webkit-box-shadow: 0 1px 3px #999;
+  text-shadow: 0 1px 1px #fff;
+  text-transform: uppercase;
+  border: 0;
+  border-bottom: 1px solid #5e5e5e;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+}
+
+/* chrome text shadow antialias fix */
+.browser-chrome .controls a{text-shadow:0 0 0 transparent, 0 1px 1px #fff;}
+
+.comment .controls a{
+  font-size: 85%;
+  font-weight: normal;
+  padding: 3px 10px 4px;
+}
+
+input[type=submit]{z-index: 20;}
+
+.controls a:hover{
+  background:#5e5e5e;
+  text-shadow: 0 -1px 1px #000;
+  color:#fff;
+  text-decoration:none;
+}
+
+.browser-chrome .controls a:hover{text-shadow:0 0 0 transparent, 0 -1px 1px #000;}
+
+
+.wide{width:100%;}
+.hidden{display:none;}
+
+.error{color:#ed1e24;}
+.success{color:#a0c207;}
+
+.error.box{
+  border:1px solid #c00;
+  background:#ffebe8;
+  padding:5px 10px;
+  font-size:115%;
+  margin:0 auto;
+  color:#c00;
+  text-align:center;
+  text-shadow:#fff 0px 1px 1px;
+  -moz-border-radius:3px;
+  -khtml-border-radius:3px;
+  -webkit-border-radius:3px;
+  border-radius:3px;
+}
+
+
+/* clearfix */
+.clear-block:after{
+  content:".";
+  display:block;
+  clear:both;
+  visibility:hidden;
+  line-height:0;
+  height:0;
+}
+
+
+.large{font-size:115%;}
+
+
+.divider{
+  padding:4px 0 0;
+  margin:5px 0 15px;
+  display:block;
+  border-bottom:1px dotted #ccc;
+  height:1px;
+  min-height:1px;
+}
+
+span.alt{
+  color:#abd91d;
+  font-style:italic;
+}
+
+.highlight{background-color:#FFE4B5;}
+
+
+img.alignleft,img.alignright{
+  padding:3px;
+  margin-top:5px;
+  margin-bottom:5px;
+}
+
+.alignleft{
+  float:left;
+  margin-right:10px;
+}
+
+.alignright{
+  float:right;
+  margin-left:10px;
+}
+
+.aligncenter{
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+}
+
+/* smiley adjustment */
+img.wp-smiley{vertical-align:-15%;}
+
+/* captions */
+.wp-caption, .gallery-caption{
+  border:1px solid #ddd;
+  text-align:center;
+  background-color:#f3f3f3;
+  padding-top:4px;
+  margin-top:10px;
+  margin-bottom:10px;
+  -moz-border-radius:3px;
+  -khtml-border-radius:3px;
+  -webkit-border-radius:3px;
+  border-radius:3px;
+}
+
+.wp-caption-dd{
+  font-size:11px;
+  line-height:17px;
+  padding:0 4px 5px;
+  margin:0;
+}
+
+.wp-caption-text{
+  font-size:xx-small;
+  color:#999;
+  vertical-align:top;
+}
+
+/* jump to top link */
+a.go-top{
+  display: none;
+  position:fixed;
+  right:10px;
+  bottom:10px;
+  cursor: pointer;
+  z-index: 99;
+  padding: 5px 10px;
+  background: #eee;
+  text-decoration: none;
+}
+
+a.go-top:hover{
+  background: #333;
+  color: #fff;
+}
+
+.no-js .hide-if-no-js{display: none;}
+
+
+
+/*** MYSTIQUE LITE SPECIFIC STYLES ***/
+
+.fixed.col-2-right #primary-content{width:610px;left:330px}
+.fixed.col-2-right #sidebar{width:320px;left:340px}
+.fixed.col-2-right #mask-1{right:320px}
+
+.home.fixed.col-2-right #primary-content{padding-top: 20px;}

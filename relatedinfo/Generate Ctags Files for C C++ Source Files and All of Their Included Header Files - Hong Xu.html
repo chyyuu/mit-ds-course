@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!-- saved from url=(0135)http://www.topbug.net/blog/2012/03/17/generate-ctags-files-for-c-slash-c-plus-plus-source-files-and-all-of-their-included-header-files/ -->
+<html class="js  placeholder maskimage transform" lang="en"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Generate Ctags Files for C/C++ Source Files and All of Their Included Header Files - Hong Xu</title>
+  <meta name="author" content="Hong Xu">
+  
+  <meta name="Generator" content="Jekyll &amp; Octopress (http://octopress.org)">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+  <link rel="canonical" href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu.html">
+  <link href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script type="text/javascript" async="" src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/ga.js"></script><script src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/octopress.min.js" type="text/javascript"></script>
+  <link href="http://www.topbug.net/atom.xml" rel="alternate" title="Hong Xu" type="application/atom+xml">
+  
+
+<!--Fonts from Google's Web font directory at http://google.com/webfonts -->
+<link href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/css" rel="stylesheet" type="text/css">
+<link href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/css(1)" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29984794-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+  
+
+  
+  <link href="http://www.gravatar.com/avatar/3bc8fbe8e22f92cb19ffb347a05f72a3?s=16" rel="icon">
+<script type="text/javascript" async="" src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/embed.js"></script><script src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/alfie.js" async="" charset="UTF-8"></script></head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="http://www.topbug.net/">Hong Xu</a></h1>
+  
+    <h2>Hong's Personal Technology Blog</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://www.topbug.net/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.topbug.net">
+    <input class="search" type="text" name="q" results="0" placeholder="Search">
+  </fieldset>
+</form>
+  
+<fieldset class="mobile-nav"><select><option value="">Navigate…</option><option value="http://www.topbug.net/">» Blog</option><option value="http://www.topbug.net/archives">» Archives</option><option value="http://www.topbug.net/open-source-projects/">» Open Source Projects</option><option value="http://www.topbug.net/about">» About</option><option value="http://www.topbug.net/atom.xml">» RSS</option></select></fieldset><ul class="main-navigation">
+  <li><a href="http://www.topbug.net/">Blog</a></li>
+  <li><a href="http://www.topbug.net/archives">Archives</a></li>
+  <li><a href="http://www.topbug.net/open-source-projects/">Open Source Projects</a></li>
+  <li><a href="http://www.topbug.net/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+
+
+
+
+
+
+
+
+
+
+
+<article class="hentry " role="article">
+  
+  <header>
+    <h1 class="entry-title">
+
+Generate Ctags Files for C/C++ Source Files and All of Their Included Header Files
+
+</h1>
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T14:29:00-07:00" pubdate="" data-updated="true">Mar 17<span>th</span>, 2012</time>
+         • <a rel="bookmark" href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu.html">Permalink</a>
+      </p>
+    
+  </header>
+
+<div class="entry-content"><p><em>This post is for those people who use <a href="http://ctags.sourceforge.net/">Exuberant Ctags</a>. If you are
+using
+<a href="http://en.wikipedia.org/wiki/Ctags#Variants_of_ctags">other versions of ctags</a>,
+this post may not be useful.</em></p>
+
+<p>When using <a href="http://ctags.sourceforge.net/">ctags</a> to generate the tags file for C/C++ projects, usually we
+use the following command:</p>
+<div class="highlight"><pre><code class="text">ctags -R .
+</code></pre></div>
+<p>For some users that need more info of the symbols, they may use this command
+instead:</p>
+<div class="highlight"><pre><code class="text">ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
+</code></pre></div>
+<p>No matter which one you use, the generated tags file only contains the symbols
+in the files in your project source tree, but not any external file, such as
+standard header files (e.g. stdio.h, stdlib.h), etc. thus editors or IDEs that
+use tags files, such as <a href="http://www.vim.org/">Vim</a>, are not able to locate symbols in external
+header files. There was a solution: generate a tags file for any external header
+files first, and let the editor or IDE read both the generated tags file and the
+tags file for the project source tree. For example, the following command will
+generate a tags file for all your system header files on UNIX/Linux:</p>
+<div class="highlight"><pre><code class="text">ctags -R --c++-kinds=+p --fields=+iaS --extra=+q /usr/include
+</code></pre></div>
+<p>This command usually takes a very long time to finish, and finally it gives a
+quite large tags file, which causes the editor or IDE a long time to search this
+tags file for symbols. To solve this problem, I came up with another idea.</p>
+
+<p>Why must we generate a tags file containing all the symbols in the system
+header? If we only generate the tags file only for the header files that are
+related to our projects, would it be faster? That's the point of this idea. We
+could first search for the header files that are included in our projects, and
+then we use ctags to generate a tags file for these files and our source files,
+in this way, a much smaller tags file that containing all the symbols that maybe
+useful for the project is generated.</p>
+
+<!-- more -->
+
+<p>To do this, I wrote a shell script:</p>
+
+<figure class="code"><figcaption>ctags_with_dep.sh<a href="https://gist.github.com/raw/1729992/4eae76f78ba44d5fd0e705d51b0ededbeb0a7a6a/ctags_with_dep.sh">link</a></figcaption><div class="highlight"><table><tbody><tr><td class="line-numbers" aria-hidden="true"><pre><div data-line="1" class="line-number"></div><div data-line="2" class="line-number"></div><div data-line="3" class="line-number"></div><div data-line="4" class="line-number"></div><div data-line="5" class="line-number"></div><div data-line="6" class="line-number"></div><div data-line="7" class="line-number"></div></pre></td><td class="main  sh"><pre><div class="line"><span class="c">#!/bin/sh</span>
+</div><div class="line"> </div><div class="line"><span class="c"># ./ctags_with_dep.sh file1.c file2.c ... to generate a tags file for these files.</span>
+</div><div class="line"> </div><div class="line">gcc -M <span class="nv">$*</span> | sed -e <span class="s1">'s/[\\ ]/\n/g'</span> | <span class="se">\</span>
+</div><div class="line">        sed -e <span class="s1">'/^$/d'</span> -e <span class="s1">'/\.o:[ \t]*$/d'</span> | <span class="se">\</span>
+</div><div class="line">        ctags -L - --c++-kinds<span class="o">=</span>+p --fields<span class="o">=</span>+iaS --extra<span class="o">=</span>+q
+</div></pre></td></tr></tbody></table></div></figure>
+
+<p>This script is also available on <a href="https://gist.github.com/1729992">github gist</a>.
+If you only want to use it,
+<a href="https://gist.github.com/raw/1729992/4eae76f78ba44d5fd0e705d51b0ededbeb0a7a6a/ctags_with_dep.sh">download</a>
+the script and use the following command to generate the tags file:</p>
+<div class="highlight"><pre><code class="text">./ctags_with_dep.sh file1.c file2.c file3.cpp ...
+</code></pre></div>
+<p>Read on if you want to know what's happening here. This script will first use
+<code>gcc -M</code> to output the list of header files that are included in our C or C++
+source files. However, the output could not be directly used by ctags, thus this
+script uses <a href="http://en.wikipedia.org/wiki/Sed">sed</a> commands to filter the output. Finally, this script uses a
+<a href="http://en.wikipedia.org/wiki/Pipeline_(Unix)">pipe</a> to put the file list to the <a href="">stdin</a> of the ctags program – ctags
+will read the file list from stdin if <code>-L -</code> is passed to it on the command
+line.</p>
+
+<p>What if you have other directories besides the standard <code>/usr/include</code> that
+containing the header files you need? You could do a little modification on this
+script. For example, you have some header files in <code>~/include</code>, then you could
+pass <code>-I ~/include</code> to the gcc command. Just like below:</p>
+
+<figure class="code"><div class="highlight"><table><tbody><tr><td class="line-numbers" aria-hidden="true"><pre><div data-line="1" class="line-number"></div><div data-line="2" class="line-number"></div><div data-line="3" class="line-number"></div></pre></td><td class="main  sh"><pre><div class="line">    gcc -M -I ~/include <span class="nv">$*</span> | sed -e <span class="s1">'s/[\\ ]/\n/g'</span> | <span class="se">\</span>
+</div><div class="line">            sed -e <span class="s1">'/^$/d'</span> -e <span class="s1">'/\.o:[ \t]*$/d'</span> | <span class="se">\</span>
+</div><div class="line">            ctags -L - --c++-kinds<span class="o">=</span>+p --fields<span class="o">=</span>+iaS --extra<span class="o">=</span>+q
+</div></pre></td></tr></tbody></table></div></figure>
+
+<p>If you have any suggestion on this idea, please let me know.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Hong Xu</span></span>
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T14:29:00-07:00" pubdate="" data-updated="true">Mar 17<span>th</span>, 2012</time>
+
+
+<span class="categories">
+  
+    <a class="category" href="http://www.topbug.net/blog/categories/c/">C</a>, <a class="category" href="http://www.topbug.net/blog/categories/c-/">C++</a>, <a class="category" href="http://www.topbug.net/blog/categories/c-c-/">C/C++</a>, <a class="category" href="http://www.topbug.net/blog/categories/ide/">IDE</a>, <a class="category" href="http://www.topbug.net/blog/categories/software-development/">Software Development</a>, <a class="category" href="http://www.topbug.net/blog/categories/vim/">Vim</a>, <a class="category" href="http://www.topbug.net/blog/categories/ctags/">ctags</a>, <a class="category" href="http://www.topbug.net/blog/categories/editor/">editor</a>
+  
+</span>
+
+
+
+      
+
+    </p>
+    
+      <div class="sharing">
+  
+    
+      <a href="http://twitter.com/share" title="Tweet this" class="twitter-share" target="_blank">Tweet</a>
+    
+  
+  
+    
+      <a title="+1 on Google Plus" class="googleplus-share" href="https://plusone.google.com/_/+1/confirm?hl=en&url=http://www.topbug.net/blog/2012/03/17/generate-ctags-files-for-c-slash-c-plus-plus-source-files-and-all-of-their-included-header-files/" target="_blank">+1</a>
+    
+  
+  
+  
+
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="http://www.topbug.net/blog/2012/03/14/use-editorconfig-to-maintain-consistent-coding-styles-between-different-editors-and-ides/" title="Previous Post: Use EditorConfig to Maintain Consistent Coding Styles between Different Editors and IDEs">« Use EditorConfig to Maintain Consistent Coding Styles between Different Editors and IDEs</a>
+      
+      
+        <a class="basic-alignment right" href="http://www.topbug.net/blog/2012/03/25/attach-a-pull-request-to-an-existing-github-issue/" title="Next Post: Attach a Pull Request to an Existing GitHub Issue">Attach a Pull Request to an Existing GitHub Issue »</a>
+      
+    </p>
+  </footer>
+</article>
+
+<section>
+  <h1>Comments</h1>
+  
+
+  
+    <div id="disqus_thread" aria-live="polite"><iframe id="dsq1" data-disqus-uid="1" allowtransparency="true" frameborder="0" role="application" style="width: 100%; border: none; overflow: hidden; height: 1208px; " width="100%" src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/saved_resource.html" scrolling="no" horizontalscrolling="no" verticalscrolling="no"></iframe><iframe id="dsq3" data-disqus-uid="3" allowtransparency="true" frameborder="0" role="application" style="width: 100%; border: none; overflow: hidden; display: none; " width="100%" src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/client.html"></iframe><iframe id="dsq-indicator-north" data-disqus-uid="-indicator-north" allowtransparency="true" frameborder="0" role="application" style="width: 658px; border: none; overflow: hidden; top: 0px; min-width: 658px; max-width: 658px; position: fixed; max-height: 29px; min-height: 29px; height: 29px; display: none; " scrolling="no"></iframe><iframe id="dsq-indicator-south" data-disqus-uid="-indicator-south" allowtransparency="true" frameborder="0" role="application" style="width: 658px; border: none; overflow: hidden; bottom: 0px; min-width: 658px; max-width: 658px; position: fixed; max-height: 29px; min-height: 29px; height: 29px; display: none; " scrolling="no"></iframe></div>
+  
+</section>
+
+</div>
+
+<aside class="sidebar thirds">
+  
+    <section class="social first odd">
+<h1>
+  <a href="http://github.com/xuhdev" title="My GitHub Profile"><img src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/github.png" alt="GitHub">GitHub</a>
+</h1>
+</section>
+
+<section class="social even">
+<h1>
+  <a href="http://twitter.com/xuhdev" title="Follow Me on Twitter"><img src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/twitter.png" alt="Twitter">Twitter</a>
+</h1>
+</section>
+
+<section class="social odd">
+<h1>
+  <a href="https://plus.google.com/101806876980287007548?rel=author"><img src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/google_plus.png" alt="Google Plus">Google Plus</a>
+</h1>
+</section>
+
+<section class="social first even">
+<h1>
+  <a href="mailto:hong@topbug.net" title="Email Me"><img src="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/email.png" alt="Email Me">Email Me</a>
+</h1>
+</section>
+
+<section class="odd">
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2013/01/10/load-a-matrix-from-an-ascii-format-file/">Load A Matrix from An ASCII Format File (C++ and Python)</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/07/02/a-simple-tutorial-create-and-publish-chocolatey-packages/">A Simple Tutorial: Create and Publish Chocolatey Packages</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/05/27/use-travis-ci-with-jython/">Use Travis CI with Jython</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/03/31/archive-a-git-superproject-and-its-submodules/">Archive a Git Superproject and Its Submodules</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/03/25/attach-a-pull-request-to-an-existing-github-issue/">Attach a Pull Request to an Existing GitHub Issue</a>
+      </li>
+    
+      <li class="post">
+        <a href="./Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu_files/Generate Ctags Files for C C++ Source Files and All of Their Included Header Files - Hong Xu.html">Generate Ctags Files for C/C++ Source Files and All of Their Included Header Files</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/03/14/use-editorconfig-to-maintain-consistent-coding-styles-between-different-editors-and-ides/">Use EditorConfig to Maintain Consistent Coding Styles between Different Editors and IDEs</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/03/10/add-a-show-image-switch-for-the-safari-browser-on-your-iphone-slash-ipad-slash-ipod-touch/">Add a "Show Image" Switch for the Safari Browser on Your iPhone/iPad/iPod Touch</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.topbug.net/blog/2012/03/07/use-singlecompile-to-compile-and-run-a-single-source-file-easily-in-vim/">Use SingleCompile to Compile and Run a Single Source File Easily in Vim</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    <span class="toggle-sidebar"></span></div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright © 2013 - Hong Xu -
+  <span class="credit">Powered by <a href="http://octopress.org/">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'xuhdev-homepage';
+			var disqus_developer = '0';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.topbug.net/blog/2012/03/17/generate-ctags-files-for-c-slash-c-plus-plus-source-files-and-all-of-their-included-header-files/';
+        var disqus_url = 'http://www.topbug.net/blog/2012/03/17/generate-ctags-files-for-c-slash-c-plus-plus-source-files-and-all-of-their-included-header-files/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+</body></html>

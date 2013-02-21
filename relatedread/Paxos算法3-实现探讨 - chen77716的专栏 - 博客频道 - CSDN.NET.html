@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0054)http://blog.csdn.net/chen77716/article/details/6172392 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET</title>
+
+<meta name="description" content="前两篇Paxos算法的讨论，让我们对paxos算法的理论形成过程有了大概的了解，但距离其成为一个可执行的算法程序还有很长的路要走，原因是很多的细节和错误未被考虑。Google Chubby的作者说，paxos算法实现起来远没有看起来简单，原因是paxos的容错仅限于server crash这一种情况，但在实际工程实现时要考虑磁盘损坏、文件损坏、Leader身份丢失等诸多的错误。 1. Pa">
+<script type="text/javascript" async="" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ga.js"></script><script src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ad.js"></script>
+<link rel="Stylesheet" type="text/css" href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/style.css">
+<link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/chen77716/rss/list">
+<link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+<link type="text/css" rel="stylesheet" href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/default.css">
+<link type="text/css" rel="stylesheet" href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/style(1).css"></head>
+<body>
+<script src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/pub_topnav_2011.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/navtop_2012.css">
+<div class="nav_top_2011">
+<p><span style="color:red;">您还未登录！</span>|<a href="https://passport.csdn.net/account/login" target="_top">登录</a>|<a href="https://passport.csdn.net/account/register" target="_top">注册</a>|<a href="https://passport.csdn.net/help/faq" target="_blank">帮助</a></p><ul>
+<li><a href="http://www.csdn.net/" target="_blank">首页</a></li>
+<li><a href="http://news.csdn.net/" target="_blank">业界</a></li>
+<li><a href="http://mobile.csdn.net/" target="_blank">移动</a></li>
+<li><a href="http://cloud.csdn.net/" target="_blank">云计算</a></li>
+<li><a href="http://sd.csdn.net/" target="_blank">研发</a></li>
+<li><a href="http://bbs.csdn.net/" target="_blank">论坛</a></li>
+<li><a href="http://blog.csdn.net/" target="_blank">博客</a></li>
+<li><a href="http://download.csdn.net/" target="_blank">下载</a></li>
+<li class="more"><h2 id="topnav_btnmore" onclick="showNavMore(this)"><a href="javascript:void(0);">更多</a></h2>
+<div id="topnav_hidlist">
+<iframe name="nav_frm" src="about:blank" width="92" height="178" scrolling="no" frameborder="no"></iframe>
+</div>
+</li>
+</ul>
+</div>
+
+
+<div id="container">
+<div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h1><a href="http://blog.csdn.net/chen77716">chen77716的专栏</a></h1>
+            <h2>曲高和寡，阳春白雪</h2>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg"></div>
+    <div class="navigator">
+        <ul>
+            <li id="btnContents"><a href="http://blog.csdn.net/chen77716?viewmode=contents"><span><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+            <li id="btnView"><a href="http://blog.csdn.net/chen77716?viewmode=list"><span><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+            <li id="btnRss"><a href="http://blog.csdn.net/chen77716/rss/list"><span><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "chen77716";
+    var blog_address = "http://blog.csdn.net/chen77716";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";
+</script>
+        
+<div id="body">
+<div id="main">
+<div class="main">
+<div class="notice"> 
+
+<a href="http://surveies.csdn.net/survey/comein/546" target="_blank">
+<font color="blue">CSDN客服工作问卷调查   </font></a>
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/8572108" target="_blank"><font color="red">社区专家谈 12306</font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://bbs.csdn.net/topics/390366069" target="_blank"><font color="red">CSDN社区“海外程序员经验谈”活动正式上线 
+</font></a>
+
+<br>
+
+
+
+
+
+<a href="http://www.csdn.net/article/2013-02-17/2814150" target="_blank">
+<font color="red">专访王豫翔：编程道路上的“三少三多” </font></a>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnstudent/article/details/8077932" target="_blank">
+<font color="red">2013年全国百所高校巡讲讲师招募  </font></a>
+
+
+</div><div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Original"></span>
+    <h3>
+        <span class="link_title"><a href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET.html">
+        Paxos算法3-实现探讨
+        </a></span>
+    </h3>
+</div>
+
+        
+    <div class="article_manage">
+        <span class="link_categories">
+        分类：
+            <a href="http://blog.csdn.net/chen77716/article/category/743686">分布式算法</a> 
+        </span>
+    <span class="link_postdate">2011-02-04 09:00</span>
+    <span class="link_view" title="阅读次数">2707人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/chen77716/article/details/6172392#comments">评论</a>(10)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;Paxos算法3-实现探讨&#39;,&#39;6172392&#39;);return false;" title="收藏">收藏</a></span>
+    <span class="link_report"><a href="http://blog.csdn.net/chen77716/article/details/6172392#report" onclick="javascript:report(6172392,2);return false;" title="举报">举报</a></span>
+    
+</div>
+
+
+    
+<div id="article_content" class="article_content">
+
+<p>前两篇Paxos算法的讨论，让我们对paxos算法的理论形成过程有了大概的了解，但距离其成为一个可执行的算法程序还有很长的路要走，原因是很多的细节和错误未被考虑。Google Chubby的作者说，paxos算法实现起来远没有看起来简单，原因是paxos的容错仅限于server crash这一种情况，但在实际工程实现时要考虑磁盘损坏、文件损坏、Leader身份丢失等诸多的错误。</p>
+<p>&nbsp;</p>
+<p>1. Paxos各角色的职能</p>
+<p>在paxos算法中存在Client、Proposer、Proposer Leaer、Acceptor、Learn五种角色，可精简为三种主要角色：proposer、acceptor、learn。角色只是逻辑上存在的，在实际实现中，节点可以身兼多职。</p>
+<p>在我们的讨论中，我们先假定没有Proposer Leader这一角色，在不考虑活锁的情况下，如果算法过程正确，那有Leader角色的算法过程肯定也正确。</p>
+<p>&nbsp;</p>
+<p>除了五种角色，还有三个重要的概念：instance、proposal、value，分别代表：每次paxos选举过程、提案、提案的value</p>
+<p>当然，还有4个关键过程：</p>
+<ul>
+<li>(Phase1)：prepare</li><li>(Phase1)：prepare ack</li><li>(Phase2)：accept</li><li>(Phase2)：accept ack</li></ul>
+<p>对acceptor来说，还蕴含是着promise、accept、reject三个动作。</p>
+<p>先上一幅图，更直观地对几种角色的职能加以了解（各角色的具体职能参考Lamport的论文就足够了）：</p>
+<p><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/0_1297849489U6qy.gif" alt="Paxos各角色职责" width="609" height="365"></p>
+<p>&nbsp;</p>
+<p>上图不是非常严格，仅为表现各角色之间的关系。</p>
+<p>&nbsp;</p>
+<p>2. Proposer</p>
+<p>在Proposer、Acceptor、Learn中均涉及到proposal的编号，该编号应该有proposer作出改变，对其他的角色是只读的，这就保证了只有一个数据源。当多个proposer同时提交proposal时，必须保证各proposer的编号唯一、且可比较，具体做法之前已经提到。这里还要强调一点的是，仅每个proposer按自己的规则提高编号是不够的，还必须了解“外面”的最大编号是多少，例如，P1、P2、P3（请参考：<a href="http://blog.csdn.net/chen77716/archive/2011/01/30/6170235.aspx">Paxos算法2#再论编号问题：编号唯一性</a>）</p>
+<ul>
+<li>P3的当前编号为初始编号2</li><li>当P3提交proposal时发现已经有更大的编号16（16是P2提出的，按规则：5*3+1）</li><li>P3发起新编号时必须保证new no &gt;16，按照前面的规则必须选择：5*3+2 = 17，而不能仅按自己的规则选择：1*3+2=5</li></ul>
+<p>这要求acceptor要在reject消息中给出当前的最大编号，proposer可能出现宕机，重启后继续服务，reject消息会帮助它迅速找到下一个正确编号。但是当多个acceptor回复各自不一的reject消息时，事情就变得复杂起来。</p>
+<p>当proposer发送proposal给一个acceptor时，会有三种结果：</p>
+<ul>
+<li>timeout：超时，未接收到aceptor的response</li><li>reject：编号不够大，拒绝。并附有当前最大编号</li><li>promise：接受，并确保不会批准小于此编号的proposal。并附有当前最大编号及对应的value</li></ul>
+<p>在判断是否可以进行Phase2时的一个充分条例就是：<strong>必须有acceptor的多数派promise了当前的proposal</strong>。</p>
+<p>下面分别从Phase1和Phase2讨论proposer的行为：</p>
+<p>&nbsp;</p>
+<p>Phase1-prepare：发送prepare到acceptor</p>
+<hr>
+<p>Proposer在本地选择proposal编号，发送给acceptor，会收到几种情况的response：</p>
+<p>&nbsp;</p>
+<p>(a). 没有收到多数派的回应</p>
+<p>消息丢失、Server宕机导致没有多数派响应，在可靠消息传输(TCP)下，应该报告宕机导致剩余的Server无法继续提供服务，在实际中一个多数派同时宕机的可能性非常小。</p>
+<p>&nbsp;</p>
+<p>(b). 收到多数派的reject</p>
+<p>Acceptor可能会发生任意的错误，比如消息丢失、宕机重启等，会导致每个acceptor看到的最大编号不一致，因而在reject消息中response给proposer的最大编号也不一致，这种情况proposer应该取其最大作为比较对象，重新计算编号后继续Phase1的prepare阶段。</p>
+<p>&nbsp;</p>
+<p>(c). 收到多数派的promise</p>
+<p>根据包含的value不同，这些promise又分三种情况：</p>
+<ul>
+<li>多数派的value是相同的，说明之前已经达成了最终决议</li><li>value互不相同，之前并没有达成最终决议</li><li>返回的value全部为null</li></ul>
+<p>全部为null的情况比较好处理，只要proposer自由决定value即可；多数派达成一致的情况也好处理，选择已经达成决议的value提交即可，value互不相同的情况有两种处理方式：</p>
+<ul>
+<li>方案1：自由确定一个value。原因：反正之前没有达成决议，本次提交哪个value应该是没有限制的。</li><li>方案2：选择promise编号最大的value。原因：本次选举（instance）已经有提案了，虽未获通过，但以后的提案应该继续之前的，Lamport在paxos simple的论文中选择这种方式。</li></ul>
+<p>其实问题的本质是：在一个instance内，一个acceptor是否能accept多个value？约束P2只是要求，如果某个value v已被选出，那之后选出的还应该是v；反过来说，如果value v还没有被多数派accept，也没有限制acceptor只accept一个value。</p>
+<p>感觉两种处理方式都可以，只要选择一个value，能在paxos之后的过程中达成一致即可。其实不然，有可能value v已经成为了最终决议，但acceptor不知道，如果这时不选择value v而选其他value，会导致在一次instance内达成两个决议。</p>
+<p>会不会存在这样一种情况：A、B、C、D为多数派的promise，A、B、C的proposal编号，value为(1,1)，D的为(2,2)？就是说，编号互不一致，但小编号的已经达成了最终决议，而大编号的没有？</p>
+<p>设：小编号的proposal为P1，value为v1；大编号的proposal为P2，value为v2</p>
+<ul>
+<li>如果P1选出最终决议，那么肯定是完成了phase1、phase2。存在一个acceptor的多数派C1，P1为其最大编号，并且每个acceptor都accept了v1；</li><li>当P2执行phase1时，存在多数派C2回应了promise，则C1与C2存在一个公共成员，其最大编号为P1，并且accept了v1</li><li>根据规则，P2只能选择v1继续phase2，也就是说v1=v2，无论phase2是否能成功，绝不会在acceptor中遗留下类似（2，2）这样的value</li></ul>
+<p>也就是说，只要按照【方案2】选择value就能保证结果的正确性。之所以能有这样的结果，关键还是那个神秘的多数派，这个多数派起了两个至关重要的作用：</p>
+<ul>
+<li>在phase1拒绝小编号的proposal</li><li>在phase2强迫proposal选择指定的value</li></ul>
+<p>而多数派能起作用的原因就是，任何两个多数派至少有一个公共成员，而这个公共成员对后续proposal的行为起着决定性的影响，如果这个多数派拒绝了后续的proposal，这些proposal就会因为无法形成新的多数派而进行不下去。这也是paxos算法的精髓所在吧。</p>
+<p>&nbsp;</p>
+<p>Phase2-accept：发送accept给acceptor</p>
+<hr>
+<p>如果一切正常，proposer会选择一个value发送给acceptor，这个过程比较简单</p>
+<p>&nbsp;</p>
+<p>accept也会收到2种回应：</p>
+<hr>
+<p>(a). acceptor多数派accept了value</p>
+<p>一旦多数派accept了value，那最终决议就已达成，剩下的工作就是交由learn学习并关闭本次选举(instance)。</p>
+<p>&nbsp;</p>
+<p>(b). acceptor多数派reject了value或超时</p>
+<p>说明acceptor不可用或提交的编号不够大，继续Phase1的处理。</p>
+<p>&nbsp;</p>
+<p>proposer的处理大概如此，但实际编程时还有几个问题要考虑：</p>
+<ul>
+<li>来自acceptor的重复消息</li><li>本来超时的消息又突然到了</li><li>消息持久化</li></ul>
+<p>其他2个问题比较简单，持久化的问题有必要讨论下。</p>
+<p>持久化的目的是在proposer server宕机“苏醒”时，可以继续参与paxos过程。</p>
+<p>从前面分析可看出，proposer工作的正确性是靠编号的正确性来保证的，编号的正确性是由proposer对编号的初始化写及acceptor的reject一起保证的，所以只要acceptor能正常工作，proposer就无须持久化当前编号。</p>
+<p>&nbsp;</p>
+<p>3. acceptor</p>
+<p>&nbsp;acceptor的行为相对简单，就是根据提案的编号决定是否接受proposal，判断编号依赖promise和accept两种消息，因此acceptor必须对接收到的消息做持久化处理。根据之前的讨论也知道，acceptor的持久化也会影响着proposer的正确性。</p>
+<p>&nbsp;在acceptor对proposal进行决策的时候，还有个重要的概念没有被详细讨论，即instance。任何对proposal的判断都是基于某个instance，即某次paxos过程，当本次instance宣布结束（选出了最终决议）时，paxos过程就转移到下一个instance。这样会衍生出几个问题：</p>
+<ol>
+<li>instance何时被关闭？被谁关闭？</li><li>acceptor的行为是否依赖instance的关闭与否？</li><li>acceptor的多数派会不会在同一个instance内对两个不同的value同时达成一致？</li></ol>
+<p>根据1中对各角色职能的讨论，决议是否被选出是由learn来决定的，当learn得知某个value v已经被多数派accept时，就认为决议被选出，并宣布关闭当前的instance。与2中提到的一样，因为网络原因acceptor可能不会得知instance已被关闭，而会继续对proposer回答关于该instance的问题。也就是说，无论如何acceptor都无法准确得知instance是否关闭，acceptor程序的正确性也就不能依赖instance是否关闭。但acceptor在已经知道instance已被关闭的情况下，在拒绝proposer时能提供更多的信息，比如，可以使proposer选择一个更高的instance重新提交请求。</p>
+<p>当然，只要proposer根据2中提到的方式进行提案，就不会发生同一instance中产生两个决议的情况。</p>
+<p>&nbsp;</p>
+<p>4. learn</p>
+<p>learn的主要职责是学习决议，但决议必须一个一个按顺序学，不能跳号，比如learn已经知道了100，102号决议，必须同时知道101时才能一起学习。只是简单的等待101号决议的到来显然不是一个好办法，learn还要去主动向acceptor询问101号决议的情况，acceptor会对消息做持久化，做到这一点显然不难。</p>
+<p>learn还要周期性地check所接收到的value，一旦意识到决议已经达成，必须关闭对应的instance，并通知acceptor、proposer等（根据需要可以通知任意多的对象）。</p>
+<p>learn还存在一个问题是，是选择一个server做learn还是选多个，假如有N个acceptor，M个learn，则会产生N*M的通信量，如果M很大则通信量会非常大，如果M=1，通信量小但会形成单点。折中方案是选择规模相对较小的M，使这些learn通知其他learn。</p>
+<p>paxos中的learn相对比较抽象，好理解但难以想象能做什么，原因在于对paxos的应用场景不清晰。一般说来有两种使用paxos的场景：</p>
+<ul>
+<li>paxos作为单独的服务，比如google的chubby，hadoop的zookeeper</li><li>paxos作为应用的一部分，比如Keyspace、BerkeleyDB</li></ul>
+<p>如果把paxos作为单独的服务，那learn的作用就是达成决议后通知客户端；如果是应用的一部分，learn则会直接执行业务逻辑，比如开始数据复制。</p>
+<p>&nbsp;</p>
+<p>持久化：</p>
+<p>learn所依赖的所有信息就是value和instance，这些信息都已在acceptor中进行了持久化，所以learn不需要再对消息进行持久化，当learn新加入或重启时要做的就是能通过acceptor把这些信息取回来。</p>
+<p>&nbsp;</p>
+<p>错误处理：</p>
+<p>learn可能会重启或新加入后会对“之前发生的事情”不清楚，解决办法是：使learn继续监听消息，直至某个instance对应的value达成一致时，learn再向acceptor请求之前所有的instance。</p>
+<p>&nbsp;</p>
+<p>至此，我们进一步讨论了paxos个角色的职责和可能的实现分析，离我们把paxos算法变为一个可执行程序的目标又进了一步，使我们对paxos的实现方式大致心里有底，但还有诸多的问题需要进一步讨论，比如错误处理。虽然文中也提到了一些错误及处理方式，但还没有系统地考虑到所有的错误。</p>
+<p>&nbsp;</p>
+<p>接下来的讨论将重点围绕着分布式环境下的错误处理。</p>
+
+</div>
+<div class="share_buttons" id="sharePanel"><span>分享到：</span> <a name="sina" class="share_sina" title="分享到新浪微博"></a><a name="qq" class="share_qq" title="分享到腾讯微博"></a></div>
+<!--192.168.1.237-->
+<div class="article_next_prev">
+    <li class="prev_article"><span>上一篇：</span><a href="http://blog.csdn.net/chen77716/article/details/6170235">Paxos算法2-算法过程</a></li>
+    <li class="next_article"><span>下一篇：</span><a href="http://blog.csdn.net/chen77716/article/details/6220524">Viewstamps算法</a></li>
+</div>
+
+
+    
+</div>
+<div id="ad_cen"><iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 1217px; height: 97px;" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ad(1).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(4, 'ad_cen');
+</script>
+<div id="comment_title" class="panel_head">查看评论<a name="comments"></a></div>
+<div id="comment_list"><dl class="comment_item comment_topic" id="comment_item_2519918"><dt class="comment_head" floor="5">5楼 <span class="user"><a class="username" href="http://blog.csdn.net/herokingyy" target="_blank">herokingyy</a> <span class="ptime">2013-01-29 03:20发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2519918" username="herokingyy"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/herokingyy" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_herokingyy.jpg" width="40" height="40"></a></dd><dd class="comment_body">您好，请教个问题：<br>假设 有3个proposer: P1、P2、P3 (同时也用作acceptor) 都还没有接受过任何决议，即处于初始状态，此时第一个 instance内，P1发起了编号是0，value是v1的proposal，p3发起了编号是2，value是v2的proposal，v1不等于v2；由于网络原因，P1发起的proposal先到达P2，P2向P1回复了promise，P1认为获得了多数派的支持，开始执行Phase2-accept，并且P1本身作为一个acceptor成功执行了accept这个value v1的动作，P2由于网络原因没有收到这个accept请求，而此时P3发起的proposal到达了P2，那么编号2可以被promise，所以P3也认为它获得了多数派的支持，开始执行Phase2-accept，此时P2和P3的最终决议是value v2，而P1的最终决议是value v1，这种情况应该怎么解决？</dd></dl><dl class="comment_item comment_topic" id="comment_item_2299576"><dt class="comment_head" floor="4">4楼 <span class="user"><a class="username" href="http://blog.csdn.net/fw37fw37" target="_blank">fw37fw37</a> <span class="ptime">2012-07-25 14:37发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2299576" username="fw37fw37"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/fw37fw37" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_fw37fw37.jpg" width="40" height="40"></a></dd><dd class="comment_body">你好，楼主，有个大的问题请教下：我的理解Paxos是完全独立的（无状态）无中心的分布式网络，但Learn的出现其实是很诡异的，因为它是有状态的，这样就回到最初的问题，很多分布式系统是为了去掉中心控制节点才引入类似的算法，这样岂不有点自相矛盾？当然关于Instance如何被判定终结是Learn一个很重要的功能。</dd></dl><dl class="comment_item comment_topic" id="comment_item_2118583"><dt class="comment_head" floor="3">3楼 <span class="user"><a class="username" href="http://blog.csdn.net/woodenhouse" target="_blank">woodenhouse</a> <span class="ptime">2012-03-04 21:57发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2118583" username="woodenhouse"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/woodenhouse" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_woodenhouse.jpg" width="40" height="40"></a></dd><dd class="comment_body">你好，我想请教下wiki中文的paxos算法(http://zh.wikipedia.org/zh-cn/Paxos%E7%AE%97%E6%B3%95)中针对某个范例的3种情况作出了3种假设，其中在第3种情况下，最后系统通过了A5提出的20％的税率，这似乎违反了 P2约束，也违反了算法的Phase2a阶段的value的选取原则，这点一直令我很不解，不知道是怎么一回事？</dd><dl class="comment_item comment_reply" id="comment_item_2119439"><dt class="comment_head" floor="3">Re: <span class="user"><a class="username" href="http://blog.csdn.net/chen77716" target="_blank">陈国庆</a> <span class="ptime">2012-03-05 17:20发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2119439" username="chen77716"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/chen77716" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_chen77716.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复woodenhouse：那个例子的意思是说，A1的提案在Phase1时被否决了，而A5则顺利地执行完了Phase1、Phase2，当然会选择A5的20%。要注意的是，在Phase1时并不提交value，当A1被否决时并没有value被提交，所以并没有违反P2</dd><dl class="comment_item comment_reply" id="comment_item_2119677"><dt class="comment_head" floor="1">Re: <span class="user"><a class="username" href="http://blog.csdn.net/woodenhouse" target="_blank">woodenhouse</a> <span class="ptime">2012-03-05 21:11发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2119677" username="woodenhouse"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/woodenhouse" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_woodenhouse.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复chen77716：啊,我明白是什么意思了!学校老师也没有懂这个的,自己一个人纠结了好几天,还是您一句指导来得有效,非常感谢!</dd></dl></dl></dl><dl class="comment_item comment_topic" id="comment_item_2118407"><dt class="comment_head" floor="2">2楼 <span class="user"><a class="username" href="http://blog.csdn.net/xiaoxiaoming" target="_blank">xiaoxiaoming</a> <span class="ptime">2012-03-04 17:08发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2118407" username="xiaoxiaoming"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/xiaoxiaoming" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_xiaoxiaoming.jpg" width="40" height="40"></a></dd><dd class="comment_body">请问一下paxos如何学习出多个决议?<br>1 决议之间没有冲突 p1: x = 1 p2: y  = 3<br>2  决议之间有冲突p1: x = 3 p2: x =5</dd><dl class="comment_item comment_reply" id="comment_item_2118535"><dt class="comment_head" floor="2">Re: <span class="user"><a class="username" href="http://blog.csdn.net/chen77716" target="_blank">陈国庆</a> <span class="ptime">2012-03-04 20:58发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2118535" username="chen77716"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/chen77716" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_chen77716.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复xiaoxiaoming：每个instance只能选出一个决议，instance都有连续编号，Learner学习时必须按照编号一个一个来。<br>我不知是否理解了你的意思？</dd><dl class="comment_item comment_reply" id="comment_item_2119552"><dt class="comment_head" floor="1">Re: <span class="user"><a class="username" href="http://blog.csdn.net/xiaoxiaoming" target="_blank">xiaoxiaoming</a> <span class="ptime">2012-03-05 19:13发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2119552" username="xiaoxiaoming"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/xiaoxiaoming" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_xiaoxiaoming.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复chen77716：是不是有2个编号，一个是instance编号，一个是propose编号。那么学习的时候应该按照那个编号来学习呢？<br><br>协议之间没有冲突：p1: x= 1 p2: y=3需要几个instance？<br><br>协议之间有冲突p1: x=1 p2: x=3 需要几个instance？</dd><dl class="comment_item comment_reply" id="comment_item_2120171"><dt class="comment_head" floor="1">Re: <span class="user"><a class="username" href="http://blog.csdn.net/chen77716" target="_blank">陈国庆</a> <span class="ptime">2012-03-06 10:54发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="2120171" username="chen77716"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/chen77716" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_chen77716.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复xiaoxiaoming：1.的确存在两个编号：instance number和proposal number，instance number是指第几次选举，proposal number是指在第几次选举中的提案编号；比如在第5次选举中，可能会有很多提案，每个提案都有全序编号<br>2.每次选举（instance）中虽然存在多个提案，但只能选出一个value，若有多个value，则需进行多次选举（instance）；学习的时候必须按照instance number一个一个来<br>3.因此，你所说的x=1,x=2，只要存在两个value，必须要有两个instance<br>算法的核心是“一次选举只能选出一个value”</dd></dl></dl></dl></dl><dl class="comment_item comment_topic" id="comment_item_1864878"><dt class="comment_head" floor="1">1楼 <span class="user"><a class="username" href="http://blog.csdn.net/onlyg" target="_blank">ggzwtj</a> <span class="ptime">2011-08-04 21:07发表</span>  <a href="http://blog.csdn.net/chen77716/article/details/6172392#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="1864878" username="onlyg"> <a href="http://blog.csdn.net/chen77716/article/details/6172392#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/chen77716/article/details/6172392#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/onlyg" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/3_onlyg.jpg" width="40" height="40"></a></dd><dd class="comment_body">请教一下：如果提案有10个，但是accepter只有11个，那么在一个paxos算法过程中是不是最多6个value会被投票，其他的是不会参加投票的？谢谢。</dd></dl><div class="clear"></div></div>
+<div id="comment_bar" style="display: none;"></div>
+<div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:csdn.showLogin(function (dat) {js_logined(dat.data.userName);});">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fchen77716%2Farticle%2Fdetails%2F6172392">[注册]</a></div></div>
+<div class="announce">* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+<script type="text/javascript">
+    var fileName = '6172392';
+    var commentscount = 10;
+    var islock = false
+</script>
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/comment.js"></script>
+<div id="ad_bot"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 1217px; height: 170px;" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ad(2).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(5, 'ad_bot');
+</script>
+<div id="report_dialog"></div>
+
+<div id="d-top" style="display:none;">
+<a id="d-top-a" href="http://blog.csdn.net/chen77716/article/details/6172392#" title="回到顶部">
+<img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/top.png" alt="TOP"></a>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var d_top=$('#d-top');
+        document.onscroll=function(){
+            var scrTop=(document.body.scrollTop||document.documentElement.scrollTop);
+            if(scrTop>500){
+                d_top.show();
+            }else{
+                d_top.hide();
+            }
+        }
+        $('#d-top-a').click(function(){
+            scrollTo(0,0);
+            this.blur();
+            return false;
+        });
+    });
+</script>
+
+
+
+<div class="clear"></div>
+</div>
+</div>
+
+<div id="side">
+<div class="side">
+<div id="panel_Profile" class="panel">
+    <ul class="panel_head"><span>个人资料</span></ul>
+    <ul class="panel_body profile">
+        <div id="blog_userface">
+            <a href="http://my.csdn.net/chen77716" target="_blank">
+            <img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/1_chen77716.jpg" title="访问我的空间" style="max-width:90%">
+            </a>
+            <br>
+            <span><a href="http://my.csdn.net/chen77716" class="user_name" target="_blank">陈国庆</a></span>
+        </div>
+<div class="interact">
+<!--<a href="#" class="attented" title="已关注"></a>-->
+<a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+<a href="javascript:void(0);" class="letter" onclick="loginto(1)" title="[发私信]"></a>
+</div>
+        <div id="blog_medal">
+        <div id="bms_box"></div></div>
+        <ul id="blog_rank">
+            <li>访问：<span>54969次</span></li>
+            <li>积分：<span>879分</span></li>
+            <li>排名：<span>第11017名</span></li>
+        </ul>
+        <ul id="blog_statistics">
+            <li>原创：<span>30篇</span></li>
+            <li>转载：<span>0篇</span></li>
+            <li>译文：<span>0篇</span></li>
+            <li>评论：<span>44条</span></li>
+        </ul>
+    </ul>
+</div>
+<script type="text/javascript">
+    var _blogger = 'chen77716';
+</script>
+
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>文章分类</span></ul>
+    <ul class="panel_body">
+        <li>
+        <a href="http://blog.csdn.net/chen77716/article/category/127049">Aop</a><span>(2)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/chen77716/article/category/772443">JVM</a><span>(2)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/chen77716/article/category/21477">Tomcat研究系列</a><span>(3)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/chen77716/article/category/743686">分布式算法</a><span>(15)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/chen77716/article/category/954996">加密算法</a><span>(3)</span>
+        </li>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+    <ul class="panel_head"><span>文章存档</span></ul>
+    <ul class="panel_body">
+        <div id="archive_list"><li><a href="http://blog.csdn.net/chen77716/article/month/2012/09">2012年09月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2012/03">2012年03月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2012/02">2012年02月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2012/01">2012年01月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/12">2011年12月</a><span>(3)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/chen77716/article/month/2011/09">2011年09月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/07">2011年07月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/06">2011年06月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/03">2011年03月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/02">2011年02月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2011/01">2011年01月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2010/12">2010年12月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2010/10">2010年10月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2010/06">2010年06月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2010/05">2010年05月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2005/06">2005年06月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2005/04">2005年04月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/chen77716/article/month/2004/07">2004年07月</a><span>(1)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>阅读排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6059575" title="Chord算法（原理）">Chord算法（原理）</a><span>(5973)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6166675" title="Paxos算法1-算法形成理论">Paxos算法1-算法形成理论</a><span>(4998)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6170235" title="Paxos算法2-算法过程">Paxos算法2-算法过程</a><span>(3600)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/5695893" title="JVM性能调优">JVM性能调优</a><span>(2900)</span>
+        </li>
+        <li>
+            <a href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET.html" title="Paxos算法3-实现探讨">Paxos算法3-实现探讨</a><span>(2707)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/7297122" title="Fast Paxos">Fast Paxos</a><span>(2667)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6275762" title="Gossip算法">Gossip算法</a><span>(2657)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/5949166" title="一致性哈希(Consistent Hashing)">一致性哈希(Consistent Hashing)</a><span>(2276)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/7309915" title="Zookeeper的一致性协议：Zab">Zookeeper的一致性协议：Zab</a><span>(2239)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6641477" title="深入JVM锁机制2-Lock">深入JVM锁机制2-Lock</a><span>(2233)</span>
+        </li>
+    </ul>
+</div>
+<div id="hotarticls2" class="panel">
+    <ul class="panel_head"><span>评论排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET.html" title="Paxos算法3-实现探讨">Paxos算法3-实现探讨</a><span>(10)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6265394" title="PaxosLease">PaxosLease</a><span>(8)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6059575" title="Chord算法（原理）">Chord算法（原理）</a><span>(5)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/7297122" title="Fast Paxos">Fast Paxos</a><span>(4)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6275762" title="Gossip算法">Gossip算法</a><span>(3)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/7309915" title="Zookeeper的一致性协议：Zab">Zookeeper的一致性协议：Zab</a><span>(3)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6618779" title="深入JVM锁机制1-synchronized">深入JVM锁机制1-synchronized</a><span>(2)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/5949166" title="一致性哈希(Consistent Hashing)">一致性哈希(Consistent Hashing)</a><span>(2)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/34790" title="Tomcat研究之ClassLoader">Tomcat研究之ClassLoader</a><span>(2)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/chen77716/article/details/6265412" title="Keyspace中的paxos">Keyspace中的paxos</a><span>(1)</span>
+        </li>
+    </ul>
+</div>
+<div id="homepageArticles" class="panel">
+    <ul class="panel_head"><span>推荐文章</span></ul>
+    <ul class="panel_body" id="ad_commend">
+    <iframe id="ad_frm_2" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 195px; height: 222px;" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ad.html"></iframe></ul>
+</div>
+<script type="text/javascript">
+    new Ad(12, 'ad_commend');
+</script><div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/6618779#comments">深入JVM锁机制1-synchronized</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/aixiangct" class="user_name">aixiangct</a>:
+文中表述contention list 为LIFO队列，但是图示却是一个FIFO队列，不解
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/6172392#comments">Paxos算法3-实现探讨</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/herokingyy" class="user_name">herokingyy</a>:
+您好，请教个问题：假设 有3个proposer: P1、P2、P3 (同时也用作acceptor) ...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/7309915#comments">Zookeeper的一致性协议：Zab</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/caohonxian" class="user_name">honXian</a>:
+1 老Leader在COMMIT前Crash（已经提交到本地）为什么在COMMIT之前不把数据都放在...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/7309915#comments">Zookeeper的一致性协议：Zab</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/caohonxian" class="user_name">honXian</a>:
+“老Leader重启后，可能还会认为自己是Leader”这部分说的是不是leader得快速恢复(避免...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/7297122#comments">Fast Paxos</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/baigan888" class="user_name">baigan888</a>:
+很好，很强大。。。赞一个。。
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/6166675#comments">Paxos算法1-算法形成理论</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/m_vptr" class="user_name">m_vptr</a>:
+"难道自始至终只能选出一个value？"这个问题我开始一直不理解，看完Paxos Made Code...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/7297122#comments">Fast Paxos</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/xiaoanian" class="user_name">xiaoanian</a>:
+不错，收藏了
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/6170235#comments">Paxos算法2-算法过程</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/Csm4a1" class="user_name">Csm4a1</a>:
+你好，我对文章一个地方不太理解，请教一下。“如果仅有一个Master，宕机时选举的结果根本就无法被l...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/5695893#comments">JVM性能调优</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/saturn6120c" class="user_name">saturn6120c</a>:
+很好哦////
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/chen77716/article/details/6265412#comments">Keyspace中的paxos</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/archimedes_zht" class="user_name">archimedes_zht</a>:
+http://scalien.com/   这个网站打开后，撒都没有了。
+    </p>
+    </li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+
+<div class="clear"></div>
+</div>
+
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/newblog.min.js"></script>
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/showblogmedal.ashx"></script>
+
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/publib_footer.js"></script><link rel="stylesheet" type="text/css" href="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/pub_footer_2012.css"><div class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd>京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>北京创新乐知信息技术有限公司 版权所有</dd><dd>世纪乐知(北京)网络技术有限公司 提供技术支持</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/ico_email.gif" alt="" title=""> 联系邮箱：webmaster(at)csdn.net</dd><dd>Copyright © 1999-2012, CSDN.NET, All Rights Reserved&nbsp;<a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div><script type="text/javascript" charset="utf-8" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/tracking.js"></script>
+
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./Paxos算法3-实现探讨 - chen77716的专栏 - 博客频道 - CSDN.NET_files/msg.popup.js"></script>
+
+
+</div>
+
+</body></html>

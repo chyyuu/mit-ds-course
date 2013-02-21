@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-Strict.dtd">
+<!-- saved from url=(0049)http://www.ruilog.com/blog/view/a1d5946e4fe7.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Paxos 导读, 工程实现</title>
+    <link rel="stylesheet" href="./Paxos 导读-工程实现_files/global.css" type="text/css" media="all">
+    <link rel="shortcut icon" type="image/x-icon" href="http://www.ruilog.com/_w/img/hooto-xicon-mc.ico">
+    <link rel="stylesheet" href="./Paxos 导读-工程实现_files/cm.css" type="text/css" media="all">
+</head>
+<body>
+
+<div id="bodywrap"><div id="bodycontent">
+
+<div class="bodytop"></div>
+
+<div class="centerbox" id="header">
+
+  <div id="logo">
+    <a href="http://www.ruilog.com/blog/view/a1d5946e4fe7.html#"><img src="./Paxos 导读-工程实现_files/ruilog-logo.png"></a>  </div>
+
+  <div id="userbar">
+    <div>
+    <a href="http://www.hooto.com/user/login?cburl=http://www.ruilog.com/blog/view/a1d5946e4fe7.html">Login / Register</a>    </div>
+  </div>
+
+  <div id="menu">
+    <ul>
+    <li><a href="http://www.ruilog.com/blog" class="current">Blog</a></li><li><a href="http://www.ruilog.com/article">Article</a></li>    </ul>
+    
+    <ul class="sr">
+      <li><a href="http://www.ruilog.com/user/profile/rui">About</a></li>      
+    </ul>
+
+  </div>
+  
+  <div id="submenu">
+
+  </div>
+
+    
+</div>
+
+
+<div id="instance-menu" class="wrapper clearboth">
+  <ul>
+    <li><a href="http://www.ruilog.com/blog/index">Explore</a></li><li><a href="http://www.ruilog.com/blog/term-category">Categories</a></li><li><a href="http://www.ruilog.com/blog/term-tag">Tags</a></li><li><a href="http://www.ruilog.com/blog/archives">Archives</a></li><li><a href="http://www.ruilog.com/blog/rss">RSS</a></li>  </ul>
+</div>
+
+<div class="wrapper clearboth">
+<div class="entry-view">
+
+  <div class="header">
+    
+    <h1 class="title">Paxos 导读, 工程实现</h1>
+    
+        <div class="info">
+        <span><img src="./Paxos 导读-工程实现_files/date.png" align="absmiddle"> 2012-07-14 14:22:18</span>
+        <span><img src="./Paxos 导读-工程实现_files/chart_organisation.png" align="absmiddle"> <a href="http://www.ruilog.com/blog/index?cat=74">Tech</a></span>
+        <span><img src="./Paxos 导读-工程实现_files/folder_page.png" align="absmiddle"> Views(1298)</span>
+            </div>
+      </div>
+  <div class="content"><p>任何分布式系统，都需要“锁”，用于持久化全局配置，协调分布式应用逻辑，保证所有系统高可用,它是分布式高可用系统的基石.</p>
+<p>Paxos 算法用于实现分布式锁, 它在这个领域至关重要:<br>
+all working protocols for asynchronous consensus we have so far encountered have Paxos at their core. (Google Chubby Paper)</p>
+<p><strong>分布式锁的应用场景</strong><br>
+<a href="http://timyang.net/distributed/paxos-scenarios/" target="_blank">http://timyang.net/distributed/paxos-scenarios</a></p>
+<p><strong><br>
+</strong></p><h2><strong>算法导读</strong></h2><strong>
+</strong><p><strong></strong><br>
+<strong>中文,中文算法描述限于 choose value，有相当多翻译错误</strong><br>
+<a href="http://zh.wikipedia.org/wiki/Paxos%E7%AE%97%E6%B3%95" target="_blank">http://zh.wikipedia.org/wiki/Paxos算法</a><br>
+<strong>英文，完整描诉</strong><br>
+<a href="http://en.wikipedia.org/wiki/Paxos_algorithm" target="_blank">http://en.wikipedia.org/wiki/Paxos_algorithm</a></p>
+<p><strong><br>
+</strong></p><h2><strong>以下3篇是对算法的注解,帮助阅读</strong></h2><strong>
+</strong><p><strong></strong><br>
+<strong>Paxos算法1-算法形成理论</strong><br>
+<a href="http://blog.csdn.net/chen77716/article/details/6166675" target="_blank">http://blog.csdn.net/chen77716/article/details/6166675</a><br>
+<strong>Paxos算法2-算法过程</strong><br>
+<a href="http://blog.csdn.net/chen77716/article/details/6170235" target="_blank">http://blog.csdn.net/chen77716/article/details/6170235</a><br>
+<strong>Paxos算法3-实现探讨</strong><br>
+<a href="http://blog.csdn.net/chen77716/article/details/6172392" target="_blank">http://blog.csdn.net/chen77716/article/details/6172392</a><br>
+<strong>PaxosLease: 锁服务自身的 Leader 选举</strong><br>
+<a href="http://blog.csdn.net/chen77716/article/details/6265394" target="_blank">http://blog.csdn.net/chen77716/article/details/6265394</a></p>
+<p><strong><br>
+</strong></p><h2><strong>已实现的项目</strong></h2><strong>
+</strong><p><strong></strong><br>
+<strong>1. 最好的工程实现 Google Chubby</strong><br>
+<a href="http://research.google.com/archive/chubby.html" target="_blank">http://research.google.com/archive/chubby.html</a><br>
+周知的 Google GFS/MapReduce/BigTable 服务都基于 Chubby，它的论文必须要读!</p>
+<p><strong>2. 开源的，而且满足企业级稳定性的目前只有 ZooKeeper</strong><br>
+<a href="http://zookeeper.apache.org/" target="_blank">http://zookeeper.apache.org</a><br>
+它用户众多，是目前最流行的分布式锁服务，基于 JRE, 提供 Java/C 两种API接入.</p>
+<p><strong>3. 其它类似的开源项目</strong><br>
+OpenReplica: Python<br>
+<a href="http://openreplica.org/" target="_blank">http://openreplica.org/</a><br>
+Doozer: Golang (主分支长久不活跃，但 fork 分支有人持续维护)<br>
+<a href="https://github.com/ha/doozerd" target="_blank">https://github.com/ha/doozerd</a></p>
+<p><strong><br>
+</strong></p><h2><strong>Paxos 工程实现的几个要点</strong></h2><strong>
+</strong><p><strong></strong><br>
+<strong>1. 多数派(Majority)</strong><br>
+提案必须达成半数以上的 Accept, 及满足多数派(Majority), 这是全局状态的一致性的保证</p>
+<p><strong>2. 永远递增的 Proposal Number</strong><br>
+永远递增的 Proposal Number, 如果无法 Majority, 则继续递增 Number 再提交, 如此重复直到 Majority.</p>
+<p><strong>3. 引入 Paxos Lease</strong><br>
+Paxos Lease 负责为锁服务自身选举一个 Leader, 是为解决上面 Proposal Number 递增产生的活锁问题. Paxos Lease 本身也存在活锁，最简单有效的解决办法就是在每次提案间隔随机 Sleep().</p>
+<p><strong>4. 性能优化</strong><br>
+引入 Paxos Lease 后, 提案递交由 Leader 单点负责，这虽然解决了活锁问题，但也使性能受限. <br>
+可以采用分区(Google Chubby 有介绍), 按照提案Key值 hash 均衡到整个Paxos服务集群, 这样不需要依赖全局 Proposal Number，只需要本地检查 Number 就可以递交提案, 这里需要处理本地主机异常离线而转换set/get主机的问题.</p>
+<p>优化会使系统变复杂，这个地方有争议, 是否应该优化? 从 Google Chubby 定义来看，它的功能定位是强一致性，只持久化最重要最核心的少量状态信息，而不是高性能，大数据量，如果有系统存在这样的需求，则建议拆离解偶到子系统. 所以, 要注意优化子系统, 合理使用锁服务.</p>
+<p><strong>5. 并发写的全局一致性保证</strong><br>
+当客户端并发修改一个 Value 时可能冲突，解决的办法是为每个 Value 记录 Number. 新的 Value 修改操作需要携带当前的 Number 和当前 MaxNumber, 如果修改成功将 Value 更新到 MaxNumber, 这是一次事务操作，同一个 Number/Value 只允许修改一次，要再次修改必须取新的Number再次提交, 配合 Majority 可以保证对 Value 修改的全局一致性. </p>
+<p><strong>6. 使用 Redis</strong><br>
+自主实现 Paxos 锁服务可以尝试用 Redis 记录各种数据信息, 它的 expire, incrby, setex, pub/sub 功能可以为你节省大量编码时间，并且使代码量极度精简，同时它具备高性能，可以持久化数据到硬盘, 它绝对是数据结构的 “瑞士军刀”.</p>
+<p>--EOF--</p>
+</div>
+    <div class="clear_both">
+     <span class="term"><img src="./Paxos 导读-工程实现_files/tag_blue.png" align="absmiddle"> Tags: 
+     &nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=Paxos">Paxos</a>&nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=Chubby">Chubby</a>&nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=ZooKeeper">ZooKeeper</a>&nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=OpenReplica">OpenReplica</a>&nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=Doozer">Doozer</a>&nbsp;&nbsp;<a href="http://www.ruilog.com/blog/index?tag=%E5%88%86%E5%B8%83%E5%BC%8F">分布式</a></span>
+  </div>
+  </div>
+
+<div class="comments">
+  <h3>Comments</h3><a name="comment-view"></a>
+        
+  <div class="view" id="entry-comment-c9419b1f69b7">
+    <div><img src="./Paxos 导读-工程实现_files/comment.png" align="absmiddle"> <b><p>shuang</p>
+</b></div>
+    <p></p><p>why not use Engthing?哈哈</p>
+<p></p>
+    <div class="info">
+      2012-07-16 16:49:45          </div>
+  </div>
+  </div>
+<div class="comment-form">
+  <a name="comment-add"></a>
+  <h3 class="comment-form-htitle">Leave a Comment</h3>
+  <form id="form_comment_submit" action="http://www.ruilog.com/blog/comment?url=http://www.ruilog.com/blog/view/a1d5946e4fe7.html" method="post">
+  <input type="hidden" name="pid" value="a1d5946e4fe7">
+  <input type="hidden" name="pinstance" value="10">
+  <input type="hidden" name="puid" value="0eb466">
+  <input type="hidden" name="status" value="1">
+  <table width="100%" border="0" cellpadding="0" cellspacing="10">
+    <tbody><tr>
+      <td width="160px" align="right"><b>Name</b></td>
+      <td><input type="text" name="uname" value="guest"></td>
+    </tr>
+    <tr>
+      <td align="right" valign="top"><b>Content</b></td>
+      <td><textarea name="content" cols="50" rows="5"></textarea></td>
+    </tr>
+        <tr>
+      <td align="right" valign="top"><b>Verification</b></td>
+      <td>
+         <img src="./Paxos 导读-工程实现_files/image" title="hcaptcha service"><br>
+         <input id="hcaptcha_token" name="hcaptcha_token" type="hidden" value="bffbeea86508405c8574f3be6597ca6e">
+         <input id="hcaptcha_word" name="hcaptcha_word" type="text" size="12" value="">
+         Type the characters you see in the picture above
+      </td>
+    </tr>
+        <tr>
+      <td></td>
+      <td><input class="input_button" type="submit" value="Submit"></td>
+    </tr>
+  </tbody></table>
+  </form>
+</div>
+
+</div>
+
+</div></div>
+
+<div class="centerbox" id="footer">
+  <div class="box">
+  
+    <div class="sl">
+      <p>Based on <b><a href="https://github.com/eryx/webware" target="_blank">Hooto WebWare 1.0.1lab</a></b></p>
+    </div>
+
+    <div class="sr">
+      <p>Page rendered in 10.01 ms, 
+      taking 1000.67 KB</p>
+    </div>
+
+  </div>
+</div>
+<!-- Piwik --> 
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://www.hooto.com/piwik/" : "http://www.hooto.com/piwik/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./Paxos 导读-工程实现_files/piwik.js" type="text/javascript"></script><script type="text/javascript">
+try {
+  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+  piwikTracker.trackPageView();
+  piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript>&lt;p&gt;&lt;img src="http://www.hooto.com/piwik/piwik.php?idsite=1" style="border:0" alt="" /&gt;&lt;/p&gt;</noscript>
+<!-- End Piwik Tracking Code -->
+
+
+
+<iframe src="./Paxos 导读-工程实现_files/clip_result.html" id="wizClipperResult" name="wizClipperResult"></iframe></body></html>

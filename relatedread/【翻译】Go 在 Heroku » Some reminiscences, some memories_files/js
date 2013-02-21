@@ -1,0 +1,7 @@
+
+(new PopularQueryRenderer(document.getElementById("queries"))).render({
+"title" : "mikespook.com-search",
+"maxNumberOfPopularQueries" : 10,
+"popularQueries" : [
+]
+})

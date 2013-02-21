@@ -1,0 +1,10 @@
+/*pub_footer*/
+.pub_footerall{clear:both; width:auto; overflow:hidden; margin:10px auto; /*padding:3px 6px;*/ padding:0; border-top:1px solid #ccc; color:#333; font:normal 12px/24px Helvetica, Tahoma, Arial, sans-serif; text-align:center;}
+.pub_footerall dl{padding:3px 0 3px; overflow:hidden; margin:0; /*font-family:simsun;*/}
+.pub_footerall dd a{padding:0 9px; margin:0;}
+.pub_footerall dd a:link, .pub_footerall dd a:visited, .pub_footerall dd a:active{color:#333; text-decoration:none;}
+.pub_footerall dd a:hover{/*color:#015FB6;*/ color:#f00;}
+.pub_footerall dd img{border:0; vertical-align:middle;}
+.pub_footerall dt {padding-top:5px; margin:0; text-align:center;}
+.pub_footerall dt a{display:inline; margin:5px; padding:0;}
+.pub_footerall dt a img{/*width:115px; height:45px;*/ width:19px; height:24px; border:1px solid #ccc; vertical-align:middle;}

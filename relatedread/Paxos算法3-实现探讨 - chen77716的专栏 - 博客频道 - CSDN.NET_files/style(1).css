@@ -1,0 +1,72 @@
+﻿body {
+}
+ 
+#csdn_shield { position:absolute; z-index:101px; left:0px; top:0px; display:block; background-color:#999; width:100%; }
+
+#csdn_divh { position:absolute; z-index:10001; top:30%; left:45%; width:460px; margin-left:-200px; }
+#csdn_divh img { border:none; }
+/*#csdn_divh a { color:#0066cc; text-decoration:underline; }
+#csdn_divh a:hover { color:#ff0000; text-decoration:none; }*/
+
+.loading { padding:20px; height:60px; text-align:center;font-size:16px; background:url(images/wait.gif) no-repeat center bottom #ffffff;}
+.h1title { font-size:20px; margin-top:0px; padding-top:6px; border-bottom:solid 4px #FFE2D2;}
+.openbox { border:solid 10px #FFE2D2; border-radius:10px; padding:10px; background-color:#fff; font-size:14px;}
+.boxbody {}
+
+/*#csdn_divh .close { float:right; *margin-top:-20px; font-size:14px; color:#999; font-family:Verdana; text-decoration:none;}
+.loginbox {}
+.loginbox th { color:#555; font-family: simsun; font-weight:normal; text-align:right; }
+.loginbox td .put {border: 1px solid #CACACA; font-family:Arial; color: #333; width:240px; height: 24px;line-height: 24px;border-radius: 4px;}
+*/
+#vcfrm { width:150px; height:50px; overflow:hidden; border:none; }
+/*#csdn_divh a.btn{ background:url(images/pic_button01.gif) left top no-repeat; width:auto; height:42px; line-height:42px;padding-left:20px; display:inline-block; text-decoration:none; margin-right:10px; cursor:pointer;}
+#csdn_divh a.btn span{background:url(images/pic_button01.gif) right top no-repeat; height:42px; line-height:42px; color:#fff; font-weight:normal; padding-right:20px; display:inline-block; font-size:20px; font-family:黑体;}
+*/
+/*#csdn_divh a.reg {}*/
+#csdn_divh a.revc { position:relative; top:-20px; margin-left:10px;}
+
+#sperr { color:Red; }
+
+#tr_third {}
+#tr_third a { margin-right:8px; }
+
+
+
+/*lish 2013-1-30*/
+ 
+ 
+*{ margin:0; padding:0;}
+.clearfix { display:block; *display:inline-block;}
+.clearfix:after {content:"."; display:block; height:0; clear:both; visibility:hidden;}
+.login{ margin:0 auto; border-color width:404px; /*height:304px;*/ background-image:url(images/login_bg.png); padding:3px; margin-top:100px; border-radius: 4px;
+-webkit-border-radius: 4px;-moz-border-radius: 4px; -khtml-border-radius: 4px;}
+.login_content{ text-align:left; margin:0 auto; width:240px;/* height:220px; */background-color:#fbfbfb; border: solid 1px #ccc; padding:40px 82px;-moz-box-shadow:0px 0px 1px #fff inset;
+-webkit-box-shadow:0px 0px 1px #fff inset; box-shadow:0px 0px 1px #fff inset; border-radius: 4px;-webkit-border-radius: 4px;-moz-border-radius: 4px; -khtml-border-radius: 4px; position:relative;}
+.login .close{ border: none; background:url(images/icons.png) -10px 10px no-repeat; width:30px; height:30px; position:absolute; top:0; right:0;border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px; cursor:pointer;}
+.login .close:hover{ background:url(images/icons.png) -10px -19px no-repeat;}
+.login .point{ font-size:12px; color:#ff6666; text-align:center; margin-bottom:5px;}
+.login .user_id{ width:210px; height:30px; border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px; border:1px #e3e3e3 solid; margin-bottom:10px;
+background:url(images/icons.png) #fff -8px -155px no-repeat; padding-left:30px;}
+.login .password{  width:210px; height:30px; border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px; border:1px #e3e3e3 solid; margin-bottom:10px;
+background:url(images/icons.png) #fff -8px -187px no-repeat; padding-left:30px;}
+.login .remember{ font-size:12px; text-align:left; color:#999; margin-bottom:20px; vertical-align:middle;}
+.login .remember input{ float:left; margin-right:10px; float:left; vertical-align:middle;}
+.login .login_bt{ text-align:left; padding:8px 22px; cursor:pointer; border: 1px solid #ef5f06; background-color:#ff6c1e; margin-top:1px; font-size:14px; font-weight:bold; color:#FFF;  border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px; margin-bottom:35px;}
+.login .login_bt:hover{ background-color:#ff3300; border: 1px solid #cc3300; }
+.login .pw_lg{ float:right; font-size:12px; color:#999;margin-top:18px;}
+.login .pw_lg a{ color:#999; text-decoration:none; padding:0 5px;}
+.login a.pw_a{ padding-right:0;}
+.login .pw_lg a:hover{ color:#06c;}
+.login .lg_3{ font-size:12px; color:#666; line-height:22px; text-align:left;}
+.login .lg_3 a{ display:block; float:right;}
+.login .weibo{ background:url(images/icons.png) -13px -90px no-repeat ; width:20px; height:20px; border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px;}
+.login .qq{ background:url(images/icons.png) -13px -56px no-repeat ; width:20px; height:20px; margin-left:25px; border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px;}
+.login .google{ background:url(images/icons.png) 0 -124px no-repeat ; width:50px; height:20px; margin-left:25px; border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px; -khtml-border-radius: 3px;}
+.login .weibo:hover{ background-color:#eee;}
+.login .qq:hover{ background-color:#eee;}
+.login .google:hover{ background-color:#eee;}
+
+
+
+
+

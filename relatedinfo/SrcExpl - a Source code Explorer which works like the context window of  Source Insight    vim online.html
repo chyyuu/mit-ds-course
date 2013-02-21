@@ -1,0 +1,650 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0052)http://www.vim.org/scripts/script.php?script_id=2179 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <link rel="Stylesheet" type="text/css" href="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/style.css">
+  <title>SrcExpl - a Source code Explorer which works like the context window of "Source Insight" : vim online</title>
+  
+  <meta name="KEYWORDS" content="Vim, Vi IMproved, text editor, home, documentation, tips, scripts, news">
+  <link rel="shortcut icon" type="image/x-icon" href="http://www.vim.org/images/vim_shortcut.ico">
+</head>
+
+<body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" bgcolor="#ffffff"> 
+
+<!-- HEADER, SPONSOR IMAGE, VIM IMAGE AND BOOK AD -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+  <tbody><tr>
+    <td colspan="4" class="lightbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  </tr>
+  <tr>
+  <td class="lightbg">&nbsp;&nbsp;&nbsp;</td>
+  <td class="lightbg" align="left"><a href="http://www.vim.org/sponsor/index.php"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/sponsorvim.gif" alt="sponsor Vim development" border="0"></a></td>
+    <td class="lightbg" align="center"><a href="http://www.vim.org/index.php"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/vim_header.gif" border="0" alt="Vim logo"></a></td>
+    <td class="lightbg" align="right"><a href="http://iccf-holland.org/click5.html"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/buyhelplearn.gif" alt="Vim Book Ad" border="0"></a></td>
+  </tr>
+  <tr>
+    <td colspan="4" class="lightbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  </tr>
+  <tr>
+    <td colspan="4" class="darkbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="10" alt=""></td>
+  </tr>
+</tbody></table>
+<!-- THE PAGE BODY: BETWEEN HEADER AND FOOTER -->
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+  <colgroup><col width="180">
+  <col width="1">
+
+  </colgroup><tbody><tr valign="top">
+    <td class="sidebar">
+      <table width="180" cellpadding="4" cellspacing="0" border="0">
+        <tbody><tr valign="top">
+          <td class="sidebar">
+
+<!-- INCLUDE THE PAGE NAVIGATION -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+    <tbody><tr>
+        <td><small>not logged in (<a href="http://www.vim.org/login.php">login</a>)</small></td>
+    </tr>
+    <tr><td>
+<small>&nbsp;</small>
+<form action="http://www.google.com/cse" id="cse-search-box">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-3005259998294962:bvyni59kjr1">
+    <input type="hidden" name="ie" value="ISO-8859-1">
+    <input type="text" name="q" size="20" style="background-image: url(http://www.google.com/cse/intl/en/images/google_custom_search_watermark.gif); background-color: rgb(255, 255, 255); background-position: 0% 50%; background-repeat: no-repeat no-repeat; ">
+    <br>
+    <input type="submit" name="sa" value="Search">
+  </div>
+<input name="siteurl" type="hidden" value="www.vim.org/scripts/script.php?script_id=2179"><input name="ref" type="hidden" value="rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html"><input name="ss" type="hidden" value=""></form>
+<script src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/plusone.js" gapi_processed="true"></script><script type="text/javascript" src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/brand"></script>
+    </td></tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="1"></td>
+    </tr>
+    <tr>
+        <td class="darkbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" height="3"></td>
+    </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="2"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/index.php">Home</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/search.php">Advanced search</a></td>
+        </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/about.php">About Vim</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/community.php">Community</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/news/news.php">News</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/sponsor/index.php">Sponsoring</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/trivia.php">Trivia</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/docs.php">Documentation</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader download"><a href="http://www.vim.org/download.php">Download</a></td>
+        </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/scripts/index.php">Scripts</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/tips/index.php">Tips</a></td>
+        </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/account/index.php">My Account</a></td>
+        </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+    <tr>
+        <td class="checker"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" height="1"></td>
+    </tr>
+    <tr>
+        <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="7"></td>
+    </tr>
+        <tr>
+            <td class="sidebarheader"><a href="http://www.vim.org/huh.php">Site Help</a></td>
+        </tr>
+</tbody></table>
+<br>
+<div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial; " id="___plusone_0"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px; " tabindex="0" vspace="0" width="100%" id="I0_1361291113455" name="I0_1361291113455" src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/fastbutton.html" allowtransparency="true" data-gapiattached="true" title="+1"></iframe></div>
+
+            <table width="172" cellpadding="0" cellspacing="0" border="0">
+              <tbody><tr><td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" alt="" border="0" width="1" height="8"></td></tr>
+              <tr><td class="darkbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="3" alt=""></td></tr>
+            </tbody></table>
+            <br>
+
+<!-- INCLUDE THE PAGE SIDEBAR TEXT -->
+&nbsp;
+
+          </td>
+        </tr>
+      </tbody></table>
+    </td>
+
+    <td class="darkbg"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="1" border="0" alt=""><br></td>
+    <td>
+      <table width="100%" cellpadding="10" cellspacing="0" border="0" bordercolor="red">
+        <tbody><tr>
+          <td valign="top">
+
+<span class="txth1">SrcExpl : a Source code Explorer which works like the context window of "Source Insight"</span> 
+
+<br>
+<br>
+
+<!-- karma table -->
+<table cellpadding="4" cellspacing="0" border="1" bordercolor="#000066">
+<tbody><tr>
+  <td class="lightbg"><b>&nbsp;script karma&nbsp;</b></td>
+  <td>
+    Rating <b>1252/345</b>,
+    Downloaded by 13383    &nbsp;
+    <div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial; " id="___plusone_1"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px; " tabindex="0" vspace="0" width="100%" id="I1_1361291113458" name="I1_1361291113458" src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/fastbutton(1).html" allowtransparency="true" data-gapiattached="true" title="+1"></iframe></div>
+  </td>
+  <td class="lightbg">
+  <b>&nbsp;Comments, bugs, improvements&nbsp;</b>
+  </td>
+  <td>
+    <a href="http://vim.wikia.com/wiki/Script:2179">Vim wiki</a>
+  </td>  
+</tr>
+</tbody></table>
+<p>
+
+<table cellspacing="0" cellpadding="0" border="0">
+<tbody><tr><td class="prompt">created by</td></tr>
+<tr><td><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">script type</td></tr>
+<tr><td>utility</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">description</td></tr>
+<tr><td>[GitHub]
+<br>
+<br>The latest dev version of Source Explorer and screenshots can be downloaded from GitHub Homepage:
+<br>
+<br><a target="_blank" href="https://github.com/wesleyche/SrcExpl">https://github.com/wesleyche/SrcExpl</a>
+<br>
+<br>[Introduction]
+<br>
+<br>The plugin (srcexpl.vim) is a source code explorer based on tags and it provides an overview of the function and type definitions.It has such a mechannism that works like the context window component of "Source Insight" software.
+<br>
+<br>If you have used Source Insight for browseing C/C++/Java project before, you may find that you can browse the definitions with the Source Explorer as well as the context window of "Source Insight".
+<br>
+<br>For example, you put the cursor on a function name in the Normal mode, its definition will show on the Source Explorer window a moment later. As soon as you do the 'double-click' operation using your mouse onto the Source Explorer window which had appeared on the bottom of (G)Vim, the definition and its context will be shown on the editor window.(Just like Source Insight does). Besides, multi-definitions' listing and jumping works like the Source Insight too. In srcexpl v1.2 and above, the function key which users mapped will play a important role that you can not only use mouse but also use keyboard in order to exploring source code in both GUI and cterm VIM.
+<br>
+<br>The Source Explorer can work with 'Taglist' and 'NERD tree' very well. Both of them make (G)Vim looks like the "Source Insight" in Unix/Windows/Mac enviroment.
+<br>
+<br>[Features]
+<br>
+<br>1\ Go insight the definitions of functions and various types of C/C++/Java language project, including function, marcos, structure, array, method, class, global variable, local variable etc.
+<br>2\ Double click using left mouse and your own map key (such as: &lt;ENTER&gt;) onto the&nbsp;&nbsp;Source Explorer window can go forward to the preview context.
+<br>3\ Popup menu and Your own map key (such as &lt;A-,&gt; in Source Insight) to go back from the preview context.
+<br>4\ Auto create and update the 'tags' file intelligently.
+<br>
+<br>[Tips]
+<br>
+<br>1\ Ensure that there is only one 'tags' file in your project PATH, or it would make VIM load all of them on the same time. For example: There are two tags file in the 'your_project' directory, so we will delete the excess 'tags' file in the 'sub_directory'.
+<br>
+<br>... ...
+<br>
+<br>[chewenlong@localhost ~]$ cd your_project/
+<br>[chewenlong@localhost your_project]$ pwd
+<br>/home/chewenlong/your_project
+<br>[chewenlong@localhost your_project]$ ls
+<br>bar.c&nbsp;&nbsp;sub_directory&nbsp;&nbsp;tags
+<br>[chewenlong@localhost your_project]$ cd sub_directory/
+<br>[chewenlong@localhost sub_directory]$ ls
+<br>foo.c&nbsp;&nbsp;tags
+<br>[chewenlong@localhost sub_directory]$ rm -rf tags
+<br>[chewenlong@localhost sub_directory]$ ls
+<br>foo.c
+<br>[chewenlong@localhost sub_directory]$ cd ..
+<br>[chewenlong@localhost your_project]$ ls
+<br>bar.c&nbsp;&nbsp;sub_directory&nbsp;&nbsp;tags
+<br>[chewenlong@localhost your_project]$ vim bar.c
+<br>
+<br>... ...
+<br>
+<br>2\ Make sure the files you are exploring is unix-format, that is, there is no '\r'(displayed as '^M') at the end of each line. Because the plugin would make a jump mistake when executing EX-commands.
+<br>
+<br>3\ If you want your VIM works like the Source Insight, just try a VIM plugin named 'Trinity (trinity.vim)': 
+<br>
+<br><a target="_blank" href="http://www.vim.org/scripts/script.php?script_id=2347">http://www.vim.org/scripts/script.php?script_id=2347</a>
+<br>
+<br>This simple plugin can manage 'Source Explorer', 'Taglist' and 'NERD Tree' work together very well.
+<br>
+<br>If you want to use VIM with Source Explorer in the UNIXs-console, I suggest map the keys below to jump from one window to another.
+<br>
+<br>nmap &lt;C-H&gt; &lt;C-W&gt;h
+<br>nmap &lt;C-J&gt; &lt;C-W&gt;j
+<br>nmap &lt;C-K&gt; &lt;C-W&gt;k
+<br>nmap &lt;C-L&gt; &lt;C-W&gt;l
+<br>
+<br>Below key mappings can replace the Vim feature for jumping to previously visited locations via jump list.
+<br>
+<br>nmap &lt;C-I&gt; &lt;C-W&gt;j:call g:SrcExpl_Jump()&lt;CR&gt;
+<br>nmap &lt;C-O&gt; :call g:SrcExpl_GoBack()&lt;CR&gt;
+<br>
+<br>The typical actions using srcexpl.vim are: 
+<br>
+<br>a\ Move the cursor onto a symbol word.
+<br>b\ As soon as the definition of the word is displayed on the preview window, we type &lt;Ctrl-j&gt; to jump into the previw window.
+<br>c\ Type the SrcExpl_jumpKey(&lt;ENTER&gt; as default) to jump to the exact context of its definition.
+<br>d\ Type the SrcExpl_gobackKey(&lt;SPACE&gt; as default) to go back to the previous position of the symbol word.
+<br></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td class="prompt">install details</td></tr>
+<tr><td>1\ Unzip the archive into your ~/.vim directory. That should put srcexpl.vim in ~/.vim/plugin and srcexpl.txt in ~/.vim/doc. 
+<br>
+<br>2\ Add the followings in your .vimrc or _vimrc and change them by yourself
+<br>
+<br>" // The switch of the Source Explorer
+<br>nmap &lt;F8&gt; :SrcExplToggle&lt;CR&gt;
+<br>
+<br>" // Set the height of Source Explorer window
+<br>let g:SrcExpl_winHeight = 8
+<br>
+<br>" // Set 100 ms for refreshing the Source Explorer
+<br>let g:SrcExpl_refreshTime = 100
+<br>
+<br>" // Set "Enter" key to jump into the exact definition context
+<br>" let g:SrcExpl_jumpKey = "&lt;ENTER&gt;"
+<br>
+<br>" // Set "Space" key for back from the definition context
+<br>let g:SrcExpl_gobackKey = "&lt;SPACE&gt;"
+<br>
+<br>" // In order to Avoid conflicts, the Source Explorer should know what plugins
+<br>" // are using buffers. And you need add their bufname into the list below
+<br>" // according to the command ":buffers!"
+<br>let g:SrcExpl_pluginList = [
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\ "__Tag_List__",
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\ "_NERD_tree_",
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\ "Source_Explorer"
+<br>&nbsp;&nbsp;&nbsp;&nbsp;\ ]
+<br>
+<br>" // Enable/Disable the local definition searching, and note that this is not
+<br>" // guaranteed to work, the Source Explorer doesn't check the syntax for now.
+<br>" // It only searches for a match with the keyword according to command 'gd'
+<br>let g:SrcExpl_searchLocalDef = 1
+<br>
+<br>" // Do not let the Source Explorer update the tags file when opening
+<br>let g:SrcExpl_isUpdateTags = 0
+<br>
+<br>" // Use 'Exuberant Ctags' with '--sort=foldcase -R .' or '-L cscope.files' to
+<br>" //&nbsp;&nbsp;create/update a tags file
+<br>let g:SrcExpl_updateTagsCmd = "ctags --sort=foldcase -R ."
+<br>
+<br>" // Set "&lt;F12&gt;" key for updating the tags file artificially
+<br>let g:SrcExpl_updateTagsKey = "&lt;F12&gt;"
+<br>
+<br>3\ Enjoy vimming :-)</td></tr>
+<tr><td>&nbsp;</td></tr>
+</tbody></table>
+
+<span class="txth2">script versions</span> (<a href="http://www.vim.org/scripts/add_script_version.php?script_id=2179">upload new version</a>)
+</p><p>
+Click on the package to download.
+</p><p>
+
+<table cellspacing="2" cellpadding="4" border="0" width="100%">
+<tbody><tr class="tableheader">
+        <th valign="top">package</th>
+    <th valign="top">script version</th>
+    <th valign="top">date</th>
+    <th valign="top">Vim version</th>
+    <th valign="top">user</th>
+    <th valign="top">release notes</th>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=18642">SrcExpl-5.1.zip</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>5.1</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2012-09-20</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">5.0
+<br>Replaced use of preview window with a named buffer.
+<br>Moved to github.
+<br>Added documentation.
+<br>
+<br>5.1
+<br>Added two APIs for serving other plugins:
+<br>SrcExpl_GetWin(), getting the Source Explorer window number for those plugins based on multiple windows.
+<br>SrcExpl_GetVer(), getting the Source Explorer version for the forward compatibility.
+<br>Added debug/logging functions for the internal development.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=18357">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>4.5</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2012-08-01</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">The Source Explorer can support Vim Highlight Searching in this version. Because srcexpl.vim can restore the user's setting named hlsearch after executing the EX command and redraw the screen.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=18351">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>4.4</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2012-07-31</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Change the variable named s:SrcExpl_markList to be a global one. So we can recover the context of mark list and continue to use SrcExpl_GoBack function although the plugin had been re-opened.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=14003">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>4.3</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2010-10-06</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Fixed a bug when the working 'tags' file was created with the commands 'ctags -L cscope.files'. In this case, the plugin could not change the relative path to the absolute one. Thank Trevor Brown for reporting this bug.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10221">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>4.2</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2009-03-16</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Bug fixed: In Linux or other *UNIX OS, Source Explorer v4.1 would change the 'current work directory' to '~/' when updating the tags file. Thanks to Ozan Sener for the bug-report.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10186">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>4.1</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2009-03-12</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Fixed a bug in Version 4.0 which would make you jump into a empty file when listing multi-tags information. </td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10149">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>4.0</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2009-03-09</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">In this version, the taglist() interface do the binary searching in the exact tags file instead of a linear search, so each tagging responses much more quickly than before even though the tags file of the source code project is so large. All we have to do is add an option in your ctags ultility (--sort=foldcase).</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10108">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.9</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2009-03-04</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">New features: --- The 1st anniversary 
+<br>1\ Manually updating or creating the 'tags' file using a new custom key named g:SrceExpl_updateTagsKey when you browse the source code without closing the Source Explorer window. 
+<br>2\ Dynamically loading the tags database from one source code project to another without closing the Source Explorer window. </td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10083">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.8</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2009-03-02</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">I've implemented a local mark-stack mechanism using variable type of dictionary in this version, so you can trace into the source code more deeply without warring about the limit of 'A-Z' level using Vim's mark before.
+<br></td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=10055">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.7</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2009-02-27</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">In this version, We do not try to tag something when we got the invalid symbol (only 0-9, a-z, A-Z, and '_' are valid) under the current cursor. So we should not feel unfrequently when we explore the huge source code project using "HJKL" to jump from a word to another.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9728">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.6</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-12-28</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Let all the folds opened in order to avoid opening and closeing each fold every time.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9461">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.5</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-11-08</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">1\ Add one new feature: Update different 'tags' file dynamically on different project PATH when opening the Source Explorer each time. 
+<br>2\ Add one user interface variable named g:SrcExpl_updateTagsCmd, which can be set to execute particular 'ctags' utility program, "ctags -R *" as default. </td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9424">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.4</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-11-03</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Bug fixed: Make "Source_Explorer" not display on the buffers list and menu.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9256">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.3</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-09-16</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Bug fixed: The string of EX command is set to be case sensitive, so it is more accurate when excuting the EX command.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9185">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.2</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-08-28</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">1\ Added one user interface variable named g:SrcExpl_jumpKey, which can be mapped to jump into the exact definition context, "&lt;ENTER&gt;" as default.
+<br>2\ Delete one user interface variable named g:SrcExpl_refreshKey, because it is almost not be used actually according to feedbacks from users.
+<br>3\ Added the protect mechanism when running multiple tab pages.
+<br>4\ Avoid additional refresh operation when the cursor had jumped into the definition context.
+<br>5\ Fixed a bug that setting a error mark on the [Jump List] line without judgement.
+<br>
+<br></td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9144">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>3.1</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-08-18</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Two bugs fixed:
+<br>1\ Avoid highlight the whole EX command when previewing the definition.
+<br>2\ Not update the Popup menu when the current word under the cursor
+<br>&nbsp;&nbsp; had been tagged already, or it would be changed on the UNIXs platform.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9086">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>3.0</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-08-07</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">New feature: Local definition searching and preview using the interface of 'gd' command in VIM. Note that this is not guaranteed to work, the Source Explorer does not check the syntax for now, it only searches for a match with the keyword according to the command 'gd' when you enable the new variable named g:SrcExpl_searchLocalDef.
+<br>Improvement: Reimplement the jump mechannism when going back from the preview context using the mark stack with 'A-Z' (26 depth actually). It is more accurate than using the 'Ctrl-o' command.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=9028">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>2.6</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-07-26</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Update the mechanism and process when the Source Explorer work with other plugins, such as Taglist, NERD tree, etc. Of course, you must tell the Source Explorer what plugins are using the split windows according to a new MMI setting: g:SrcExpl_pluginList</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8955">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>2.5</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-07-15</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">&nbsp;&nbsp;In this version, I add a prompt line which contain the tag name and its counts when we do the multi-definition searching. A bug about folding in VIM is fixed. In srcexpl.vim, I desrcibed that how the Source Explorer works with the Taglist and the MiniBufExplorer on my platform.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8901">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>2.4</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-07-08</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">&nbsp;&nbsp;&nbsp;&nbsp;In version 2.4, the srcexpl plugin should work more stable and more efficient than before.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Firstly, I implemented the method of getting tags list without traversaling the 'tags' file. So parsing and showing the tags of whole project is more quickly, espacially in a large project. (e.g. The size of tags file in "Linux-2.4.0" is 19 MBytes which including more than 248000 lines data.)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Secondly, it is more accurate to find the symbol definition because of the regular expression. 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Finally, I handled a potential problem of deleting buffers, and it may become a bug when changing the tags list in WIN32 platform.
+<br>
+<br></td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8520">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>2.3</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-04-05</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Bugfixed: When the current file which you are editing is not saved, the Source Explorer would not jump to the definition of the symbol under the cursor. This mechanism can handle the 'one-file-multi-buffers' situation very well.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8495">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>2.2</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-03-26</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">In this version(V2.2), I added a feature, which supported 'tags' file auto-updateing when you open the Source Explorer every time. And if the tags file&nbsp;&nbsp;were not found, the Source Explorer would create one in the current directory according your choice. Besides, I fixed a bug of tags file loading on the mac OS X running enviorment. Thank Larry and Maqi for their freebacks and suggestions. :-)</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8487">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>2.1</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-03-23</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">In this version, I implemented the method to do the recursion for searching the 'tags' file from the current directory to the root directory. In addition, the mechanism for vim version inspection is added. Finally, I rewrote the function named g:SrcExpl_OtherPluginAdapter() in order to adapt the privious postion of the editor window when using the Taglist and MiniBufExpl Plugins.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8453">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>2.0</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-03-14</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Added an important feature, that is, multi-definitions list and explore. 
+<br>When the symbol under the cursor is defined in several places, the Source Explorer window will list them one by one. You can select one of them by a double-click or a &lt;Enter&gt; key onto the exact line, and then we jump to the place that match the definition.
+<br>This feature is so important that you can only use one hand ( the one using the mouse :-) ) to explore the source code conveniently, and avoid the number selection when tagging a mulit-definition by &lt;Left-Mouse&gt; or &lt;Ctrl-]&gt;.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8430">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>1.2</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-03-10</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Add one feature and two user interfaces.
+<br>You can use your own map key to force to complete one refreshing operation. And it will take a less waiting time sometimes.
+<br>Additionally, users can set update time interval by themselves in this version.</td>
+</tr>
+<tr>
+        <td class="roweven" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8400">srcexpl.vim</a></td>
+    <td class="roweven" valign="top" nowrap=""><b>1.1</b></td>
+    <td class="roweven" valign="top" nowrap=""><i>2008-03-06</i></td>
+    <td class="roweven" valign="top" nowrap="">7.0</td>
+    <td class="roweven" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="roweven" valign="top" width="2000">Inthis version(v1.1), I added the following features
+<br>1\ add the 'SrcExplGoBack' item in popup menu when you click right button of your mouse. You will see that when you use srcexpl.vim for exploring the source code.
+<br>2\ add an interface for users who want to map their own key for do the 'SrcExplGoBack' function.
+<br>3\ 'SrcExplGoBack' is such a feature that it make user go back from 'definition contexts' in editor. When you click the 'SrcExplGoBack' item, it jump the privious place which your have explored just now.</td>
+</tr>
+<tr>
+        <td class="rowodd" valign="top" nowrap=""><a href="http://www.vim.org/scripts/download_script.php?src_id=8388">srcexpl.vim</a></td>
+    <td class="rowodd" valign="top" nowrap=""><b>1.0</b></td>
+    <td class="rowodd" valign="top" nowrap=""><i>2008-03-04</i></td>
+    <td class="rowodd" valign="top" nowrap="">7.0</td>
+    <td class="rowodd" valign="top"><i><a href="http://www.vim.org/account/profile.php?user_id=13998">Wenlong Che</a></i></td>
+    <td class="rowodd" valign="top" width="2000">Initial upload</td>
+</tr>
+</tbody></table>
+ip: ##
+<!-- finish off the framework -->
+          </p></td>
+        </tr>
+      </tbody></table>
+    </td>
+
+  </tr>
+</tbody></table>
+
+<!-- END OF THE PAGE BODY: BETWEEN HEADER AND FOOTER -->
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bordercolor="red">
+  <tbody><tr><td colspan="4"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="5" alt=""></td></tr>
+  <tr><td colspan="4" bgcolor="#000000"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" height="2" width="1" alt=""></td></tr>
+  <tr><td colspan="4"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="5" alt=""></td></tr>
+  <tr>
+    <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="5" height="1" alt=""></td>
+
+    <td align="left" valign="top"><small>
+      If you have questions or remarks about this site, visit the
+      <a href="http://vimonline.sf.net/">vimonline development</a> pages.
+      Please use this site responsibly.
+      <br> 
+      
+      Questions about <a href="http://www.vim.org/about.php">Vim</a> should go
+      to the <a href="http://www.vim.org/maillist.php">maillist</a>.
+      Help Bram <a href="http://iccf-holland.org/">help Uganda</a>.
+      </small>
+	&nbsp;
+	&nbsp;
+
+	<!-- Start of StatCounter Code -->
+	<script type="text/javascript" language="javascript">
+	var sc_project=1417324; 
+	var sc_invisible=1; 
+	var sc_partition=11; 
+	var sc_security="d41633bc"; 
+	</script>
+
+	<script type="text/javascript" language="javascript" src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/counter.js"></script><noscript>&lt;a href="http://www.statcounter.com/" target="_blank"&gt;&lt;img  src="http://c12.statcounter.com/counter.php?sc_project=1417324&amp;java=0&amp;security=d41633bc&amp;invisible=0" alt="free tracking" border="0"&gt;&lt;/a&gt; </noscript>
+	<!-- End of StatCounter Code -->
+          </td>
+
+    <td align="right" valign="top">
+      		<a href="http://sourceforge.net/projects/vim" rel="nofollow"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/sflogo.php" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+    </td>
+
+    <td><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="5" height="1" alt=""></td>
+  </tr>
+
+    
+  <tr><td colspan="4"><img src="./SrcExpl - a Source code Explorer which works like the context window of  Source Insight    vim online_files/spacer.gif" width="1" height="5" alt=""></td>
+  
+  </tr>
+</tbody></table>
+
+<!-- for Google +1 button -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+
+
+
+</body></html>

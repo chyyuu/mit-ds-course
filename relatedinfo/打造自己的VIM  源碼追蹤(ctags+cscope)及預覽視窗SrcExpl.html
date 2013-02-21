@@ -1,0 +1,1300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0056)http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html -->
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:b="http://www.google.com/2005/gml/b" xmlns:data="http://www.google.com/2005/gml/data" xmlns:expr="http://www.google.com/2005/gml/expr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/cb=gapi.loaded_2" async=""></script><script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/cb=gapi.loaded_1" async=""></script><script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript">(function() { var a=window,b="jstiming",d="tick";var e=function(c){this.t={};this.tick=function(c,p,h){h=void 0!=h?h:(new Date).getTime();this.t[c]=[h,p]};this[d]("start",null,c)},f=new e;a.jstiming={Timer:e,load:f};if(a.performance&&a.performance.timing){var g=a.performance.timing,j=a[b].load,k=g.navigationStart,l=g.responseStart;0<k&&l>=k&&(j[d]("_wtsrt",void 0,k),j[d]("wtsrt_","_wtsrt",l),j[d]("tbsd_","wtsrt_"))}
+try{var m=null;a.chrome&&a.chrome.csi&&(m=Math.floor(a.chrome.csi().pageT),j&&0<k&&(j[d]("_tbnd",void 0,a.chrome.csi().startE),j[d]("tbnd_","_tbnd",k)));null==m&&a.gtbExternal&&(m=a.gtbExternal.pageT());null==m&&a.external&&(m=a.external.pageT,j&&0<k&&(j[d]("_tbnd",void 0,a.external.startE),j[d]("tbnd_","_tbnd",k)));m&&(a[b].pt=m)}catch(n){};a.tickAboveFold=function(c){var i=0;if(c.offsetParent){do i+=c.offsetTop;while(c=c.offsetParent)}c=i;750>=c&&a[b].load[d]("aft")};var q=!1;function r(){q||(q=!0,a[b].load[d]("firstScrollTime"))}a.addEventListener?a.addEventListener("scroll",r,!1):a.attachEvent("onscroll",r);
+ })();</script>
+<meta content="true" name="MSSmartTagsPreventParsing">
+<meta content="blogger" name="generator">
+<link href="http://rickey-nctu.blogspot.com/favicon.ico" rel="icon" type="image/x-icon">
+<link href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl.html" rel="canonical">
+<link rel="alternate" type="application/atom+xml" title="Rickey&#39;s pets - Atom" href="http://rickey-nctu.blogspot.com/feeds/posts/default">
+<link rel="alternate" type="application/rss+xml" title="Rickey&#39;s pets - RSS" href="http://rickey-nctu.blogspot.com/feeds/posts/default?alt=rss">
+<link rel="service.post" type="application/atom+xml" title="Rickey&#39;s pets - Atom" href="http://www.blogger.com/feeds/1705789716225971320/posts/default">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.blogger.com/rsd.g?blogID=1705789716225971320">
+<link rel="alternate" type="application/atom+xml" title="Rickey&#39;s pets - Atom" href="http://rickey-nctu.blogspot.com/feeds/5448839770365236054/comments/default">
+<link rel="image_src" href="http://lh6.ggpht.com/_WxXxOGW5qJM/SZmYVHvQGsI/AAAAAAAAB9c/G-irLoHpCWw/s72-c/%5BUNSET%5D.png?imgmax=800">
+<link href="https://plus.google.com/116983464210883610340" rel="publisher">
+<!--[if IE]> <script> (function() { var html5 = ("abbr,article,aside,audio,canvas,datalist,details," + "figure,footer,header,hgroup,mark,menu,meter,nav,output," + "progress,section,time,video").split(','); for (var i = 0; i < html5.length; i++) { document.createElement(html5[i]); } try { document.execCommand('BackgroundImageCache', false, true); } catch(e) {} })(); </script> <![endif]-->
+<title>Rickey's pets: 打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl</title>
+<link type="text/css" rel="stylesheet" href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/3950009988-widget_css_bundle.css">
+<link type="text/css" rel="stylesheet" href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/authorization.css">
+<style id="page-skin-1" type="text/css"><!--
+/*
+-----------------------------------------------
+Blogger Template Style
+Name:     Stretch Denim
+Designer: Darren Delaye
+URL:      www.DarrenDelaye.com
+Date:     11 Jul 2006
+-----------------------------------------------
+*/
+/* Variable definitions
+====================
+<Variable name="bgColor" description="Page Background Color"
+type="color" default="#efefef">
+<Variable name="textColor" description="Text Color"
+type="color" default="#333333">
+<Variable name="linkColor" description="Link Color"
+type="color" default="#336699">
+<Variable name="headerBgColor" description="Page Header Background Color"
+type="color" default="#336699">
+<Variable name="headerTextColor" description="Page Header Text Color"
+type="color" default="#ffffff">
+<Variable name="headerCornersColor" description="Page Header Corners Color"
+type="color" default="#528bc5">
+<Variable name="mainBgColor" description="Main Background Color"
+type="color" default="#ffffff">
+<Variable name="borderColor" description="Border Color"
+type="color" default="#cccccc">
+<Variable name="dateHeaderColor" description="Date Header Color"
+type="color" default="#999999">
+<Variable name="sidebarTitleBgColor" description="Sidebar Title Background Color"
+type="color" default="#ffd595">
+<Variable name="sidebarTitleTextColor" description="Sidebar Title Text Color"
+type="color" default="#333333">
+<Variable name="bodyFont" description="Text Font"
+type="font" default="normal normal 100% Verdana, Arial, Sans-serif;">
+<Variable name="headerFont" description="Page Header Font"
+type="font" default="normal normal 210% Verdana, Arial, Sans-serif;">
+<Variable name="startSide" description="Start side in blog language"
+type="automatic" default="left">
+<Variable name="endSide" description="End side in blog language"
+type="automatic" default="right">
+*/
+body {
+background: #efefef;
+margin: 0;
+padding: 0px;
+font: x-small Verdana, Arial;
+text-align: center;
+color: #333333;
+font-size/* */:/**/small;
+font-size: /**/small;
+}
+a:link {
+color: #336699;
+}
+a:visited {
+color: #336699;
+}
+a img {
+border-width: 0;
+}
+#outer-wrapper {
+font: normal normal 100% Verdana, Arial, Sans-serif;;
+}
+/* Header
+----------------------------------------------- */
+#header-wrapper {
+margin:0;
+padding: 0;
+background-color: #528bc5;
+text-align: left;
+}
+#header {
+margin: 0 2%;
+background-color: #336699;
+color: #ffffff;
+padding: 0;
+font: normal normal 210% Verdana, Arial, Sans-serif;;
+position: relative;
+}
+h1.title {
+padding-top: 38px;
+margin: 0 1% .1em;
+line-height: 1.2em;
+font-size: 100%;
+}
+h1.title a, h1.title a:visited {
+color: #ffffff;
+text-decoration: none;
+}
+#header .description {
+display: block;
+margin: 0 1%;
+padding: 0 0 40px;
+line-height: 1.4em;
+font-size: 50%;
+}
+/* Content
+----------------------------------------------- */
+.clear {
+clear: both;
+}
+#content-wrapper {
+margin: 0 2%;
+padding: 0 0 15px;
+text-align: left;
+background-color: #ffffff;
+border: 1px solid #cccccc;
+border-top: 0;
+}
+#main-wrapper {
+margin-left: 1%;
+width: 64%;
+float: left;
+background-color: #ffffff;
+display: inline;       /* fix for doubling margin in IE */
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;      /* fix for long non-text content breaking IE sidebar float */
+}
+#sidebar-wrapper {
+margin-right: 1%;
+width: 29%;
+float: right;
+background-color: #ffffff;
+display: inline;       /* fix for doubling margin in IE */
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;      /* fix for long non-text content breaking IE sidebar float */
+}
+/* Headings
+----------------------------------------------- */
+h2, h3 {
+margin: 0;
+}
+/* Posts
+----------------------------------------------- */
+.date-header {
+margin: 1.5em 0 0;
+font-weight: normal;
+color: #999999;
+font-size: 100%;
+}
+.post {
+margin: 0 0 1.5em;
+padding-bottom: 1.5em;
+}
+.post-title {
+margin: 0;
+padding: 0;
+font-size: 125%;
+font-weight: bold;
+line-height: 1.1em;
+}
+.post-title a, .post-title a:visited, .post-title strong {
+text-decoration: none;
+color: #333333;
+font-weight: bold;
+}
+.post div {
+margin: 0 0 .75em;
+line-height: 1.3em;
+}
+.post-footer {
+margin: -.25em 0 0;
+color: #333333;
+font-size: 87%;
+}
+.post-footer .span {
+margin-right: .3em;
+}
+.post img, table.tr-caption-container {
+padding: 4px;
+border: 1px solid #cccccc;
+}
+.tr-caption-container img {
+border: none;
+padding: 0;
+}
+.post blockquote {
+margin: 1em 20px;
+}
+.post blockquote p {
+margin: .75em 0;
+}
+/* Comments
+----------------------------------------------- */
+#comments h4 {
+margin: 1em 0;
+color: #999999;
+}
+#comments h4 strong {
+font-size: 110%;
+}
+#comments-block {
+margin: 1em 0 1.5em;
+line-height: 1.3em;
+}
+#comments-block dt {
+margin: .5em 0;
+}
+#comments-block dd {
+margin: .25em 0 0;
+}
+#comments-block dd.comment-footer {
+margin: -.25em 0 2em;
+line-height: 1.4em;
+font-size: 78%;
+}
+#comments-block dd p {
+margin: 0 0 .75em;
+}
+.deleted-comment {
+font-style:italic;
+color:gray;
+}
+.feed-links {
+clear: both;
+line-height: 2.5em;
+}
+#blog-pager-newer-link {
+float: left;
+}
+#blog-pager-older-link {
+float: right;
+}
+#blog-pager {
+text-align: center;
+}
+/* Sidebar Content
+----------------------------------------------- */
+.sidebar h2 {
+margin: 1.6em 0 .5em;
+padding: 4px 5px;
+background-color: #ffd595;
+font-size: 100%;
+color: #333333;
+}
+.sidebar ul {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+.sidebar li {
+margin: 0;
+padding-top: 0;
+padding-right: 0;
+padding-bottom: .5em;
+padding-left: 15px;
+text-indent: -15px;
+line-height: 1.5em;
+}
+.sidebar {
+color: #333333;
+line-height:1.3em;
+}
+.sidebar .widget {
+margin-bottom: 1em;
+}
+.sidebar .widget-content {
+margin: 0 5px;
+}
+/* Profile
+----------------------------------------------- */
+.profile-img {
+float: left;
+margin-top: 0;
+margin-right: 5px;
+margin-bottom: 5px;
+margin-left: 0;
+padding: 4px;
+border: 1px solid #cccccc;
+}
+.profile-data {
+margin:0;
+text-transform:uppercase;
+letter-spacing:.1em;
+font-weight: bold;
+line-height: 1.6em;
+font-size: 78%;
+}
+.profile-datablock {
+margin:.5em 0 .5em;
+}
+.profile-textblock {
+margin: 0.5em 0;
+line-height: 1.6em;
+}
+/* Footer
+----------------------------------------------- */
+#footer {
+clear: both;
+text-align: center;
+color: #333333;
+}
+#footer .widget {
+margin:.5em;
+padding-top: 20px;
+font-size: 85%;
+line-height: 1.5em;
+text-align: left;
+}
+/** Page structure tweaks for layout editor wireframe */
+body#layout #header {
+width: 750px;
+}
+
+--></style>
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/prettify.js" type="text/javascript"></script>
+<link href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/prettify.css" rel="stylesheet" type="text/css">
+<style>
+code {
+    display: block;
+    font-size: 8pt;
+    overflow: auto;
+    white-space: nowrap;
+    border: 1px solid #7F7F7F;
+    padding: 5px 5px 5px 5px;
+    max-height: 600px;
+    line-height: 1.5em;
+    letter-spacing: 0px;
+    color: #000000;
+}
+</style>
+<script language="JavaScript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/funp_button.js"></script>
+<script type="text/javascript">var a=navigator,b="userAgent",c="indexOf",f="&m=1",g="(^|&)m=",h="?",i="?m=1";function j(){var d=window.location.href,e=d.split(h);switch(e.length){case 1:return d+i;case 2:return 0<=e[1].search(g)?null:d+f;default:return null}}if(-1!=a[b][c]("Mobile")&&-1!=a[b][c]("WebKit")&&-1==a[b][c]("iPad")||-1!=a[b][c]("Opera Mini")||-1!=a[b][c]("IEMobile")){var k=j();k&&window.location.replace(k)};
+</script><script type="text/javascript">
+if (window.jstiming) window.jstiming.load.tick('headEnd');
+</script><script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/google_top_exp.js"></script><style>.gc-bubbleDefault{background-color:transparent !important;text-align:left;padding:0 !important;margin:0 !important;border:0 !important;table-layout:auto !important}.gc-reset{background-color:transparent !important;border:0 !important;padding:0 !important;margin:0 !important;text-align:left}.pls-bubbleTop{border-bottom:1px solid #ccc !important}.pls-topTail,.pls-vertShimLeft,.pls-contentLeft{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/border_3.gif) !important}.pls-topTail{background-repeat:repeat-x !important;background-position:bottom !important}.pls-vertShim{background-color:#fff !important;text-align:right}.pls-vertShimLeft{background-repeat:repeat-y !important;background-position:right !important;height:4px}.pls-vertShimRight{height:4px}.pls-confirm-container .pls-vertShim{background-color:#fff3c2 !important}.pls-contentWrap{background-color:#fff !important;position:relative !important;vertical-align:top}.pls-contentLeft{background-repeat:repeat-y;background-position:right;vertical-align:top}.pls-dropRight{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropR_3.png) !important;background-repeat:repeat-y !important;vertical-align:top}.pls-vert,.pls-tailleft,.pls-dropTR .pls-dropBR,.pls-dropBL,.pls-vert img{vertical-align:top}.pls-dropBottom{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleDropB_3.png) !important;background-repeat:repeat-x !important;width:100%;vertical-align:top}.pls-topLeft{background:inherit !important;text-align:right;vertical-align:bottom}.pls-topRight{background:inherit !important;text-align:left;vertical-align:bottom}.pls-bottomLeft{background:inherit !important;text-align:right}.pls-bottomRight{background:inherit !important;text-align:left;vertical-align:top}.pls-tailtop,.pls-tailright,.pls-tailbottom,.pls-tailleft{display:none;position:relative}.pls-tailbottom,.pls-tailtop,.pls-tailright,.pls-tailleft,.pls-dropTR,.pls-dropBR,.pls-dropBL{background-image:url(//ssl.gstatic.com/s2/oz/images/stars/po/bubblev1/bubbleSprite_3.png) !important;background-repeat:no-repeat}.pls-tailbottom{background-position:-23px 0}.pls-confirm-container .pls-tailbottom{background-position:-23px -10px}.pls-tailtop{background-position:-19px -20px}.pls-tailright{background-position:0 0}.pls-tailleft{background-position:-10px 0}.pls-tailtop{vertical-align:top}.gc-bubbleDefault td{line-height:0;font-size:0}.pls-topLeft img,.pls-topRight img,.pls-tailbottom{vertical-align:bottom}.pls-bottomLeft img,.bubbleDropTR,.pls-dropBottomL img,.pls-dropBottom img,.pls-dropBottomR img,.pls-bottomLeft{vertical-align:top}.pls-dropTR{background-position:0 -22px}.pls-dropBR{background-position:0 -27px}.pls-dropBL{background-position:0 -16px}.pls-spacertop,.pls-spacerright,.pls-spacerbottom,.pls-spacerleft{position:static !important}.pls-spinner{bottom:0;position:absolute;left:0;margin:auto;right:0;top:0}</style><script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/api.php" type="text/javascript"></script></head>
+<body onload="prettyPrint()">
+<div class="navbar section" id="navbar"><div class="widget Navbar" id="Navbar1"><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="" tabindex="0" vspace="0" width="100%" id="navbar-iframe" name="navbar-iframe" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/navbar.html"></iframe></div>
+<script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/plusone.js" gapi_processed="true"></script>
+<script type="text/javascript">
+        gapi.load("iframes-styles-bubble", function() {
+          if (window.iframes && iframes.open) {
+            iframes.open(
+                '//www.blogger.com/navbar.g?targetBlogID\0751705789716225971320\46blogName\75Rickey\47s+pets\46publishMode\75PUBLISH_MODE_BLOGSPOT\46navbarType\75BLUE\46layoutType\75LAYOUTS\46searchRoot\75http://rickey-nctu.blogspot.com/search\46blogLocale\75en_US\46v\0752\46homepageUrl\75http://rickey-nctu.blogspot.com/\46targetPostID\0755448839770365236054\46blogPostOrPageUrl\75http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html\46vt\75-8694718901305771321',
+                {
+                  container: "navbar-iframe-container",
+                  id: "navbar-iframe"
+                },
+                {
+                });
+          }
+        });
+      </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div id="outer-wrapper"><div id="wrap2">
+<!-- skip links for text browsers -->
+<span id="skiplinks" style="display:none;">
+<a href="http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html#main">skip to main </a> |
+      <a href="http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html#sidebar">skip to sidebar</a>
+</span>
+<div id="header-wrapper">
+<div class="header section" id="header"><div class="widget Header" id="Header1">
+<div id="header-inner">
+<div class="titlewrapper">
+<h1 class="title">
+<a href="http://rickey-nctu.blogspot.com/">Rickey's pets</a>
+</h1>
+</div>
+<div class="descriptionwrapper">
+<p class="description"><span>
+</span></p>
+</div>
+</div>
+</div></div>
+</div>
+<div id="content-wrapper">
+<div id="crosscol-wrapper" style="text-align:center">
+<div class="crosscol section" id="crosscol"></div>
+</div>
+<div id="main-wrapper">
+<div class="main section" id="main"><div class="widget Blog" id="Blog1">
+<div class="blog-posts hfeed">
+<!-- google_ad_section_start(name=default) -->
+
+          <div class="date-outer">
+        
+<h2 class="date-header"><span>2009/02/17</span></h2>
+
+          <div class="date-posts">
+        
+<div class="post-outer">
+<div class="post hentry">
+<a name="5448839770365236054"></a>
+<h3 class="post-title entry-title">
+<a href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl.html">打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl</a>
+</h3>
+<div class="post-header-line-1"></div>
+<div class="post-body entry-content">
+<div style="float:right;margin-left:10px;">
+<script type="text/javascript">
+HEMiDEMi_Bookmark_Button_URL = 'http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html';
+HEMiDEMi_Bookmark_Button_Title = '打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl';
+</script>
+<script type="text/javascript">
+HEMiDEMi_Bookmark_Button_Style = 'button1';
+</script>
+<script src="http://js.hemidemi.com/javascripts/hemidemi_bookmark_button.js" type="text/javascript"></script>
+<script>funp_genButton("http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html",11);</script><iframe src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/buttoniframe.html" height="20" width="100" scrolling="no" frameborder="0" marginheight="0" marginwidth="0"></iframe>
+</div>
+Windows上重量級的源碼追蹤程式Source Insight，其最重要的功能之一就是他能依據程式內的函式名、結構名或其他源碼內使用之關鍵字，快速跳躍至該關鍵字的宣告或定義處。<br><br>超強編程軟體 - VIM - 也有這種能力。我們用VIM doc裡的文件來解釋一下什麼叫根據源碼關鍵字跳到定義處。如下圖：<br><br><br><div align="center"><img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/[UNSET].png" alt=""><br><br></div><br>我 們在write_block函式內用到write_line，若我們想看一下write_line的定義，在VIM裡只需將游標移到write_line 上，按下Ctrl+]就可以跳到該函式處。更進一步，在write_line裡頭用到write_char，我們也只需在write_char上按下 Ctrl+]，又能再跳到write_char定義處。這樣的功能在追蹤大型的程式時是很方便的功能，在VIM要有這樣的能力只需一些小小的設定就能達 到。<br><br>本文參考2份VIM document，分別為[<a href="http://vimdoc.sourceforge.net/htmldoc/usr_29.html">usr_29</a>]及[<a href="http://vimdoc.sourceforge.net/htmldoc/tagsrch.html">tagsrch</a>]。<br><br><br><big><big><b>ctags安裝及使用<br><br></b></big></big><br>要使用源碼追蹤的功能預設是必需在工作目錄下存在一個檔名為tags的檔案，該檔案會紀錄源碼內所有的關鍵字出現位置，tags file的產生可藉由ctags這支程式，ctags的安裝方法我在之前的文章[<a href="http://rickey-nctu.blogspot.com/2009/02/vim-taglist.html">TagList</a>]已經有介紹過了，所以這裡不再累述，需要安裝的人請參考那篇文章。<br><br>產生tags方式，必需先切換工作目錄至源碼根目錄下，並輸入下面指令(在命令提示字元下則不要輸入:!喔)：<br><br><code>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .</code><br><br>如此就會產生一名為tags的檔案在此目錄下，是不是很容易呀。<br><br>另 外，還有一種情形值得一提，有時源碼庫是很大一包，每次執行ctags產生tags file可能會需要一段不短的時間，而我們維護的程式可能只是這一大包源碼庫的其中一個小小的資料匣，因此我們有時會只希望更新我們維護的資料匣，而不是 一大包的源碼庫。這種情形可以只在源碼的所在位置產生一個local tags file，並且再藉著tags option將local tag file加入tag搜尋檔案中。<br><br>首先在目前編輯檔案所在位置產生tags：<br><br><code>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f "%:p:h\\tags" "%:p:h"<cr></cr></code><br><br>因 為tags option預設為./tags,tags (輸入:set tags即會顯示出來)，因此只要產生local tags file即會自動被加入tag搜尋檔案中，不需再做設定tag搜尋檔案的工作。在網路上可以查到許多教各位如何將STL的header加入tags搜尋檔 案中，它的方法也是先在STL源碼庫內使用ctags產生tags file，接著再設定tag option。<br><br>有了tags files我們便可以開始追蹤源碼了，追蹤源碼我較常用到這幾個功能，當然這些功能有不少被後後的快速鍵給取代掉了：<br><br><code>Ctrl+]              " 根據游標所在位置的字串常做關鍵字，跳進去(快速鍵:tj)。<br>Ctrl+t     " 跳出來。<br>:tselect        " 當有多個關鍵字在tags file中被找到時，可用tselect來選。<br>:tags                 " 查看現跳到那裡了快速鍵:ta)。<br>:tnext                " 跳到下一個被找到的tag(快速鍵:tn)。<br>:tprev                "跳到前一個被找到的tag(快速鍵:tp)。</code><br><br><br><big><big><b>cscope安裝及使用<br><br></b></big></big><br>cscope與ctags十分類似，只是它有些功能是ctags所沒有的(cscope似乎可以完全取代ctags ??)，所以我在這裡就稍微提下它的安裝及用法。<br><br>首先要安裝cscope.exe跟之前安裝ctags一樣，也是使用cygwin即可安裝它的windows版本，這裡我就不再贅述。另外對於VIM有人已經製作了它的keymapping及自動載入cscope reference file(cscope.out)的script [<a href="http://rickey-nctu.blogspot.com/2009/02/cscope.sourceforge.net/cscope_maps.vim">cscope_maps.vim</a>]，將它下載後放至vim72\plugin裡即可。<br><br>如同ctags，cscope也要建立一個cscope.out的參考檔。建立方式如下：<br><br><code>cscope -Rbkq</code><br><br>除了讓它自己去搜尋所有檔案，你也可以自己指定一份檔案列表，我們可以先用find(cygwin, NOT windows find)找出所有.cpp及.h的檔案再讓cscope.exe去讀取。如下：<br><br><code>find . -name "*.h" -o -name "*.c" -o -name "*.cc" &gt; cscope.files<br>cscope -Rbkq cscope.files<br></code><br><br>以下為cscope_maps.vim提供的功能及對應的按鍵：<br><br><code>Ctrl+\ s    "s表Symbol，列出所有參考到游標所在字串的地方，包含定義和呼叫。<br>ctrl+\ g    "g表Global，與ctags的Ctrl+]相同。<br>ctrl+\ c    "c表Call，列出所有以游標所在字串當函數名的地方。<br>ctrl+\ t    "t表Text，列出專案中所有出現游標所在字串的地方。<br>ctrl+\ f    "f表File，以游標所在字串當檔名，開啟之。<br>ctrl+\ i    "i表Include，以游標所在字串當檔名，列出所有include此檔的檔案。<br>ctrl+\ d    "d表calleD，以游標所在字串當函式名，列出所有此函式呼叫的函式。<br></code><br><br>若想知道其他更詳細的用法可以參考:cs內的內容。<br><br>ps. 若是出現"沒有cscope連線"，這應該是你的工作目錄下沒有cscope.out檔案，若是想不想關掉VIM卻想自行加入cscope連線，可以參考:cs connect指令。<br><br>參考資料: <a href="http://www.yuanma.org/data/2006/0908/article_1487.htm">http://www.yuanma.org/data/2006/0908/article_1487.htm</a><br><br><big><big><b>快速鍵設定</b></big></big><br><br>我設定了2個快速鍵來建立global and local tags file，分別為Ctrl+F12及F12。以及多個快速鍵來來方便tag的使用，其設定如下：<br><br><code>map  <f12>       :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f "%:p:h\\tags" "%:p:h"<cr><br>map  <c-f12>     :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<cr><br>map  <c-f11>     :!cscope -Rbkq<cr><br>nmap  <tj>       :exec "tjump ".expand("<cword>")<cr><br>nmap  <tn>  :exec "ts ".expand("<cword>")&lt;&gt;CR&gt;<br>nmap  <tp>  :exec "tnext"<cr><br>nmap  <ta>         :exec "tprevious"<cr></cr></ta></cr></tp></cword></tn></cr></cword></tj></cr></c-f11></cr></c-f12></cr></f12></code><br><br><big><big><b>預覽視窗 SrcExpl</b></big></big><br><br>狂熱於使用VIM的開發人員至此還不是很滿意，他們想為什麼我們不分割一個視窗來做源碼預覽的效果，[<a href="http://www.vim.org/scripts/script.php?script_id=2179">SrcExpl</a>]也就因此誕生了。它的截圖如下：<br><br><div align="center"><img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/[UNSET](1).png" alt=""><br></div><br>呼 叫SrcExpl預覽視窗為指令:SrcExplToogle，以上圖為例原先在編輯init/main.c，在叫出SrcExpl預覽視窗後，當我們移 到任意的關鍵字上，SrcExpl預覽視窗就會自動將查詢到的tags顯示在視窗內。上圖為游標在boot_cpu_init()後，預覽視窗即馬上顯示 函式定義。<br><br>說老實話，我大部份的時候很喜歡這個套件，但對於大project我很討厭它。主要原因是對於很大的project時，它tag檔很大，如果我開著這個功能我整個VIM都頓頓的，整個用起來很煩。各位看倌還是自己視情形用它吧<br><br>另外，呼叫SrcExpl預覽視窗，我也定義快速鍵F7<br><br><code>map <f7> <esc>:SrcExplToggle<cr></cr></esc></f7></code><br><br><div class="zemanta-pixie"><img class="zemanta-pixie-img" alt="" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/pixy.gif"></div>
+<div style="clear: both;"></div>
+</div>
+<div class="post-footer">
+<div class="post-footer-line post-footer-line-1"><span class="post-comment-link">
+</span>
+<span class="post-icons">
+<span class="item-control blog-admin pid-482264593">
+<a href="http://www.blogger.com/post-edit.g?blogID=1705789716225971320&postID=5448839770365236054&from=pencil" title="Edit Post">
+<img alt="" class="icon-action" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_edit_allbkg.gif" width="18">
+</a>
+</span>
+</span>
+</div>
+<div class="post-footer-line post-footer-line-2"><span class="post-labels">
+標籤：
+<a href="http://rickey-nctu.blogspot.com/search/label/Programming" rel="tag">Programming</a>,
+<a href="http://rickey-nctu.blogspot.com/search/label/vim" rel="tag">vim</a>
+</span>
+</div>
+<div class="post-footer-line post-footer-line-3"></div>
+</div>
+</div>
+<div class="comments" id="comments">
+<a name="comments"></a>
+<h4>No comments:</h4>
+<div id="Blog1_comments-block-wrapper">
+<dl class="avatar-comment-indent" id="comments-block">
+</dl>
+</div>
+<p class="comment-footer">
+<a href="http://www.blogger.com/comment.g?blogID=1705789716225971320&postID=5448839770365236054" onclick="">Post a Comment</a>
+</p>
+<div id="backlinks-container">
+<div id="Blog1_backlinks-container"><a name="links"></a><h4>此文章的連結</h4>
+<p class="comment-footer">
+<a class="comment-link" href="http://www.blogger.com/blog-this.g" id="Blog1_backlinks-create-link" target="_blank">Create a Link</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+<!-- google_ad_section_end(name=default) -->
+<div class="inline-ad">
+<script type="text/javascript"><!--
+google_ad_client="pub-7177432443296316";
+google_ad_host="pub-1556223355139109";
+google_ad_host_channel="00000";
+google_ad_width=300;
+google_ad_height=250;
+google_ad_format="300x250_as";
+google_ad_type="text_image";
+google_color_border="FFFFFF";
+google_color_bg="FFFFFF";
+google_color_link="336699";
+google_color_url="999999";
+google_color_text="333333";
+//--></script>
+<script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><ins id="aswift_0_anchor" style="display:block;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><iframe width="300" height="250" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;"></iframe></ins></ins>
+</div>
+<!-- google_ad_section_start -->
+
+        </div></div>
+      
+<!-- google_ad_section_end -->
+</div>
+<div class="blog-pager" id="blog-pager">
+<span id="blog-pager-newer-link">
+<a class="blog-pager-newer-link" href="http://rickey-nctu.blogspot.com/2009/02/vim-fuzzyfinder.html" id="Blog1_blog-pager-newer-link" title="Newer Post">Newer Post</a>
+</span>
+<span id="blog-pager-older-link">
+<a class="blog-pager-older-link" href="http://rickey-nctu.blogspot.com/2009/02/vim-tip.html" id="Blog1_blog-pager-older-link" title="Older Post">Older Post</a>
+</span>
+<a class="home-link" href="http://rickey-nctu.blogspot.com/">Home</a>
+</div>
+<div class="clear"></div>
+<div class="post-feeds">
+<div class="feed-links">
+Subscribe to:
+<a class="feed-link" href="http://rickey-nctu.blogspot.com/feeds/5448839770365236054/comments/default" target="_blank" type="application/atom+xml">Post Comments (Atom)</a>
+</div>
+</div>
+<script type="text/javascript">window.___gcfg = {'lang': 'en_US'};</script>
+</div></div>
+</div>
+<div id="sidebar-wrapper">
+<div class="sidebar section" id="sidebar"><div class="widget Profile" id="Profile1" style="">
+<h2>About Me</h2>
+<div class="widget-content">
+<a href="https://plus.google.com/116983464210883610340"><img alt="My Photo" class="profile-img" height="80" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/photo.jpg" width="80"></a>
+<dl class="profile-datablock">
+<dt class="profile-data">
+<a class="profile-name-link g-profile" href="https://plus.google.com/116983464210883610340" rel="author" style="background-image: url(//www.google.com/images/icons/ui/gprofile_button-16.png);" data-gapiscan="true" data-onload="true" data-gapiattached="true" id="___hovercard_0">
+Wu FanCheng
+</a>
+</dt>
+</dl>
+<a class="profile-link" href="https://plus.google.com/116983464210883610340" rel="author">View my complete profile</a>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=Profile&widgetId=Profile1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Profile1&quot;));" target="configProfile1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div><div class="widget LinkList" id="LinkList1">
+<div class="widget-content">
+<ul>
+<li><a href="http://picasaweb.google.com/FCWu.tw">My Gallery</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/make-vim-more-powerful-cont-and-prolog.html">打造自己的VIM 系列文章</a></li>
+</ul>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=LinkList&widgetId=LinkList1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;LinkList1&quot;));" target="configLinkList1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div><div class="widget Image" id="Image1">
+<div class="widget-content">
+<img alt="" height="21" id="Image1_img" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/image.png" width="144" style="visibility: visible; ">
+<br>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=Image&widgetId=Image1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Image1&quot;));" target="configImage1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget HTML" id="HTML5">
+<h2 class="title">Plurk</h2>
+<div class="widget-content">
+<div style="width:200px; height:375px;"><iframe scrolling="no" width="200" frameborder="0" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/getWidget.html" height="375"></iframe><div style="float: right; padding: 1px;"> <a style="font-size: 10px !important; color: #999 !important; border: none; text-decorate: none;" href="http://plurk.com/" target="_blank" title="Plurk - A Social Journal for your life">Plurk.com</a></div></div>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=HTML&widgetId=HTML5&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML5&quot;));" target="configHTML5" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget HTML" id="HTML1">
+<h2 class="title">Search</h2>
+<div class="widget-content">
+<form id="cse-search-box" action="http://www.google.com/cse">
+  <div>
+    <input value="006978788468772031835:vcjmx6yen3u" name="cx" type="hidden">
+    <input value="UTF-8" name="ie" type="hidden">
+    <input name="q" size="31" type="text" style="background-image: url(http://www.google.com/cse/intl/zh-Hant/images/google_custom_search_watermark.gif); background-color: rgb(255, 255, 255); background-position: 0% 50%; background-repeat: no-repeat no-repeat; ">
+    <input value="搜尋" name="sa" type="submit">
+  </div>
+<input name="siteurl" type="hidden" value="rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html"><input name="ref" type="hidden" value="www.google.com.hk/url?sa=t&amp;rct=j&amp;q=ctags+C%2B%2B&amp;source=web&amp;cd=3&amp;cad=rja&amp;ved=0CEsQFjAC&amp;url=http%3A%2F%2Frickey-nctu.blogspot.com%2F2009%2F02%2Fvim-srcexpl.html&amp;ei=0qIjUemLDIr49gT01IHICg&amp;usg=AFQjCNE1Tbt7nQmFWqw77SDbyKtwQ9uKJg"><input name="ss" type="hidden" value=""></form>
+
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/brand" type="text/javascript"></script>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=HTML&widgetId=HTML1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML1&quot;));" target="configHTML1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget Label" id="Label1">
+<h2>Labels</h2>
+<div class="widget-content">
+<ul>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Programming">
+Programming
+</a>
+<span dir="ltr">(38)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/vim">
+vim
+</a>
+<span dir="ltr">(29)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Computer">
+Computer
+</a>
+<span dir="ltr">(24)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Linux">
+Linux
+</a>
+<span dir="ltr">(9)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Life">
+Life
+</a>
+<span dir="ltr">(8)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Diary">
+Diary
+</a>
+<span dir="ltr">(5)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Hacking">
+Hacking
+</a>
+<span dir="ltr">(5)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/wargame">
+wargame
+</a>
+<span dir="ltr">(4)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/android">
+android
+</a>
+<span dir="ltr">(3)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Drama">
+Drama
+</a>
+<span dir="ltr">(2)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Investment">
+Investment
+</a>
+<span dir="ltr">(2)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/Graphic">
+Graphic
+</a>
+<span dir="ltr">(1)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/M%24">
+M$
+</a>
+<span dir="ltr">(1)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/embedded">
+embedded
+</a>
+<span dir="ltr">(1)</span>
+</li>
+<li>
+<a dir="ltr" href="http://rickey-nctu.blogspot.com/search/label/python">
+python
+</a>
+<span dir="ltr">(1)</span>
+</li>
+</ul>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=Label&widgetId=Label1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Label1&quot;));" target="configLabel1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div><div class="widget BlogArchive" id="BlogArchive1">
+<h2>Blog Archive</h2>
+<div class="widget-content">
+<div id="ArchiveList">
+<div id="BlogArchive1_ArchiveList">
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/search?updated-min=2012-01-01T00:00:00%2B08:00&updated-max=2013-01-01T00:00:00%2B08:00&max-results=1">2012</a>
+<span class="post-count" dir="ltr">(1)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2012_08_01_archive.html">August</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/search?updated-min=2011-01-01T00:00:00%2B08:00&updated-max=2012-01-01T00:00:00%2B08:00&max-results=7">2011</a>
+<span class="post-count" dir="ltr">(7)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2011_09_01_archive.html">September</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2011_08_01_archive.html">August</a>
+<span class="post-count" dir="ltr">(3)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2011_07_01_archive.html">July</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2011_06_01_archive.html">June</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/search?updated-min=2010-01-01T00:00:00%2B08:00&updated-max=2011-01-01T00:00:00%2B08:00&max-results=6">2010</a>
+<span class="post-count" dir="ltr">(6)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2010_09_01_archive.html">September</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2010_08_01_archive.html">August</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2010_05_01_archive.html">May</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2010_04_01_archive.html">April</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">▼&nbsp;</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/search?updated-min=2009-01-01T00:00:00%2B08:00&updated-max=2010-01-01T00:00:00%2B08:00&max-results=32">2009</a>
+<span class="post-count" dir="ltr">(32)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_08_01_archive.html">August</a>
+<span class="post-count" dir="ltr">(4)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_07_01_archive.html">July</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_04_01_archive.html">April</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_03_01_archive.html">March</a>
+<span class="post-count" dir="ltr">(10)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate expanded">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy toggle-open">▼&nbsp;</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_02_01_archive.html">February</a>
+<span class="post-count" dir="ltr">(15)</span>
+<ul class="posts">
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-nerd-tree.html">打造自己的VIM: 樹狀檔案列表 NERD Tree</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-fuzzyfinder.html">打造自己的VIM: 檔案搜尋 FuzzyFinder</a></li>
+<li><a href="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl.html">打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-tip.html">VIM tip: 單行註解一整個區塊</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-taglist.html">打造自己的VIM: 函式列表 TagList</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-quickfix.html">打造自己的VIM: QuickFix 編譯視窗</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/qttabbar-windows.html">QTTabBar: 為windows檔案總管加上快速鍵</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-tip-pipe-vim.html">VIM tip: Pipe 使用外部命令處理VIM內資料</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-folding.html">打造自己的VIM: Folding</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim.html">打造自己的VIM: 書籤及游標移動</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-tabbar.html">打造自己的VIM: 多檔編輯TabBar</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-tuning.html">打造自己的VIM: 修改目錄(功能表)</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/vim-tips-tabspace.html">VIM tip: 將tab取代成space及程式縮排方式</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/make-vim-more-powerful-cont-and-prolog.html">打造自己的VIM</a></li>
+<li><a href="http://rickey-nctu.blogspot.com/2009/02/ubuntu-convert-wav-file-to-mp3.html">Ubuntu: convert wav file to mp3</a></li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2009_01_01_archive.html">January</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/search?updated-min=2008-01-01T00:00:00%2B08:00&updated-max=2009-01-01T00:00:00%2B08:00&max-results=26">2008</a>
+<span class="post-count" dir="ltr">(26)</span>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_07_01_archive.html">July</a>
+<span class="post-count" dir="ltr">(4)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_06_01_archive.html">June</a>
+<span class="post-count" dir="ltr">(2)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_04_01_archive.html">April</a>
+<span class="post-count" dir="ltr">(1)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_03_01_archive.html">March</a>
+<span class="post-count" dir="ltr">(5)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_02_01_archive.html">February</a>
+<span class="post-count" dir="ltr">(5)</span>
+</li>
+</ul>
+<ul class="hierarchy">
+<li class="archivedate collapsed">
+<a class="toggle" href="javascript:void(0)">
+<span class="zippy">
+
+          ►&nbsp;
+        
+</span>
+</a>
+<a class="post-count-link" href="http://rickey-nctu.blogspot.com/2008_01_01_archive.html">January</a>
+<span class="post-count" dir="ltr">(9)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=BlogArchive&widgetId=BlogArchive1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;BlogArchive1&quot;));" target="configBlogArchive1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div><div class="widget HTML" id="HTML2">
+<div class="widget-content">
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/badge.js" type="text/javascript"></script><iframe frameborder="no" marginwidth="0" marginheight="0" border="0" scrolling="no" width="100%" height="137" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl.html" class="sitetag-badge-iframe-1" style="margin-bottom: 10px; height: 221px; "></iframe>
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/tracking.js" type="text/javascript"></script>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=HTML&widgetId=HTML2&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML2&quot;));" target="configHTML2" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget Subscribe" id="Subscribe1">
+<div style="white-space:nowrap">
+<div class="widget-content">
+<div class="subscribe-wrapper subscribe-type-POST">
+<div class="subscribe expanded subscribe-type-POST" id="SW_READER_LIST_Subscribe1POST" style="display:none;">
+<div class="top">
+<span class="inner" onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1POST&quot;));">
+<img class="subscribe-dropdown-arrow" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/arrow_dropdown.gif">
+<img align="absmiddle" alt="" border="0" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+Posts
+</span>
+<div class="feed-reader-links">
+<a class="feed-reader-link" href="http://www.google.com/ig/add?source=bstp&feedurl=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2Fposts%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-google.png">
+</a>
+<a class="feed-reader-link" href="http://www.netvibes.com/subscribe.php?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2Fposts%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-netvibes.png">
+</a>
+<a class="feed-reader-link" href="http://www.newsgator.com/ngs/subscriber/subext.aspx?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2Fposts%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-newsgator.png">
+</a>
+<a class="feed-reader-link" href="http://add.my.yahoo.com/content?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2Fposts%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-yahoo.png">
+</a>
+<a class="feed-reader-link" href="http://rickey-nctu.blogspot.com/feeds/posts/default" target="_blank">
+<img align="absmiddle" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+                Atom
+              </a>
+</div>
+</div>
+<div class="bottom"></div>
+</div>
+<div class="subscribe" id="SW_READER_LIST_CLOSED_Subscribe1POST" onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1POST&quot;));">
+<div class="top">
+<span class="inner">
+<img class="subscribe-dropdown-arrow" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/arrow_dropdown.gif">
+<span onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1POST&quot;));">
+<img align="absmiddle" alt="" border="0" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+Posts
+</span>
+</span>
+</div>
+<div class="bottom"></div>
+</div>
+</div>
+<div class="subscribe-wrapper subscribe-type-PER_POST">
+<div class="subscribe expanded subscribe-type-PER_POST" id="SW_READER_LIST_Subscribe1PER_POST" style="display:none;">
+<div class="top">
+<span class="inner" onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1PER_POST&quot;));">
+<img class="subscribe-dropdown-arrow" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/arrow_dropdown.gif">
+<img align="absmiddle" alt="" border="0" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+Comments
+</span>
+<div class="feed-reader-links">
+<a class="feed-reader-link" href="http://www.google.com/ig/add?source=bstp&feedurl=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2F5448839770365236054%2Fcomments%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-google.png">
+</a>
+<a class="feed-reader-link" href="http://www.netvibes.com/subscribe.php?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2F5448839770365236054%2Fcomments%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-netvibes.png">
+</a>
+<a class="feed-reader-link" href="http://www.newsgator.com/ngs/subscriber/subext.aspx?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2F5448839770365236054%2Fcomments%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-newsgator.png">
+</a>
+<a class="feed-reader-link" href="http://add.my.yahoo.com/content?url=http%3A%2F%2Frickey-nctu.blogspot.com%2Ffeeds%2F5448839770365236054%2Fcomments%2Fdefault" target="_blank">
+<img src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/subscribe-yahoo.png">
+</a>
+<a class="feed-reader-link" href="http://rickey-nctu.blogspot.com/feeds/5448839770365236054/comments/default" target="_blank">
+<img align="absmiddle" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+                Atom
+              </a>
+</div>
+</div>
+<div class="bottom"></div>
+</div>
+<div class="subscribe" id="SW_READER_LIST_CLOSED_Subscribe1PER_POST" onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1PER_POST&quot;));">
+<div class="top">
+<span class="inner">
+<img class="subscribe-dropdown-arrow" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/arrow_dropdown.gif">
+<span onclick="return(_SW_toggleReaderList(event, &quot;Subscribe1PER_POST&quot;));">
+<img align="absmiddle" alt="" border="0" class="feed-icon" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon_feed12.png">
+Comments
+</span>
+</span>
+</div>
+<div class="bottom"></div>
+</div>
+</div>
+<div style="clear:both"></div>
+</div>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=Subscribe&widgetId=Subscribe1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;Subscribe1&quot;));" target="configSubscribe1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget AdSense" id="AdSense1">
+<div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client="pub-7177432443296316";
+google_ad_host="pub-1556223355139109";
+google_ad_host_channel="00000";
+google_alternate_ad_url="http://www.blogger.com/img/blogger_ad180x150.html";
+google_ad_width=180;
+google_ad_height=150;
+google_ad_format="180x150_as";
+google_ad_type="text_image";
+google_color_border="FFFFFF";
+google_color_bg="FFFFFF";
+google_color_link="336699";
+google_color_url="336699";
+google_color_text="333333";
+//--></script>
+<script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:150px;margin:0;padding:0;position:relative;visibility:visible;width:180px"><ins id="aswift_1_anchor" style="display:block;border:none;height:150px;margin:0;padding:0;position:relative;visibility:visible;width:180px"><iframe width="180" height="150" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_1" name="aswift_1" style="left:0;position:absolute;top:0;"></iframe></ins></ins>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=AdSense&widgetId=AdSense1&action=editWidget&sectionId=sidebar" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;AdSense1&quot;));" target="configAdSense1" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div>
+</div></div>
+</div>
+<!-- spacer for skins that want sidebar and main to be the same height-->
+<div class="clear">&nbsp;</div>
+</div>
+<!-- end content-wrapper -->
+<div id="footer-wrapper">
+<div class="footer section" id="footer"><div class="widget HTML" id="HTML3">
+<div class="widget-content">
+
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/prettify.js" type="text/javascript"></script>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=HTML&widgetId=HTML3&action=editWidget&sectionId=footer" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML3&quot;));" target="configHTML3" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div><div class="widget HTML" id="HTML4">
+<div class="widget-content">
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-4060763-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</div>
+<div class="clear"></div>
+<span class="widget-item-control">
+<span class="item-control blog-admin">
+<a class="quickedit" href="http://www.blogger.com/rearrange?blogID=1705789716225971320&widgetType=HTML&widgetId=HTML4&action=editWidget&sectionId=footer" onclick="return _WidgetManager._PopupConfig(document.getElementById(&quot;HTML4&quot;));" target="configHTML4" title="Edit">
+<img alt="" height="18" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/icon18_wrench_allbkg.png" width="18">
+</a>
+</span>
+</span>
+<div class="clear"></div>
+</div></div>
+</div>
+</div></div><iframe frameborder="0" name="google_top_static_frame" style="height: 0px; width: 0px; position: absolute; " src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/blank.html"></iframe>
+<!-- end outer-wrapper -->
+<script type="text/javascript">
+if (window.jstiming) window.jstiming.load.tick('widgetJsBefore');
+</script><script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/2134638198-widgets.js"></script>
+<script type="text/javascript" src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/plusone.js" gapi_processed="true"></script>
+<script type="text/javascript">
+if (typeof(BLOG_attachCsiOnload) != 'undefined' && BLOG_attachCsiOnload != null) { window['blogger_templates_experiment_id'] = "templatesV1";window['blogger_blog_id'] = '1705789716225971320';BLOG_attachCsiOnload('item_'); }_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d1705789716225971320','//rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html','1705789716225971320');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '1705789716225971320', 'bloggerUrl': 'http://www.blogger.com', 'title': 'Rickey\47s pets', 'pageType': 'item', 'url': 'http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html', 'canonicalUrl': 'http://rickey-nctu.blogspot.com/2009/02/vim-srcexpl.html', 'canonicalHomepageUrl': 'http://rickey-nctu.blogspot.com/', 'homepageUrl': 'http://rickey-nctu.blogspot.com/', 'blogspotFaviconUrl': 'http://rickey-nctu.blogspot.com/favicon.ico', 'enabledCommentProfileImages': true, 'adultContent': false, 'disableAdSenseWidget': false, 'analyticsAccountNumber': '', 'searchLabel': '', 'searchQuery': '', 'pageName': '打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl', 'pageTitle': 'Rickey\47s pets: 打造自己的VIM: 源碼追蹤(ctags+cscope)及預覽視窗SrcExpl', 'encoding': 'UTF-8', 'locale': 'en-US', 'localeLanguage': 'en', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'languageDirection': 'ltr', 'feedLinks': '\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42Rickey\46#39;s pets - Atom\42 href\75\42http://rickey-nctu.blogspot.com/feeds/posts/default\42 /\76\n\74link rel\75\42alternate\42 type\75\42application/rss+xml\42 title\75\42Rickey\46#39;s pets - RSS\42 href\75\42http://rickey-nctu.blogspot.com/feeds/posts/default?alt\75rss\42 /\76\n\74link rel\75\42service.post\42 type\75\42application/atom+xml\42 title\75\42Rickey\46#39;s pets - Atom\42 href\75\42http://www.blogger.com/feeds/1705789716225971320/posts/default\42 /\76\n\74link rel\75\42EditURI\42 type\75\42application/rsd+xml\42 title\75\42RSD\42 href\75\42http://www.blogger.com/rsd.g?blogID\0751705789716225971320\42 /\76\n\74link rel\75\42alternate\42 type\75\42application/atom+xml\42 title\75\42Rickey\46#39;s pets - Atom\42 href\75\42http://rickey-nctu.blogspot.com/feeds/5448839770365236054/comments/default\42 /\76\n', 'meTag': '', 'openIdOpTag': '', 'googleProfileUrl': 'https://plus.google.com/116983464210883610340', 'postImageThumbnailUrl': 'http://lh6.ggpht.com/_WxXxOGW5qJM/SZmYVHvQGsI/AAAAAAAAB9c/G-irLoHpCWw/s72-c/%5BUNSET%5D.png?imgmax\75800', 'imageSrcTag': '\74link rel\75\42image_src\42 href\75\42http://lh6.ggpht.com/_WxXxOGW5qJM/SZmYVHvQGsI/AAAAAAAAB9c/G-irLoHpCWw/s72-c/%5BUNSET%5D.png?imgmax\75800\42 /\76\n', 'latencyHeadScript': '\74script type\75\42text/javascript\42\76(function() { var a\75window,b\75\42jstiming\42,d\75\42tick\42;var e\75function(c){this.t\75{};this.tick\75function(c,p,h){h\75void 0!\75h?h:(new Date).getTime();this.t[c]\75[h,p]};this[d](\42start\42,null,c)},f\75new e;a.jstiming\75{Timer:e,load:f};if(a.performance\46\46a.performance.timing){var g\75a.performance.timing,j\75a[b].load,k\75g.navigationStart,l\75g.responseStart;0\74k\46\46l\76\75k\46\46(j[d](\42_wtsrt\42,void 0,k),j[d](\42wtsrt_\42,\42_wtsrt\42,l),j[d](\42tbsd_\42,\42wtsrt_\42))}\ntry{var m\75null;a.chrome\46\46a.chrome.csi\46\46(m\75Math.floor(a.chrome.csi().pageT),j\46\0460\74k\46\46(j[d](\42_tbnd\42,void 0,a.chrome.csi().startE),j[d](\42tbnd_\42,\42_tbnd\42,k)));null\75\75m\46\46a.gtbExternal\46\46(m\75a.gtbExternal.pageT());null\75\75m\46\46a.external\46\46(m\75a.external.pageT,j\46\0460\74k\46\46(j[d](\42_tbnd\42,void 0,a.external.startE),j[d](\42tbnd_\42,\42_tbnd\42,k)));m\46\46(a[b].pt\75m)}catch(n){};a.tickAboveFold\75function(c){var i\0750;if(c.offsetParent){do i+\75c.offsetTop;while(c\75c.offsetParent)}c\75i;750\76\75c\46\46a[b].load[d](\42aft\42)};var q\75!1;function r(){q||(q\75!0,a[b].load[d](\42firstScrollTime\42))}a.addEventListener?a.addEventListener(\42scroll\42,r,!1):a.attachEvent(\42onscroll\42,r);\n })();\74/script\076', 'mobileHeadScript': '', 'adsenseClientId': 'pub-7177432443296316', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/415c4782c5b3e5f8', 'plusOneApiSrc': 'https://apis.google.com/js/plusone.js'}}, {'name': 'skin', 'data': {'vars': {'textColor': '#333333', 'linkColor': '#336699', 'borderColor': '#cccccc', 'headerTextColor': '#ffffff', 'mainBgColor': '#ffffff', 'sidebarTitleTextColor': '#333333', 'bgColor': '#efefef', 'headerCornersColor': '#528bc5', 'headerFont': 'normal normal 210% Verdana, Arial, Sans-serif;', 'sidebarTitleBgColor': '#ffd595', 'bodyFont': 'normal normal 100% Verdana, Arial, Sans-serif;', 'dateHeaderColor': '#999999', 'endSide': 'right', 'startSide': 'left', 'headerBgColor': '#336699'}, 'override': ''}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '/?view\75classic'}, 'flipcard': {'name': 'flipcard', 'url': '/?view\75flipcard'}, 'magazine': {'name': 'magazine', 'url': '/?view\75magazine'}, 'mosaic': {'name': 'mosaic', 'url': '/?view\75mosaic'}, 'sidebar': {'name': 'sidebar', 'url': '/?view\75sidebar'}, 'snapshot': {'name': 'snapshot', 'url': '/?view\75snapshot'}, 'timeslide': {'name': 'timeslide', 'url': '/?view\75timeslide'}}}]);
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML3', 'footer', null, document.getElementById('HTML3'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML4', 'footer', null, document.getElementById('HTML4'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_ProfileView', new _WidgetInfo('Profile1', 'sidebar', null, document.getElementById('Profile1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_LinkListView', new _WidgetInfo('LinkList1', 'sidebar', null, document.getElementById('LinkList1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_ImageView', new _WidgetInfo('Image1', 'sidebar', null, document.getElementById('Image1'), {'resize': true}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML5', 'sidebar', null, document.getElementById('HTML5'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML1', 'sidebar', null, document.getElementById('HTML1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_LabelView', new _WidgetInfo('Label1', 'sidebar', null, document.getElementById('Label1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar', null, document.getElementById('BlogArchive1'), {'languageDirection': 'ltr'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML2', 'sidebar', null, document.getElementById('HTML2'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_SubscribeView', new _WidgetInfo('Subscribe1', 'sidebar', null, document.getElementById('Subscribe1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_AdSenseView', new _WidgetInfo('AdSense1', 'sidebar', null, document.getElementById('AdSense1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', null, document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', null, document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', null, document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'showBacklinks': true, 'postId': '5448839770365236054', 'lightboxEnabled': true, 'lightboxModuleUrl': '//www.blogger.com/static/v1/jsbin/2258955905-lbx.js', 'lightboxCssUrl': '//www.blogger.com/static/v1/v-css/228702327-lightbox_bundle.css'}, 'displayModeFull'));
+</script>
+
+<script src="./打造自己的VIM  源碼追蹤(ctags+cscope)及預覽視窗SrcExpl_files/track.php" type="text/javascript"></script></body></html>

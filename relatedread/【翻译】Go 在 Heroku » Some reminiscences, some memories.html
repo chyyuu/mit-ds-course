@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<!-- saved from url=(0089)http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/ -->
+<html lang="zh-CN"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<link rel="pingback" href="http://www.mikespook.com/xmlrpc.php">
+
+	<title>  【翻译】Go 在 Heroku » Some reminiscences, some memories</title>
+	<!--[if lt IE 9]>
+	<script src="http://www.mikespook.com/wp-content/themes/suffusion/scripts/html5.js" type="text/javascript"></script>
+	<![endif]-->
+<link rel="alternate" type="application/rss+xml" title="Some reminiscences, some memories » Feed" href="http://www.mikespook.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Some reminiscences, some memories » 评论 Feed" href="http://www.mikespook.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Some reminiscences, some memories » 【翻译】Go 在 Heroku 评论 Feed" href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91go-%e5%9c%a8-heroku/feed/">
+<script src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/cb=gapi.loaded_0" async=""></script><script>var killIE6ImgUrl = "http://www.mikespook.com/wp-content/plugins/lets-kill-ie6/img";</script><link rel="stylesheet" id="suffusion-theme-css" href="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/style.css" type="text/css" media="all">
+<link rel="stylesheet" id="suffusion-theme-skin-1-css" href="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/skin.css" type="text/css" media="all">
+<!--[if !IE]>--><link rel="stylesheet" id="suffusion-rounded-css" href="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/rounded-corners.css" type="text/css" media="all">
+<!--<![endif]-->
+<!--[if gt IE 8]><link rel='stylesheet' id='suffusion-rounded-css'  href='http://www.mikespook.com/wp-content/themes/suffusion/rounded-corners.css?ver=4.4.6' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]><link rel='stylesheet' id='suffusion-ie-css'  href='http://www.mikespook.com/wp-content/themes/suffusion/ie-fix.css?ver=4.4.6' type='text/css' media='all' />
+<![endif]-->
+<link rel="stylesheet" id="suffusion-generated-css" href="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/saved_resource" type="text/css" media="all">
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/comment-reply.min.js"></script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/jquery.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var Suffusion_JS = {"wrapper_width_type_page_template_1l_sidebar_php":"fixed","wrapper_max_width_page_template_1l_sidebar_php":"1200","wrapper_min_width_page_template_1l_sidebar_php":"600","wrapper_orig_width_page_template_1l_sidebar_php":"75","wrapper_width_type_page_template_1r_sidebar_php":"fixed","wrapper_max_width_page_template_1r_sidebar_php":"1200","wrapper_min_width_page_template_1r_sidebar_php":"600","wrapper_orig_width_page_template_1r_sidebar_php":"75","wrapper_width_type_page_template_1l1r_sidebar_php":"fixed","wrapper_max_width_page_template_1l1r_sidebar_php":"1200","wrapper_min_width_page_template_1l1r_sidebar_php":"600","wrapper_orig_width_page_template_1l1r_sidebar_php":"75","wrapper_width_type_page_template_2l_sidebars_php":"fixed","wrapper_max_width_page_template_2l_sidebars_php":"1200","wrapper_min_width_page_template_2l_sidebars_php":"600","wrapper_orig_width_page_template_2l_sidebars_php":"75","wrapper_width_type_page_template_2r_sidebars_php":"fixed","wrapper_max_width_page_template_2r_sidebars_php":"1200","wrapper_min_width_page_template_2r_sidebars_php":"600","wrapper_orig_width_page_template_2r_sidebars_php":"75","wrapper_width_type":"fixed","wrapper_max_width":"1200","wrapper_min_width":"600","wrapper_orig_width":"75","wrapper_width_type_page_template_no_sidebars_php":"fixed","wrapper_max_width_page_template_no_sidebars_php":"1200","wrapper_min_width_page_template_no_sidebars_php":"600","wrapper_orig_width_page_template_no_sidebars_php":"75","suf_featured_interval":"4000","suf_featured_transition_speed":"1000","suf_featured_fx":"fade","suf_featured_pause":"Pause","suf_featured_resume":"Resume","suf_featured_sync":"0","suf_featured_pager_style":"numbers","suf_nav_delay":"500","suf_nav_effect":"fade","suf_navt_delay":"500","suf_navt_effect":"fade","suf_jq_masonry_enabled":"disabled","suf_fix_aspect_ratio":"preserve","suf_show_drop_caps":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/suffusion.js"></script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/lets-kill-ie6.js"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.mikespook.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.mikespook.com/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="【翻译】gofix 介绍" href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91gofix-%e4%bb%8b%e7%bb%8d/">
+<link rel="next" title="【翻译】App Engine Go 概述" href="http://www.mikespook.com/2011/05/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91app-engine-go-%e6%a6%82%e8%bf%b0/">
+<link rel="canonical" href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91go-%e5%9c%a8-heroku/">
+<link rel="shortlink" href="http://www.mikespook.com/?p=969">
+    <link rel="stylesheet" href="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/gpo_plusone.css" type="text/css" media="screen"><!-- Start Additional Feeds -->
+<!-- End Additional Feeds -->
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+<style type="text/css" media="screen">body{position:relative}#dynamic-to-top{display:none;overflow:hidden;width:auto;z-index:90;position:fixed;bottom:20px;right:20px;top:auto;left:auto;font-family:sans-serif;font-size:1em;color:#fff;text-decoration:none;padding:17px 16px;border:1px solid #000;background:#272727;-webkit-background-origin:border;-moz-background-origin:border;-icab-background-origin:border;-khtml-background-origin:border;-o-background-origin:border;background-origin:border;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;-icab-background-clip:padding-box;-khtml-background-clip:padding-box;-o-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-ms-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-moz-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-o-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-khtml-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-icab-box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );box-shadow:0 1px 3px rgba( 0, 0, 0, 0.4 ), inset 0 0 0 1px rgba( 0, 0, 0, 0.2 ), inset 0 1px 0 rgba( 255, 255, 255, .4 ), inset 0 10px 10px rgba( 255, 255, 255, .1 );-webkit-border-radius:30px;-moz-border-radius:30px;-icab-border-radius:30px;-khtml-border-radius:30px;border-radius:30px}#dynamic-to-top:hover{background:#4e9c9c;background:#272727 -webkit-gradient( linear, 0% 0%, 0% 100%, from( rgba( 255, 255, 255, .2 ) ), to( rgba( 0, 0, 0, 0 ) ) );background:#272727 -webkit-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 -khtml-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 -moz-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 -o-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 -ms-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 -icab-linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );background:#272727 linear-gradient( top, rgba( 255, 255, 255, .2 ), rgba( 0, 0, 0, 0 ) );cursor:pointer}#dynamic-to-top:active{background:#272727;background:#272727 -webkit-gradient( linear, 0% 0%, 0% 100%, from( rgba( 0, 0, 0, .3 ) ), to( rgba( 0, 0, 0, 0 ) ) );background:#272727 -webkit-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 -moz-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 -khtml-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 -o-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 -ms-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 -icab-linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) );background:#272727 linear-gradient( top, rgba( 0, 0, 0, .1 ), rgba( 0, 0, 0, 0 ) )}#dynamic-to-top,#dynamic-to-top:active,#dynamic-to-top:focus,#dynamic-to-top:hover{outline:none}#dynamic-to-top span{display:block;overflow:hidden;width:14px;height:12px;background:url( http://www.mikespook.com/wp-content/plugins/dynamic-to-top/css/images/up.png )no-repeat center center}</style><!-- location header -->
+<meta id="syntaxhighlighteranchor" name="syntaxhighlighter-version" content="3.1.3">
+</head>
+
+<body class="single single-post postid-969 single-format-standard light-theme-gray-2 suffusion-custom preset-1000px device-desktop">
+    				<div id="wrapper" class="fix">
+					<div id="header-container" class="custom-header fix">
+					<header id="header" class="fix">
+			<h2 class="blogtitle left"><a href="http://www.mikespook.com/">Some reminiscences, some memories</a></h2>
+		<div class="description right">Just another boring day</div>
+    </header><!-- /header -->
+ 	<nav id="nav" class="tab fix">
+		<div class="col-control left">
+	<!-- right-header-widgets -->
+	<div id="right-header-widgets" class="warea">
+	
+<form method="get" class="searchform " action="http://www.mikespook.com/">
+	<input type="text" name="s" class="searchfield" value="Search" onfocus="if (this.value == &#39;Search&#39;) {this.value = &#39;&#39;;}" onblur="if (this.value == &#39;&#39;) {this.value = &#39;Search&#39;;}">
+	<input type="submit" class="searchsubmit" value="" name="searchsubmit">
+</form>
+	</div>
+	<!-- /right-header-widgets -->
+<ul class="sf-menu l_tinynavNaN">
+
+					<li class="regular-tab"><a href="http://www.mikespook.com/">Home</a></li><li class="pagenav dd-tab"><a href="http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/#" onclick="return false;" class="with-arrow"><!--[if !IE]>--><span class="down-ptr">&nbsp;</span><!--<![endif]-->Pages<!--[if lt IE 7]>&nbsp;&nbsp;&darr;<![endif]--> <!--[if (!IE)|(gte IE 7)]><span class='down-ptr'>&nbsp;</span><![endif]--></a><ul style="display: none; visibility: hidden;"><li class="page_item page-item-718"><a href="http://www.mikespook.com/akihabara-tutorial/">Akihabara 指南</a></li>
+<li class="page_item page-item-21"><a href="http://www.mikespook.com/my-ninny-project/">My “ninny” project</a></li>
+<li class="page_item page-item-606"><a href="http://www.mikespook.com/yasudoku/">Yet Another Sudoku</a></li>
+<li class="page_item page-item-936"><a href="http://www.mikespook.com/learning-go/">《学习Go语言》中文版</a></li>
+<li class="page_item page-item-18"><a href="http://www.mikespook.com/%e6%88%91%e5%8f%82%e4%b8%8e%e7%9a%84-php/">我参与的 PHP</a></li>
+</ul></li><li class="categories dd-tab"><a href="http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/#" class="with-arrow"><!--[if !IE]>--><span class="down-ptr">&nbsp;</span><!--<![endif]-->Categories<!--[if lt IE 7]>&nbsp;&nbsp;&darr;<![endif]--> <!--[if (!IE)|(gte IE 7)]><span class='down-ptr'>&nbsp;</span><![endif]--></a><ul style="display: none; visibility: hidden;">	<li class="cat-item cat-item-332"><a href="http://www.mikespook.com/category/apple/">Apple</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.mikespook.com/category/database/">Database</a>
+</li>
+	<li class="cat-item cat-item-165"><a href="http://www.mikespook.com/category/game/">Game</a>
+</li>
+	<li class="cat-item cat-item-380"><a href="http://www.mikespook.com/category/golang-2/">Golang</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.mikespook.com/category/java/" class="drop"><!--[if !IE]>--><span class="float-ptr">&nbsp;</span><!--<![endif]-->Java<!--[if lt IE 7]>&nbsp;&nbsp;&rarr;<![endif]--> <!--[if (!IE)|(gte IE 7)]><span class='float-ptr'>&nbsp;</span><![endif]--></a>
+<ul class="children">
+	<li class="cat-item cat-item-325"><a href="http://www.mikespook.com/category/java/android-java/">android</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://www.mikespook.com/category/java/netbeans/">NetBeans</a>
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-137"><a href="http://www.mikespook.com/category/linux/">linux</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://www.mikespook.com/category/my-life/" class="drop"><!--[if !IE]>--><span class="float-ptr">&nbsp;</span><!--<![endif]-->My life<!--[if lt IE 7]>&nbsp;&nbsp;&rarr;<![endif]--> <!--[if (!IE)|(gte IE 7)]><span class='float-ptr'>&nbsp;</span><![endif]--></a>
+<ul class="children">
+	<li class="cat-item cat-item-143"><a href="http://www.mikespook.com/category/my-life/twitter/">Twitter</a>
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://www.mikespook.com/category/php/" class="drop"><!--[if !IE]>--><span class="float-ptr">&nbsp;</span><!--<![endif]-->PHP<!--[if lt IE 7]>&nbsp;&nbsp;&rarr;<![endif]--> <!--[if (!IE)|(gte IE 7)]><span class='float-ptr'>&nbsp;</span><![endif]--></a>
+<ul class="children">
+	<li class="cat-item cat-item-7"><a href="http://www.mikespook.com/category/php/ninny-project/">ninny Project</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://www.mikespook.com/category/php/zend-framework/">Zend Framework</a>
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-27"><a href="http://www.mikespook.com/category/python/">Python</a>
+</li>
+	<li class="cat-item cat-item-162"><a href="http://www.mikespook.com/category/stardy-research/">Stardy &amp; Research</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.mikespook.com/category/uncategorized/">Uncategorized</a>
+</li>
+</ul></li><li class="regular-tab"><a href="http://www.skygaga.com/?c=main&m=index&u=mikespook" target="_blank">腾讯微博-SkyGaGa</a></li>
+
+</ul><select class="tinynav tinynavNaN"><option value="http://www.mikespook.com">Home</option><option value="#">&nbsp;Pages </option><option value="http://www.mikespook.com/akihabara-tutorial/">— Akihabara 指南</option><option value="http://www.mikespook.com/my-ninny-project/">— My “ninny” project</option><option value="http://www.mikespook.com/yasudoku/">— Yet Another Sudoku</option><option value="http://www.mikespook.com/learning-go/">— 《学习Go语言》中文版</option><option value="http://www.mikespook.com/%e6%88%91%e5%8f%82%e4%b8%8e%e7%9a%84-php/">— 我参与的 PHP</option><option value="#">&nbsp;Categories </option><option value="http://www.mikespook.com/category/apple/">— Apple</option><option value="http://www.mikespook.com/category/database/">— Database</option><option value="http://www.mikespook.com/category/game/">— Game</option><option value="http://www.mikespook.com/category/golang-2/">— Golang</option><option value="http://www.mikespook.com/category/java/">— &nbsp;Java </option><option value="http://www.mikespook.com/category/java/android-java/">— — android</option><option value="http://www.mikespook.com/category/java/netbeans/">— — NetBeans</option><option value="http://www.mikespook.com/category/linux/">— linux</option><option value="http://www.mikespook.com/category/my-life/">— &nbsp;My life </option><option value="http://www.mikespook.com/category/my-life/twitter/">— — Twitter</option><option value="http://www.mikespook.com/category/php/">— &nbsp;PHP </option><option value="http://www.mikespook.com/category/php/ninny-project/">— — ninny Project</option><option value="http://www.mikespook.com/category/php/zend-framework/">— — Zend Framework</option><option value="http://www.mikespook.com/category/python/">— Python</option><option value="http://www.mikespook.com/category/stardy-research/">— Stardy &amp; Research</option><option value="http://www.mikespook.com/category/uncategorized/">— Uncategorized</option><option value="http://www.skygaga.com?c=main&amp;m=index&amp;u=mikespook" selected="selected">腾讯微博-SkyGaGa</option></select>
+		</div><!-- /col-control -->
+	</nav><!-- /nav -->
+			</div><!-- //#header-container -->
+			<div id="container" class="fix">
+				    <div id="main-col">
+		  	<div id="content">
+	<article class="post-969 post type-post status-publish format-standard hentry category-golang-2 tag-golang tag-387 tag-73 category-380-id full-content meta-position-corners fix" id="post-969">
+<header class="post-header title-container fix">
+	<div class="title">
+		<h1 class="posttitle"><a href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91go-%e5%9c%a8-heroku/" class="entry-title" rel="bookmark" title="【翻译】Go 在 Heroku">【翻译】Go 在 Heroku</a></h1>
+		<div class="postdata fix">
+					<span class="category"><span class="icon">&nbsp;</span><a href="http://www.mikespook.com/category/golang-2/" title="查看 Golang 中的全部文章" rel="category tag">Golang</a></span>
+							<span class="comments"><span class="icon">&nbsp;</span><a href="http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/#respond">Add comments</a></span>
+					</div><!-- /.postdata -->
+		</div><!-- /.title -->
+		<div class="date"><span class="month">四</span> <span class="day">22</span><span class="year">2011</span></div>
+	</header><!-- /.title-container -->
+	<span class="post-format-icon">&nbsp;</span><span class="updated" title="2011-04-22T12:36:30+00:00"></span>		<div class="entry-container fix">
+			<div class="entry fix">
+<div id="bottomcontainerBox" class="both">
+<div class="buttons">
+<div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial;" id="___plusone_0"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I0_1361402349659" name="I0_1361402349659" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/fastbutton.html" allowtransparency="true" data-gapiattached="true" title="+1" wiz_ext_name="Frame_0"></iframe></div>
+</div></div><div style="clear:both"></div><div style="padding-bottom:2px;"></div><p>最近看到许多朋友都在问类似的问题：Go 能做什么？Go 有实际应用吗？敢不敢在实际项目中使用 Go 呢……</p>
+<p>正好，golang 的博客刊登了 Heroku 的两个系统工程师关于 Go 语言在他们的分布式系统中的应用的文章。</p>
+<p>大家还记得 Doozer 吗？对，我之前有过翻译<a href="http://www.mikespook.com/2011/04/%e9%ab%98%e9%80%9f%e6%95%b0%e6%8d%ae%e5%90%8c%e6%ad%a5%e6%9c%8d%e5%8a%a1%e5%99%a8%e2%80%94%e2%80%94doozer/" target="_blank">高速数据同步服务器——Doozer</a>。貌似就是这群优秀的工程师搞出来的杰作。他们作为 go 语言应用的先行者，的确值得我们关注他们的工作，学习他们的经验，并向这群优秀的工程师致敬！</p>
+<p>原文在此：<a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/blog.golang.org/2011/04/go-at-heroku.html&#39;);" href="http://blog.golang.org/2011/04/go-at-heroku.html" target="_blank">http://blog.golang.org/2011/04/go-at-heroku.html</a><br>
+——————————-用于致敬的翻译分割线——————————-<br>
+<em>本周的博客内容是由 Heroku 的系统工程师 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/xph.us/&#39;);" href="http://xph.us/" target="_blank">Keith Rarick</a> 和 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/itsbonus.heroku.com/&#39;);" href="http://itsbonus.heroku.com/" target="_blank">Blake Mizerany</a> 撰写的。用他们自己的话说，他们“吃、喝、睡在分布式系统上”。这里讨论了一些他们应用 Go 的经验。</em></p>
+<p>构建分布式系统的一个巨大的问题是物理服务器之间的协作。每个服务器需要知道关于系统整体上的各种情况。这些关键数据包括锁、配置数据等等，而即便是在数据存储异常的情况下，这些也必须是一致并且可用的。因此，需要一个有着绝对一致保障的数据存储。对于这个问题的解决方案是 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/xph.us/2011/04/13/introducing-doozer.html&#39;);" href="http://xph.us/2011/04/13/introducing-doozer.html" target="_blank">Doozer</a>，一个用 Go 编写的、新的、一致性的、高可用的数据存储。<br>
+<span id="more-969"></span><br>
+Doozer 的核心是 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/en.wikipedia.org/wiki/Paxos_(computer_science)&#39;);" href="http://en.wikipedia.org/wiki/Paxos_(computer_science)" target="_blank">Paxos</a>，一个协议族用于解决不可靠网络中的不可靠节点的一致性问题。Paxos 的本质是运行一个容错系统，众所周知这是非常难以实现的。即便是在网上有的例子实现，尽管为了教学目的进行了简化，也都还是复杂而且难以理解的。已有的生产系统的名声就更糟了。</p>
+<p>幸运的是，Go 原生的并发机制使得这个任务更加简单。Paxos 定义在通过消息传递通讯的，无依赖关系的一组并发进程上。在 Doozer 中，这些进程是由 goroutine 实现的，而通讯是由 channel 来完成。同样的，和垃圾回收机制改进了 malloc 和 free一样，我们发现 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/blog.golang.org/2010/07/share-memory-by-communicating.html&#39;);" href="http://blog.golang.org/2010/07/share-memory-by-communicating.html" target="_blank">goroutine 和 channel</a> 改进了基于锁机制的并发。这些工具让我们避免了复杂的赘述，并且让脑袋一直保持对核心问题的关注。我们对用如此之少的代码行数，就完成了一贯被认为是难以实现的内容感到相当惊讶。</p>
+<p>Go 的标准包是在 Doozer 上的另一个巨大成功。Go 团队对什么能进入标准包是相当实用的态度，我们很快发现 <a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/golang.org/pkg/websocket/&#39;);" href="http://golang.org/pkg/websocket/" target="_blank">websocket</a> 包是非常实用的。当我们工作于数据存储时，我们需要一些简单的办法来观察并且将活动可视化。使用 websocket 包，Keith 就可以在家进行骑车训练的时候增加一个 web 界面，而无须依赖任何额外的东西。这真正见证了用 Go 来粘合系统和应用程序有多么好。</p>
+<p>我们最喜欢的生产力的提高来自于 Go 的代码格式化工具：<a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/golang.org/cmd/gofmt/&#39;);" href="http://golang.org/cmd/gofmt/" target="_blank">gofmt</a>。我们从未对哪里写大括号、tab 还是空格，或者是否应当对齐赋值符号而争论。我们全部认同了 gofmt 默认的输出。</p>
+<p>开发 Doozer 之简单程度是相当令人满意的。Go 的静态连接意味着 Doozer 无序额外的依赖；它只有一个文件复制到任何机器，然后立刻可以运行并加入运行 Doozer 的集群。</p>
+<p>最终，Go 简洁的设计哲学与我们对软件工程的认识令人发狂的一致。就像 Go 团队一样，我们对什么特性可以进入 Doozer，也是从实用的角度出发。我们反复推敲，期望修改已有的功能而不是增加一个新的功能。在这点上来看，Go 与 Doozer 相当的匹配。</p>
+<p>我们对于在将来的项目中使用 Go 已经有了一些想法。Doozer 对于一个大系统来说只是刚刚开始。</p>
+<div id="bottomcontainerBox" class="both">
+<div class="buttons">
+<div style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; background-position: initial initial; background-repeat: initial initial;" id="___plusone_1"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I1_1361402349662" name="I1_1361402349662" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/fastbutton(1).html" allowtransparency="true" data-gapiattached="true" title="+1" wiz_ext_name="Frame_1"></iframe></div>
+</div></div><div style="clear:both"></div><div style="padding-bottom:2px;"></div>			</div><!--/entry -->
+		</div><!-- .entry-container -->
+<footer class="post-footer postdata fix">
+<span class="author"><span class="icon">&nbsp;</span>Posted by <span class="vcard"><a href="http://www.mikespook.com/author/mikespook/" class="url fn" rel="author">mikespook</a></span> at 12:36</span>		<span class="tags tax"><span class="icon">&nbsp;</span>Tagged with: <a href="http://www.mikespook.com/tag/golang/" rel="tag">golang</a>, <a href="http://www.mikespook.com/tag/%e5%ae%9e%e4%be%8b/" rel="tag">实例</a>, <a href="http://www.mikespook.com/tag/%e7%bf%bb%e8%af%91/" rel="tag">翻译</a></span>
+	</footer><!-- .post-footer -->
+<section id="comments">
+<h3 class="comments"><span class="icon">&nbsp;</span>
+	2 Responses to “【翻译】Go 在 Heroku”</h3>
+<ol class="commentlist">
+	<li id="comment-3325" class="pingback even thread-even depth-1 plain-nested">
+				<div id="div-comment-3325" class="comment-body">
+			<div class="comment-author fix vcard">
+							<div class="comment-author-link">
+					<cite class="fn"><a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/ntcn.net/blog/?p=83&#39;);" href="http://ntcn.net/blog/?p=83" rel="external nofollow" class="url">Go语言资料收集 | 我的博客</a></cite> <span class="says">says:</span>				</div>
+				<div class="comment-meta commentmetadata"><a href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91go-%e5%9c%a8-heroku/comment-page-1/#comment-3325">
+				2011/12/28 at 23:57</a>				</div>
+
+			</div>
+	
+			<p>[...] 2011-04-21&nbsp;Go在Heroku中的应用&nbsp;原文&nbsp;(译1&nbsp;译2) [...]</p>
+
+			</div>
+
+			<div class="reply">
+						</div>
+
+
+
+		
+	</li>
+	<li id="comment-3517" class="pingback odd alt thread-odd thread-alt depth-1 plain-nested">
+				<div id="div-comment-3517" class="comment-body">
+			<div class="comment-author fix vcard">
+							<div class="comment-author-link">
+					<cite class="fn"><a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/ntcn.net/blog/?p=1092&#39;);" href="http://ntcn.net/blog/?p=1092" rel="external nofollow" class="url">Go语言资料收集 | 我的博客</a></cite> <span class="says">says:</span>				</div>
+				<div class="comment-meta commentmetadata"><a href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91go-%e5%9c%a8-heroku/comment-page-1/#comment-3517">
+				2012/01/26 at 11:41</a>				</div>
+
+			</div>
+	
+			<p>[...] 2011-04-21&nbsp;Go在Heroku中的应用&nbsp;原文(译1&nbsp;译2) [...]</p>
+
+			</div>
+
+			<div class="reply">
+						</div>
+
+
+
+		
+	</li>
+</ol>
+<div class="navigation fix">
+	<div class="alignleft"></div>
+	<div class="alignright"></div>
+</div>
+								<div id="respond">
+				<h3 id="reply-title"><span class="icon">&nbsp;</span>Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/#respond" style="display:none;">Cancel reply</a></small></h3>
+									<form action="http://www.mikespook.com/wp-comments-post.php" method="post" id="commentform">
+																			<span></span>							
+					<p>
+						<label for="author" class="suf-comment-label">Name</label>
+						<input type="text" name="author" id="author" class="textarea" value="" size="28" tabindex="1"> (required)
+					</p>
+
+					<p>
+						<label for="email" class="suf-comment-label">E-mail</label>
+						<input type="text" name="email" id="email" value="" size="28" tabindex="2" class="textarea"> (required)
+					</p>
+
+					<p>
+						<label for="url" class="suf-comment-label">URI</label>
+						<input type="text" name="url" id="url" value="" size="28" tabindex="3" class="textarea">
+					</p>
+												
+					<p>
+						<label for="comment" class="textarea suf-comment-label">Your Comment</label>
+						<textarea name="comment" id="comment" cols="60" rows="10" tabindex="4" class="textarea"></textarea>
+					</p>						<p class="form-allowed-tags">You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: <code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></p>						<p class="form-submit">
+							<input name="submit" type="submit" id="submit" value="Submit Comment">
+							<input type="hidden" name="comment_post_ID" value="969" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+						</p>
+						<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="32d84bdaa6"></p>					</form>
+							</div><!-- #respond -->
+						</section>   <!-- #comments -->	</article><!--/post -->
+<nav class="post-nav fix">
+<table>
+<tbody><tr>
+	<td class="previous"><a href="http://www.mikespook.com/2011/04/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91gofix-%e4%bb%8b%e7%bb%8d/" rel="prev"><span class="icon">&nbsp;</span> 【翻译】gofix 介绍</a></td>
+	<td class="next"><a href="http://www.mikespook.com/2011/05/%e3%80%90%e7%bf%bb%e8%af%91%e3%80%91app-engine-go-%e6%a6%82%e8%bf%b0/" rel="next"><span class="icon">&nbsp;</span> 【翻译】App Engine Go 概述</a></td>
+</tr>
+</tbody></table>
+</nav>
+      </div><!-- content -->
+    </div><!-- main col -->
+<div id="sidebar-shell-1" class="sidebar-shell sidebar-shell-right">
+<div class="dbx-group right boxed warea" id="sidebar">
+<!--widget start --><aside id="text-4" class="dbx-box suf-widget widget_text"><div class="dbx-content">			<div class="textwidget"><form action="http://www.google.com.hk/" id="cse-search-box" target="_blank">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-1198985910753103:7018544013">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="text" name="q" size="22" style="background-image: url(http://www.google.com.hk/cse/intl/zh-Hans/images/google_custom_search_watermark.gif); background-color: rgb(255, 255, 255); background-position: 0% 50%; background-repeat: no-repeat no-repeat;">
+    <input type="submit" name="sa" value="搜索">
+  </div>
+<input name="siteurl" type="hidden" value="www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/"><input name="ref" type="hidden" value="www.google.com/"><input name="ss" type="hidden" value=""></form>
+
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/brand"></script>
+
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/query_renderer.js"></script>
+<div id="queries"></div>
+<script src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/js"></script>
+</div>
+		</div></aside><!--widget end --><!--widget start --><aside id="wkc_random_posts" class="dbx-box suf-widget widget_wkc_random_posts"><h3 class="dbx-handle plain">Random Posts</h3><div class="dbx-content"><ul>
+<li>   <a href="http://www.mikespook.com/2009/01/%e7%bf%bb%e8%af%91%e5%9c%a8%e8%ae%ba%e6%96%87%e5%92%8c%e6%96%87%e7%ab%a0%e4%b8%ad%e4%bd%bf%e7%94%a8%e6%9c%80%e5%a5%bd%e6%96%b9%e5%bc%8f%e8%a1%a8%e8%be%be%e7%a0%94%e7%a9%b6%e6%88%90%e6%9e%9c/" rel="bookmark" title="Ivan Stojmenovic
+ http://www.site.uottawa.ca/%7Eivan/presentstyle.pdf
+ 这篇文档介绍了如何撰写研究性文章或硕士、博士论文。大部分介绍的内容同样适用于制作幻灯片（由于幻灯片制作有一些不同，相关的内容被放到由 Veljko Milutinovic 撰写的另外一篇文档中介绍，在我的网站上同现在这篇文档放在一起）。如果说本文介绍的方式可......  2009.01.5">[翻译]在论文和文章中使用最好方式表达研究成果</a></li>
+<li>   <a href="http://www.mikespook.com/2009/12/netbeans-6-8-%e5%8f%91%e5%b8%83%e4%ba%86%e2%80%a6%e2%80%a6%e9%a6%96%e5%85%88%e8%a7%a3%e5%86%b3%e7%9a%84%e5%b0%8fbug/" rel="bookmark" title="Oracle 对 Sun 的收购，还未真正尘埃落定，坊间就流言四起……Netbeans 6.8 的发布，无疑增强了大家对 Netbeans 在带着神谕的阳光下生存下去的信心。于是，还未上班前，趁着大家吃早餐的时间全速下回来了最新的 Netbeeans 6.8 的 j2se 开发版本。赏玩一番……
+ 
+ 本来呢，由于工作的原因，Netbeans 我会用来做 PHP、C 的开发（无奈 python 插......  2009.12.11">Netbeans 6.8 发布，首先需要解决的小bug</a></li>
+<li>   <a href="http://www.mikespook.com/2008/08/ratproxy-%e5%9c%a8-cygwin-%e4%b8%8b%e7%9a%84%e7%bc%96%e8%af%91/" rel="bookmark" title="ubuntu 下已经搞掂，很简单：apt-get install make gcc build-essential libssl-dev ca-certificates，然后 make 即可。
+ 
+ cygwin 下有一点小麻烦，特别记录一下：
+ 
+ 需要安装的包：make gcc binutils openssl-devel
+ 
+ 需要做的改动：Makefile 的 CFLAGS   = -Wa......  2008.08.20">RatProxy 在 cygwin 下的编译</a></li>
+<li>   <a href="http://www.mikespook.com/2007/10/%e4%bb%8a%e5%a4%a9%e6%94%b6%e5%88%b0%e4%ba%86netbeans%e7%9a%84%e5%85%89%e7%9b%98/" rel="bookmark" title="自己都快忘了这事了。快两个月，终于漂洋过海的送到了。
+  
+ 
+ 
+  等6.0出来了，再去申请一张。感觉蛮好用。
+ ...  2007.10.31">今天收到了NetBeans的光盘</a></li>
+<li>   <a href="http://www.mikespook.com/2009/02/php%e6%a1%86%e6%9e%b6%e7%9a%84%e7%b9%81%e8%8d%a3%e6%98%af%e6%ad%a3%e7%a1%ae%e7%9a%84%e5%8f%91%e5%b1%95%e6%96%b9%e5%90%91%e5%90%97%ef%bc%9f/" rel="bookmark" title="这个其实是源于 javaeye 上的这个讨论：http://www.javaeye.com/post/886707。最开始吸引我的是在 rails 板块上诸多专业玩 java 和 ruby 的人是如何评价 php 以及 php 框架的。在讨论中发现有一些值得学习和借鉴的地方。所以推荐大家完整阅读这个帖子。从技术性、知识面和娱乐性来讲，都是质量很高的。
+ 
+ 我就简单说一下我对于 php 框架繁荣的......  2009.02.17">PHP框架的繁荣是正确的发展方向吗？</a></li>
+</ul>
+</div></aside><!--widget end --><!--widget start --><aside id="text-2" class="dbx-box suf-widget widget_text"><div class="dbx-content">			<div class="textwidget"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-1198985910753103";
+/* mikespook.com-sidebar */
+google_ad_slot = "2964562072";
+google_ad_width = 234;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:234px"><ins id="aswift_0_anchor" style="display:block;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:234px"><iframe width="234" height="60" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left: 0px; position: absolute; top: 0px;" wiz_ext_name="Frame_2"></iframe></ins></ins>
+
+<!-- 将以下代码放在<head>之后或者</body>标签之前。 -->
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/plusone.js" gapi_processed="true">
+  {lang: 'zh-CN'}
+</script></div>
+		</div></aside><!--widget end --><!--widget start --><aside id="calendar-2" class="dbx-box suf-widget widget_calendar"><div class="dbx-content"><div id="calendar_wrap"><table id="wp-calendar">
+	<caption>2011 年四月</caption>
+	<thead>
+	<tr>
+		<th scope="col" title="星期一">一</th>
+		<th scope="col" title="星期二">二</th>
+		<th scope="col" title="星期三">三</th>
+		<th scope="col" title="星期四">四</th>
+		<th scope="col" title="星期五">五</th>
+		<th scope="col" title="星期六">六</th>
+		<th scope="col" title="星期日">日</th>
+	</tr>
+	</thead>
+
+	<tfoot>
+	<tr>
+		<td colspan="3" id="prev"><a href="http://www.mikespook.com/2011/03/" title="查看 2011 年三月的文章">« 三</a></td>
+		<td class="pad">&nbsp;</td>
+		<td colspan="3" id="next"><a href="http://www.mikespook.com/2011/05/" title="查看 2011 年五月的文章">五 »</a></td>
+	</tr>
+	</tfoot>
+
+	<tbody>
+	<tr>
+		<td colspan="4" class="pad">&nbsp;</td><td class="with-posts"><a href="http://www.mikespook.com/2011/04/01/" title="【翻译】Godoc：文档化 Go 代码">1</a></td><td>2</td><td>3</td>
+	</tr>
+	<tr>
+		<td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td>
+	</tr>
+	<tr>
+		<td class="with-posts"><a href="http://www.mikespook.com/2011/04/11/" title="Learning Go 中文版本《学习Go语言》">11</a></td><td>12</td><td>13</td><td class="with-posts"><a href="http://www.mikespook.com/2011/04/14/" title="高速数据同步服务器——Doozer">14</a></td><td>15</td><td class="with-posts"><a href="http://www.mikespook.com/2011/04/16/" title="网络原因引起的 Golang 编译错误">16</a></td><td>17</td>
+	</tr>
+	<tr>
+		<td>18</td><td>19</td><td class="with-posts"><a href="http://www.mikespook.com/2011/04/20/" title="【翻译】gofix 介绍">20</a></td><td>21</td><td class="with-posts"><a href="http://www.mikespook.com/2011/04/22/" title="【翻译】Go 在 Heroku">22</a></td><td>23</td><td>24</td>
+	</tr>
+	<tr>
+		<td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td>
+		<td class="pad" colspan="1">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table></div></div></aside><!--widget end --><!--widget start --><aside id="recent-comments-2" class="dbx-box suf-widget widget_recent_comments"><h3 class="dbx-handle plain">近期评论</h3><div class="dbx-content"><ul id="recentcomments"><li class="recentcomments">raph 发表在《<a href="http://www.mikespook.com/2013/02/%e7%bf%bb%e8%af%91-gogolang-%e5%ae%9e%e7%8e%b0%e7%9a%84%e7%8a%b6%e6%80%81%e6%9c%ba/comment-page-1/#comment-4752">[翻译] Go(#golang) 实现的状态机</a>》</li><li class="recentcomments">高健 发表在《<a href="http://www.mikespook.com/learning-go/comment-page-2/#comment-4717">《学习Go语言》中文版</a>》</li><li class="recentcomments"><a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/mikespook.com&#39;);" href="http://mikespook.com/" rel="external nofollow" class="url">mikespook</a> 发表在《<a href="http://www.mikespook.com/2013/01/%e7%bf%bb%e8%af%91%e6%88%91%e5%85%b6%e5%ae%9e%e6%b2%a1%e5%8a%9e%e6%b3%95%e5%ad%a6-erlang%ef%bc%8c%e5%9b%a0%e4%b8%ba%e5%ae%83%e4%b8%8d%e5%ad%98%e5%9c%a8%ef%bc%8c%e6%89%80%e4%bb%a5%e6%88%91%e5%8f%91/comment-page-1/#comment-4708">[翻译]我其实没办法学 Erlang，因为它不存在，所以我发明了它</a>》</li><li class="recentcomments">LY 发表在《<a href="http://www.mikespook.com/2013/01/%e7%bf%bb%e8%af%91%e6%88%91%e5%85%b6%e5%ae%9e%e6%b2%a1%e5%8a%9e%e6%b3%95%e5%ad%a6-erlang%ef%bc%8c%e5%9b%a0%e4%b8%ba%e5%ae%83%e4%b8%8d%e5%ad%98%e5%9c%a8%ef%bc%8c%e6%89%80%e4%bb%a5%e6%88%91%e5%8f%91/comment-page-1/#comment-4703">[翻译]我其实没办法学 Erlang，因为它不存在，所以我发明了它</a>》</li><li class="recentcomments"><a onclick="javascript:pageTracker._trackPageview(&#39;/outgoing/blog.jobbole.com/32731/&#39;);" href="http://blog.jobbole.com/32731/" rel="external nofollow" class="url">Erlang之父Joe Armstrong近期回顾的一些旧事 - 博客 - 伯乐在线</a> 发表在《<a href="http://www.mikespook.com/2013/01/%e7%bf%bb%e8%af%91%e6%88%91%e5%85%b6%e5%ae%9e%e6%b2%a1%e5%8a%9e%e6%b3%95%e5%ad%a6-erlang%ef%bc%8c%e5%9b%a0%e4%b8%ba%e5%ae%83%e4%b8%8d%e5%ad%98%e5%9c%a8%ef%bc%8c%e6%89%80%e4%bb%a5%e6%88%91%e5%8f%91/comment-page-1/#comment-4687">[翻译]我其实没办法学 Erlang，因为它不存在，所以我发明了它</a>》</li></ul></div></aside><!--widget end --><!--widget start --><aside id="tag_cloud-2" class="dbx-box suf-widget widget_tag_cloud"><h3 class="dbx-handle plain">Tags</h3><div class="dbx-content"><div class="tagcloud"><a href="http://www.mikespook.com/tag/akihabara/" class="tag-link-290" title="4 个话题" style="font-size: 10.524590163934pt;">akihabara</a>
+<a href="http://www.mikespook.com/tag/android/" class="tag-link-315" title="5 个话题" style="font-size: 11.44262295082pt;">Android</a>
+<a href="http://www.mikespook.com/tag/api/" class="tag-link-344" title="3 个话题" style="font-size: 9.3770491803279pt;">API</a>
+<a href="http://www.mikespook.com/tag/apple/" class="tag-link-332" title="4 个话题" style="font-size: 10.524590163934pt;">Apple</a>
+<a href="http://www.mikespook.com/tag/countdown/" class="tag-link-214" title="2 个话题" style="font-size: 8pt;">countdown</a>
+<a href="http://www.mikespook.com/tag/demo/" class="tag-link-187" title="2 个话题" style="font-size: 8pt;">Demo</a>
+<a href="http://www.mikespook.com/tag/firefox-add-one/" class="tag-link-22" title="2 个话题" style="font-size: 8pt;">firefox add-one</a>
+<a href="http://www.mikespook.com/tag/framework/" class="tag-link-124" title="2 个话题" style="font-size: 8pt;">framework</a>
+<a href="http://www.mikespook.com/tag/game-engine/" class="tag-link-289" title="6 个话题" style="font-size: 12.245901639344pt;">game engine</a>
+<a href="http://www.mikespook.com/tag/gfw/" class="tag-link-92" title="3 个话题" style="font-size: 9.3770491803279pt;">gfw</a>
+<a href="http://www.mikespook.com/tag/golang/" class="tag-link-244" title="49 个话题" style="font-size: 22pt;">golang</a>
+<a href="http://www.mikespook.com/tag/google/" class="tag-link-91" title="7 个话题" style="font-size: 12.819672131148pt;">google</a>
+<a href="http://www.mikespook.com/tag/html5/" class="tag-link-288" title="8 个话题" style="font-size: 13.393442622951pt;">html5</a>
+<a href="http://www.mikespook.com/tag/iphone/" class="tag-link-319" title="3 个话题" style="font-size: 9.3770491803279pt;">iphone</a>
+<a href="http://www.mikespook.com/tag/javascript/" class="tag-link-97" title="2 个话题" style="font-size: 8pt;">javascript</a>
+<a href="http://www.mikespook.com/tag/linux/" class="tag-link-137" title="2 个话题" style="font-size: 8pt;">linux</a>
+<a href="http://www.mikespook.com/tag/mysql/" class="tag-link-35" title="4 个话题" style="font-size: 10.524590163934pt;">mysql</a>
+<a href="http://www.mikespook.com/tag/netbeans/" class="tag-link-9" title="5 个话题" style="font-size: 11.44262295082pt;">NetBeans</a>
+<a href="http://www.mikespook.com/tag/nginx/" class="tag-link-247" title="3 个话题" style="font-size: 9.3770491803279pt;">nginx</a>
+<a href="http://www.mikespook.com/tag/oauth/" class="tag-link-346" title="4 个话题" style="font-size: 10.524590163934pt;">OAuth</a>
+<a href="http://www.mikespook.com/tag/oracle/" class="tag-link-310" title="3 个话题" style="font-size: 9.3770491803279pt;">oracle</a>
+<a href="http://www.mikespook.com/tag/pecl/" class="tag-link-345" title="3 个话题" style="font-size: 9.3770491803279pt;">PECL</a>
+<a href="http://www.mikespook.com/tag/php/" class="tag-link-3" title="24 个话题" style="font-size: 18.55737704918pt;">PHP</a>
+<a href="http://www.mikespook.com/tag/python/" class="tag-link-27" title="7 个话题" style="font-size: 12.819672131148pt;">Python</a>
+<a href="http://www.mikespook.com/tag/ubuntu/" class="tag-link-33" title="10 个话题" style="font-size: 14.426229508197pt;">ubuntu</a>
+<a href="http://www.mikespook.com/tag/vim/" class="tag-link-58" title="3 个话题" style="font-size: 9.3770491803279pt;">vim</a>
+<a href="http://www.mikespook.com/tag/web/" class="tag-link-279" title="3 个话题" style="font-size: 9.3770491803279pt;">web</a>
+<a href="http://www.mikespook.com/tag/xdebug/" class="tag-link-48" title="3 个话题" style="font-size: 9.3770491803279pt;">xdebug</a>
+<a href="http://www.mikespook.com/tag/xml/" class="tag-link-212" title="2 个话题" style="font-size: 8pt;">xml</a>
+<a href="http://www.mikespook.com/tag/xubuntu/" class="tag-link-30" title="3 个话题" style="font-size: 9.3770491803279pt;">xubuntu</a>
+<a href="http://www.mikespook.com/tag/zend-framework/" class="tag-link-6" title="9 个话题" style="font-size: 13.967213114754pt;">Zend Framework</a>
+<a href="http://www.mikespook.com/tag/%e4%b9%b1%e7%a0%81/" class="tag-link-37" title="2 个话题" style="font-size: 8pt;">乱码</a>
+<a href="http://www.mikespook.com/tag/%e5%9b%a2%e9%98%9f/" class="tag-link-191" title="3 个话题" style="font-size: 9.3770491803279pt;">团队</a>
+<a href="http://www.mikespook.com/tag/%e5%9c%b0%e9%9c%87/" class="tag-link-60" title="3 个话题" style="font-size: 9.3770491803279pt;">地震</a>
+<a href="http://www.mikespook.com/tag/%e5%a4%87%e6%a1%88/" class="tag-link-169" title="2 个话题" style="font-size: 8pt;">备案</a>
+<a href="http://www.mikespook.com/tag/%e5%ad%a6%e4%b9%a0/" class="tag-link-276" title="3 个话题" style="font-size: 9.3770491803279pt;">学习</a>
+<a href="http://www.mikespook.com/tag/%e5%b9%bf%e5%b7%9e/" class="tag-link-148" title="3 个话题" style="font-size: 9.3770491803279pt;">广州</a>
+<a href="http://www.mikespook.com/tag/%e5%bc%82%e6%ad%a5/" class="tag-link-275" title="4 个话题" style="font-size: 10.524590163934pt;">异步</a>
+<a href="http://www.mikespook.com/tag/%e6%80%a7%e8%83%bd/" class="tag-link-164" title="4 个话题" style="font-size: 10.524590163934pt;">性能</a>
+<a href="http://www.mikespook.com/tag/%e6%89%af%e6%b7%a1/" class="tag-link-252" title="4 个话题" style="font-size: 10.524590163934pt;">扯淡</a>
+<a href="http://www.mikespook.com/tag/%e6%9e%b6%e6%9e%84/" class="tag-link-428" title="5 个话题" style="font-size: 11.44262295082pt;">架构</a>
+<a href="http://www.mikespook.com/tag/%e6%b8%b8%e6%88%8f/" class="tag-link-159" title="5 个话题" style="font-size: 11.44262295082pt;">游戏</a>
+<a href="http://www.mikespook.com/tag/%e6%bc%8f%e6%b4%9e/" class="tag-link-179" title="2 个话题" style="font-size: 8pt;">漏洞</a>
+<a href="http://www.mikespook.com/tag/%e7%bf%bb%e8%af%91/" class="tag-link-73" title="38 个话题" style="font-size: 20.737704918033pt;">翻译</a>
+<a href="http://www.mikespook.com/tag/%e8%af%97/" class="tag-link-43" title="3 个话题" style="font-size: 9.3770491803279pt;">诗</a></div>
+</div></aside><!--widget end --><!--widget start --><aside id="linkcat-2" class="dbx-box suf-widget widget_links"><h3 class="dbx-handle plain">Blogroll</h3><div class="dbx-content">
+	<ul class="xoxo blogroll">
+<li><a href="http://blog.cathayan.org/blog/1" target="_blank">Blog on 27th Floor</a></li>
+<li><a href="http://www.dbanotes.net/" target="_blank">DBA notes</a></li>
+<li><a href="http://timyang.net/" target="_blank">Tim[后端技术]</a></li>
+<li><a href="http://95da8.com/" target="_blank">九唔搭八</a></li>
+<li><a href="http://1234567i.org/" target="_blank">小众音乐</a></li>
+<li><a href="http://www.yanbin.org/" target="_blank">抚琴居</a></li>
+<li><a href="http://www.ooso.net/" target="_blank">某人的栖息地</a></li>
+<li><a href="http://www.jaceju.net/blog/" target="_blank">網站製作學習誌</a></li>
+<li><a href="http://zhilaohu.blog.sohu.com/" target="_blank">纸老虎传媒</a></li>
+
+	</ul>
+</div></aside><!--widget end -->
+<!--widget start --><aside id="linkcat-101" class="dbx-box suf-widget widget_links"><h3 class="dbx-handle plain">Old friends</h3><div class="dbx-content">
+	<ul class="xoxo blogroll">
+<li><a href="http://www.cbf107.com/" target="_blank">cbf107</a></li>
+
+	</ul>
+</div></aside><!--widget end -->
+<!--widget start --><aside id="linkcat-292" class="dbx-box suf-widget widget_links"><h3 class="dbx-handle plain">Others</h3><div class="dbx-content">
+	<ul class="xoxo blogroll">
+<li><a href="http://www.ninny-g.com/" target="_blank">媚惑桃花</a></li>
+<li><a href="http://36948.com/" target="_blank">爱茶吧</a></li>
+<li><a href="http://www.skygaga.com/?c=main&m=index&u=mikespook" target="_blank">腾讯微博-SkyGaGa</a></li>
+
+	</ul>
+</div></aside><!--widget end -->
+<!--widget start --><aside id="linkcat-20" class="dbx-box suf-widget widget_links"><h3 class="dbx-handle plain">OurPNP</h3><div class="dbx-content">
+	<ul class="xoxo blogroll">
+<li><a href="http://www.ourpnp.org/" target="_blank">PNP街坊</a></li>
+<li><a href="http://chenxiaoyu.org/" target="_blank">smallfish 鱼哥的窝子</a></li>
+<li><a href="http://www.hdwong.com/" target="_blank">冰山日志</a></li>
+<li><a href="http://www.surf-boy.com/" target="_blank">冲浪 – iPhone Blog</a></li>
+<li><a href="http://blog.sina.com.cn/ittuan" target="_blank">团长</a></li>
+<li><a href="http://webisbeauty.appspot.com/" target="_blank">墙外的光神V5</a></li>
+<li><a href="http://www.luohuizhu.cn/" target="_blank">夜雨's Blog</a></li>
+<li><a href="http://www.kb24.net.cn/" target="_blank">小冬kobe</a></li>
+<li><a href="http://www.mikale.org/" target="_blank">小路的奇异世界</a></li>
+<li><a href="http://www.gzseed.com/" target="_blank">广州萌芽工作室</a></li>
+<li><a href="http://www.cngump.com/" rel="acquaintance met co-worker neighbor" target="_blank">老甘blog</a></li>
+<li><a href="http://blog.laiyonghao.com/" target="_blank">赖勇浩的编程私伙局</a></li>
+
+	</ul>
+</div></aside><!--widget end -->
+<!--widget start --><aside id="linkcat-384" class="dbx-box suf-widget widget_links"><h3 class="dbx-handle plain">Tech Group</h3><div class="dbx-content">
+	<ul class="xoxo blogroll">
+<li><a href="http://simple-is-better.com/" target="_blank">Simple is Better</a></li>
+<li><a href="http://tiny4cocoa.com/" target="_blank">Tiny4Cocoa</a></li>
+
+	</ul>
+</div></aside><!--widget end -->
+<!--widget start --><aside id="meta-3" class="dbx-box suf-widget widget_meta"><h3 class="dbx-handle plain">功能</h3><div class="dbx-content">			<ul>
+						<li><a href="http://www.mikespook.com/wp-login.php">登录</a></li>
+			<li><a href="http://www.mikespook.com/feed/" title="使用 RSS 2.0 订阅本站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://www.mikespook.com/comments/feed/" title="使用 RSS 订阅本站点的所有文章的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://cn.wordpress.org/" title="基于 WordPress，一个优美、先进的个人信息发布平台。">WordPress.org</a></li>
+						</ul>
+</div></aside><!--widget end --><!--widget start --><aside id="text-3" class="dbx-box suf-widget widget_text"><div class="dbx-content">			<div class="textwidget"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-1198985910753103";
+/* mikespook.com-sidebar */
+google_ad_slot = "2964562072";
+google_ad_width = 234;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:234px"><ins id="aswift_1_anchor" style="display:block;border:none;height:60px;margin:0;padding:0;position:relative;visibility:visible;width:234px"><iframe width="234" height="60" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){w.location.replace(h)}}" id="aswift_1" name="aswift_1" style="left: 0px; position: absolute; top: 0px;" wiz_ext_name="Frame_3"></iframe></ins></ins></div>
+		</div></aside><!--widget end --></div><!--/sidebar -->
+</div>
+	</div><!-- /container -->
+
+<footer>
+	<div id="cred">
+		<table>
+			<tbody><tr>
+				<td class="cred-left">© 2011 <a href="http://www.mikespook.com/">Some reminiscences, some memories</a></td>
+				<td class="cred-center"></td>
+				<td class="cred-right"><a href="http://aquoid.com/news/themes/suffusion/">Suffusion theme by Sayontan Sinha</a></td>
+			</tr>
+		</tbody></table>
+	</div>
+</footer>
+<!-- 64 queries, 8MB in 0.286 seconds. -->
+</div><!--/wrapper -->
+<!-- location footer -->
+
+<!-- tracker added by Ultimate Google Analytics plugin v1.6.0: http://www.oratransplant.nl/uga -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-535688-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/plusone(1).js" gapi_processed="true"></script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/jquery.easing.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var mv_dynamic_to_top = {"text":"0","version":"0","min":"200","speed":"1000","easing":"easeInOutExpo","margin":"20"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/dynamic.to.top.min.js"></script><a href="http://www.mikespook.com/2011/04/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91go-%E5%9C%A8-heroku/#" id="dynamic-to-top" style="display: none;"><span>&nbsp;</span></a>
+
+
+
+<iframe src="./【翻译】Go 在 Heroku » Some reminiscences, some memories_files/clip_result.html" id="wizClipperResult" name="wizClipperResult"></iframe></body></html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!-- saved from url=(0059)http://readsandthoughts.sinaapp.com/understand_zk_concepts/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" async="" src="./ZooKeeper中的概念剖析   谋食谋道_files/ga.js"></script><script type="text/javascript" async="" src="./ZooKeeper中的概念剖析   谋食谋道_files/page.js"></script><script src="./ZooKeeper中的概念剖析   谋食谋道_files/shares.php" charset="utf-8"></script>
+	
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+
+	<title>ZooKeeper中的概念剖析 | 谋食谋道</title>
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0 - 所有文章" href="http://readsandthoughts.sinaapp.com/feed/">
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0 - 所有评论" href="http://readsandthoughts.sinaapp.com/comments/feed/">
+	<link rel="pingback" href="http://blog.shupeng.org/xmlrpc.php">
+
+	<!-- style START -->
+	<!-- default style -->
+	<style type="text/css" media="screen">@import url( http://blog.shupeng.org/wp-content/themes/inove/style.css );</style>
+	<!-- for translations -->
+			<link rel="stylesheet" href="./ZooKeeper中的概念剖析   谋食谋道_files/chinese.css" type="text/css" media="screen">
+		<!--[if IE]>
+		<link rel="stylesheet" href="http://blog.shupeng.org/wp-content/themes/inove/ie.css" type="text/css" media="screen" />
+	<![endif]-->
+	<!-- style END -->
+
+	<!-- script START -->
+	<script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/base.js"></script>
+	<script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/menu.js"></script>
+	<!-- script END -->
+
+	<link rel="alternate" type="application/rss+xml" title="谋食谋道 » ZooKeeper中的概念剖析 评论 Feed" href="http://readsandthoughts.sinaapp.com/understand_zk_concepts/feed/">
+<link rel="stylesheet" id="A2A_SHARE_SAVE-css" href="./ZooKeeper中的概念剖析   谋食谋道_files/addtoany.min.css" type="text/css" media="all">
+<script type="text/javascript">
+var duoshuoQuery = {"short_name":"linfeng","sso":{"login":"http:\/\/blog.shupeng.org\/wp-login.php?action=duoshuo_login","logout":"http:\/\/blog.shupeng.org\/wp-login.php?action=logout&_wpnonce=081fcf4eed"},"remote_auth":"W10= 5206c10b66364db6536a4298be455efc640f2720 1361404157"};
+duoshuoQuery.sso.login += '&redirect_to=' + encodeURIComponent(window.location.href);
+duoshuoQuery.sso.logout += '&redirect_to=' + encodeURIComponent(window.location.href);
+</script>
+<script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/embed.js"></script><link type="text/css" rel="stylesheet" href="./ZooKeeper中的概念剖析   谋食谋道_files/embed.css">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://blog.shupeng.org/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://blog.shupeng.org/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="ZooKeeper论文阅读笔记" href="http://readsandthoughts.sinaapp.com/zookeeper_paper_notes/">
+<link rel="next" title="Mac新手入门配置之道" href="http://readsandthoughts.sinaapp.com/learn_mac_from_scratch_one/">
+<meta name="generator" content="WordPress 3.4.1">
+<link rel="shortlink" href="http://readsandthoughts.sinaapp.com/?p=61">
+
+<script type="text/javascript"><!--
+var a2a_config=a2a_config||{},wpa2a={done:false,html_done:false,script_ready:false,script_load:function(){var a=document.createElement('script'),s=document.getElementsByTagName('script')[0];a.type='text/javascript';a.async=true;a.src='http://static.addtoany.com/menu/page.js';s.parentNode.insertBefore(a,s);wpa2a.script_load=function(){};},script_onready:function(){if(a2a.type=='page'){wpa2a.script_ready=true;if(wpa2a.html_done)wpa2a.init();}},init:function(){for(var i=0,el,target,targets=wpa2a.targets,length=targets.length;i<length;i++){el=document.getElementById('wpa2a_'+(i+1));target=targets[i];a2a_config.linkname=target.title;a2a_config.linkurl=target.url;if(el)a2a.init('page',{target:el});wpa2a.done=true;}}};a2a_config.tracking_callback=['ready',wpa2a.script_onready];a2a_localize = {
+	Share: "分享",
+	Save: "收藏",
+	Subscribe: "订阅",
+	Email: "电子邮件",
+    Bookmark: "书签",
+	ShowAll: "显示全部服务",
+	ShowLess: "显示部分服务",
+	FindServices: "查找服务",
+	FindAnyServiceToAddTo: "动态查找任何用以添加的服务",
+	PoweredBy: "Powered by",
+	ShareViaEmail: "通过电子邮件分享",
+	SubscribeViaEmail: "通过电子邮件订阅",
+	BookmarkInYourBrowser: "添加为浏览器书签",
+	BookmarkInstructions: "按下 [Ctrl+D] 或 [Cmd+D] 将本页加为书签",
+	AddToYourFavorites: "添加至收藏夹",
+	SendFromWebOrProgram: "从任何电子邮件地址或电子邮件程序发送",
+    EmailProgram: "电子邮件程序"
+};
+
+//--></script>
+
+<!-- All in One SEO Pack 1.6.10 by Michael Torbert of Semper Fi Web Design[339,394] -->
+<link rel="canonical" href="./ZooKeeper中的概念剖析   谋食谋道_files/ZooKeeper中的概念剖析   谋食谋道.html">
+<!-- /all in one seo pack -->
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+<!--[if IE]>
+<style type="text/css">
+.addtoany_list a img{filter:alpha(opacity=70)}
+.addtoany_list a:hover img,.addtoany_list a.addtoany_share_save img{filter:alpha(opacity=100)}
+</style>
+<![endif]-->
+<meta id="syntaxhighlighteranchor" name="syntaxhighlighter-version" content="3.1.3">
+<style type="text/css">.a2a_menu, .a2a_menu *{float:none;margin:0;padding:0;height:auto;width:auto;}.a2a_menu{width: 300px;}.a2a_menu table{border-collapse:collapse;border-spacing:0;width:auto}.a2a_menu table,.a2a_menu tbody,.a2a_menu td,.a2a_menu tr{border:0;margin:0;padding:0;background-color:#FFF} .a2a_menu td{vertical-align:top}.a2a_menu,.a2a_menu_inside{border-radius:16px;-webkit-border-radius:16px;-moz-border-radius:16px}.a2a_menu{display:none;z-index:9999999;position:absolute;direction:ltr;min-width:200px;background:#EEE;background:rgba(238,238,238,.6);font:12px Arial,Helvetica,sans-serif;color:#000;line-height:12px;border:1px solid transparent;_border:1px solid #EEE;padding:7px;vertical-align:baseline;overflow:hidden}.a2a_menu_inside{background-color:#FFF;border: 1px solid #CCC;padding:8px}.a2a_menu a span, 	.a2a_tabs .a2a_tab_selected span{color:#00F}.a2a_menu a:hover span, 	.a2a_tabs div span,	.a2a_tabs a span{color:#000}.a2a_menu a,#a2a_hist_list a,.a2a_tabs div{color:#00F;text-decoration:none;font:12px Arial,Helvetica,sans-serif;line-height:12px;height:auto;width:auto;outline:none;-moz-outline:none;border-radius:8px;-webkit-border-radius:8px;-moz-border-radius:8px}.a2a_menu a:visited,#a2a_hist_list a:visited{color:#00F}.a2a_menu a:hover,.a2a_menu a:active,.a2a_menu a.a2a_i:focus,.a2a_tabs div:hover{color:#000;border:1px solid #CCC;background-color:#EEE;text-decoration:none}.a2a_menu span,.a2a_img{background:url(http://static.addtoany.com/menu/icons_22.png) no-repeat;border:0;display:block;line-height:16px}.a2a_menu span.a2a_i_find{height:16px;left:5px;position:absolute;top:2px;width:16px}#a2a_menu_container{display:inline-block} #a2a_menu_container{_display:inline} .a2a_menu_title_container{margin-bottom:2px;padding:6px}.a2a_menu_find_container{position:relative;text-align:left;margin:4px 1px;padding:1px 24px 1px 0;border:1px solid #CCC;border-radius:8px;-webkit-border-radius:8px;-moz-border-radius:8px}.a2a_cols_container{border-bottom-right-radius:8px;border-top-right-radius:8px}.a2a_cols_container .a2a_col1{overflow-x:hidden;overflow-y:auto;}.a2a_menu input, .a2a_menu input[type="text"]{display:block;background-image:none;box-shadow:none;line-height:100%;margin:0;overflow:hidden;padding:0;-moz-box-shadow:none;-webkit-box-shadow:none;-webkit-appearance:none} .a2a_menu_title_container input.a2a_menu_title{color:#000;background-color:#FFF;border:0;margin:0;padding:0;width:99%}.a2a_menu_find_container input.a2a_menu_find{position:relative;left:24px;color:#000;font-size:12px;padding:2px 0;outline:0;border:0;background-color:transparent;_background-color:#FFF;width:99%} .a2a_clear{clear:both} .a2a_default_style a{float:left;line-height:16px;padding:0 2px}.a2a_default_style .a2a_img{display:block;height:16px;line-height:16px;overflow:hidden;width:16px}.a2a_default_style .a2a_img, .a2a_default_style .a2a_dd{float:left}.a2a_default_style .a2a_img_text{margin-right:4px}.a2a_default_style .a2a_divider{border-left:1px solid #000;display:inline;float:left;height:16px;line-height:16px;margin:0 5px}.a2a_kit a{cursor:pointer}.a2a_nowrap{white-space:nowrap}.a2a_note{margin:0 auto;padding:9px;font-size:12px;text-align:center}.a2a_note .a2a_note_note{margin:0;color:#000}.a2a_wide a{display:block;margin-top:3px;border:1px solid #EEE;padding:3px;text-align:center}.a2a_tabs{float:left;margin:0 0 3px} .a2a_tabs a,.a2a_tabs div{margin:1px;background-color:#EEE; border:1px solid #EEE; font-size:11px; padding:6px 12px ; white-space:nowrap} .a2a_tabs a span, .a2a_tabs div span{display:inline-block;padding-left:20px;height:auto;width:auto} .a2a_tabs_default a span, .a2a_tabs_default div span{height:auto;max-width:99px;overflow:hidden;padding-left:20px;width:auto;_width:expression(this.clientWidth > 99? "97px" : "auto");}.a2a_tabs a, .a2a_tabs a:visited, .a2a_tabs a:hover, .a2a_tabs div, .a2a_tabs div:hover{cursor:pointer;border-bottom:1px solid #EEE;color:#000;border-bottom-left-radius:0;-webkit-border-bottom-left-radius:0;-moz-border-radius-bottomleft:0;border-bottom-right-radius:0;-webkit-border-bottom-right-radius:0;-moz-border-radius-bottomright:0}a.a2a_tab_selected, a.a2a_tab_selected:visited,a.a2a_tab_selected:hover,a.a2a_tab_selected:active,a.a2a_tab_selected:focus, div.a2a_tab_selected,div.a2a_tab_selected:hover{color:#00F;background-color:#FFF;border:1px solid #CCC;border-bottom:1px solid #FFF}a.a2a_i{display:block;float:left;border:1px solid #FFF;padding:4px 6px;text-align:left;white-space:nowrap;width:126px;}a.a2a_i span{padding-left:20px}.a2a_x_shorten a.a2a_i{width:116px}a.a2a_sss{font-weight:700}a.a2a_ind{display:inline;margin:0;padding:0} a.a2a_email_client span{display:inline-block;height:16px;line-height:16px;margin:0 2px;padding-left:0;width:16px;}a.a2a_menu_show_more_less{margin:4px 0 8px;padding:0}a.a2a_menu_show_more_less span{display:inline-block;height:14px;margin:0 auto;vertical-align:baseline;width:16px} div.a2a_menu_powered_by{background-color:#EEE;font-size:9px;color:#999;text-align:center;margin-top:4px;padding:3px;border-radius:8px;-webkit-border-radius:8px;-moz-border-radius:8px}div.a2a_menu_powered_by a,div.a2a_menu_powered_by a:visited{display:inline;font-size:9px;color:#999}div.a2a_menu_powered_by a:hover{border:0;text-decoration:underline}iframe.a2a_shim{border:0;position:absolute;z-index:999999;}.a2a_dd img{border:0;}.a2a_ptz_notes a, .a2a_ptz_notes a:hover { background: none; border: 0; }.a2a_ptz_notes .a2a_ptz_stats { font-size: 13px; }.a2a_ptz_notes .a2a_ptz_stats span { background: none; display: inline; font-weight: bold; }.a2a_ptz_notes .a2a_ptz_desc { line-height: 14px; margin: 14px 0 21px; }.a2a_ptz_notes .a2a_ptz_claim a { background-color: #EEE; border: 1px solid #EEE; color: #00F; font-size: 13px; font-weight: bold; padding: 7px 21px; border-radius: 8px; }.a2a_ptz_notes .a2a_ptz_claim a:hover { background-color: #EEE; border: 1px solid #CCC; color: #000; }.a2a_ptz_notes .a2a_ptz_login { line-height: 14px; margin: 21px 0 0; }.a2a_ptz_notes .a2a_ptz_login a:hover { text-decoration: underline; }.a2a_ptz_notes .a2a_i_lockerz { display: inline-block; margin: 20px 0 0; padding-left: 20px; height: auto; width:auto; }.a2a_i_a2a{background-position:0 0!important}.a2a_i_a2a_bw{background-position:0 -17px!important}.a2a_i_agregator{background-position:0 -34px!important}.a2a_i_aiderss{background-position:0 -51px!important}.a2a_i_aim{background-position:0 -68px!important}.a2a_i_allvoices{background-position:0 -85px!important}.a2a_i_amazon{background-position:0 -102px!important}.a2a_i_aol{background-position:0 -119px!important}.a2a_i_apple_mail{background-position:0 -136px!important}.a2a_i_arto{background-position:0 -153px!important}.a2a_i_ask{background-position:0 -170px!important}.a2a_i_backflip{background-position:0 -187px!important}.a2a_i_bebo{background-position:0 -204px!important}.a2a_i_bibsonomy{background-position:0 -221px!important}.a2a_i_bitty{background-position:0 -238px!important}.a2a_i_blinklist{background-position:0 -255px!important}.a2a_i_blogger{background-position:0 -272px!important}.a2a_i_bloglines{background-position:0 -289px!important}.a2a_i_blogmarks{background-position:0 -306px!important}.a2a_i_bookmark{background-position:0 -323px!important}.a2a_i_bookmarks_fr{background-position:0 -340px!important}.a2a_i_box{background-position:0 -357px!important}.a2a_i_buddymarks{background-position:0 -374px!important}.a2a_i_business_exchange{background-position:0 -391px!important}.a2a_i_care2{background-position:0 -408px!important}.a2a_i_chrome{background-position:0 -425px!important}.a2a_i_citeulike{background-position:0 -442px!important}.a2a_i_clear{background-position:0 -459px!important}.a2a_i_connotea{background-position:0 -476px!important}.a2a_i_current{background-position:0 -493px!important}.a2a_i_dailyme{background-position:0 -510px!important}.a2a_i_dailyrotation{background-position:0 -527px!important}.a2a_i_darr{background-position:0 -544px!important}.a2a_i_darr_wt{background-position:0 -561px!important}.a2a_i_default{background-position:0 -578px!important}.a2a_i_delicious{background-position:0 -595px!important}.a2a_i_designfloat{background-position:0 -612px!important}.a2a_i_digg{background-position:0 -629px!important}.a2a_i_diglog{background-position:0 -646px!important}.a2a_i_diigo{background-position:0 -663px!important}.a2a_i_dzone{background-position:0 -680px!important}.a2a_i_email{background-position:0 -697px!important}.a2a_i_email_bw{background-position:0 -714px!important}.a2a_i_evernote{background-position:0 -731px!important}.a2a_i_expression{background-position:0 -748px!important}.a2a_i_facebook{background-position:0 -765px!important}.a2a_i_fark{background-position:0 -782px!important}.a2a_i_faves{background-position:0 -799px!important}.a2a_i_feed{background-position:0 -816px!important}.a2a_i_feedblitz{background-position:0 -833px!important}.a2a_i_feedbucket{background-position:0 -850px!important}.a2a_i_feedmailer{background-position:0 -867px!important}.a2a_i_feedshow{background-position:0 -884px!important}.a2a_i_find{background-position:0 -901px!important}.a2a_i_fireant{background-position:0 -918px!important}.a2a_i_firefox{background-position:0 -935px!important}.a2a_i_folkd{background-position:0 -952px!important}.a2a_i_formspring{background-position:0 -969px!important}.a2a_i_friendfeed{background-position:0 -986px!important}.a2a_i_funp{background-position:0 -1003px!important}.a2a_i_furl{background-position:0 -1020px!important}.a2a_i_fwicki{background-position:0 -1036px!important}.a2a_i_gabbr{background-position:0 -1053px!important}.a2a_i_global_grind{background-position:0 -1070px!important}.a2a_i_gmail{background-position:0 -1087px!important}.a2a_i_google{background-position:0 -1104px!important}.a2a_i_google_plus{background-position:0 -1121px!important}.a2a_i_healthranker{background-position:0 -1138px!important}.a2a_i_hellotxt{background-position:0 -1155px!important}.a2a_i_hemidemi{background-position:0 -1172px!important}.a2a_i_hubdog{background-position:0 -1189px!important}.a2a_i_hugg{background-position:0 -1206px!important}.a2a_i_hyves{background-position:0 -1223px!important}.a2a_i_identica{background-position:0 -1240px!important}.a2a_i_imera{background-position:0 -1257px!important}.a2a_i_instapaper{background-position:0 -1274px!important}.a2a_i_itunes{background-position:0 -1291px!important}.a2a_i_jamespot{background-position:0 -1308px!important}.a2a_i_jots{background-position:0 -1325px!important}.a2a_i_jumptags{background-position:0 -1342px!important}.a2a_i_khabbr{background-position:0 -1359px!important}.a2a_i_kledy{background-position:0 -1376px!important}.a2a_i_klipfolio{background-position:0 -1393px!important}.a2a_i_linkagogo{background-position:0 -1410px!important}.a2a_i_linkatopia{background-position:0 -1427px!important}.a2a_i_linkedin{background-position:0 -1444px!important}.a2a_i_live{background-position:0 -1461px!important}.a2a_i_livejournal{background-position:0 -1478px!important}.a2a_i_lockerz{background-position:0 -1495px!important}.a2a_i_ma_gnolia{background-position:0 -1512px!important}.a2a_i_maple{background-position:0 -1529px!important}.a2a_i_meneame{background-position:0 -1546px!important}.a2a_i_messenger{background-position:0 -1563px!important}.a2a_i_mindbodygreen{background-position:0 -1580px!important}.a2a_i_miro{background-position:0 -1597px!important}.a2a_i_mister-wong{background-position:0 -1614px!important}.a2a_i_mixx{background-position:0 -1631px!important}.a2a_i_mobile{background-position:0 -1648px!important}.a2a_i_mozillaca{background-position:0 -1665px!important}.a2a_i_msdn{background-position:0 -1682px!important}.a2a_i_multiply{background-position:0 -1699px!important}.a2a_i_my_msn{background-position:0 -1716px!important}.a2a_i_mylinkvault{background-position:0 -1733px!important}.a2a_i_myspace{background-position:0 -1750px!important}.a2a_i_netimechannel{background-position:0 -1767px!important}.a2a_i_netlog{background-position:0 -1784px!important}.a2a_i_netvibes{background-position:0 -1801px!important}.a2a_i_netvouz{background-position:0 -1818px!important}.a2a_i_newsalloy{background-position:0 -1835px!important}.a2a_i_newscabby{background-position:0 -1852px!important}.a2a_i_newsgator{background-position:0 -1869px!important}.a2a_i_newshutch{background-position:0 -1886px!important}.a2a_i_newsisfree{background-position:0 -1903px!important}.a2a_i_newstrust{background-position:0 -1920px!important}.a2a_i_newsvine{background-position:0 -1937px!important}.a2a_i_nowpublic{background-position:0 -1954px!important}.a2a_i_oneview{background-position:0 -1971px!important}.a2a_i_openbm{background-position:0 -1988px!important}.a2a_i_orkut{background-position:0 -2005px!important}.a2a_i_outlook{background-position:0 -2022px!important}.a2a_i_pageflakes{background-position:0 -2039px!important}.a2a_i_pdf{background-position:0 -2056px!important}.a2a_i_phonefavs{background-position:0 -2073px!important}.a2a_i_ping{background-position:0 -2090px!important}.a2a_i_pinterest{background-position:0 -2107px!important}.a2a_i_plaxo{background-position:0 -2124px!important}.a2a_i_plurk{background-position:0 -2141px!important}.a2a_i_podnova{background-position:0 -2158px!important}.a2a_i_posterous{background-position:0 -2175px!important}.a2a_i_print{background-position:0 -2192px!important}.a2a_i_printfriendly{background-position:0 -2209px!important}.a2a_i_protopage{background-position:0 -2226px!important}.a2a_i_ptz{background-position:0 -2243px!important}.a2a_i_ptz_bw{background-position:0 -2260px!important}.a2a_i_pusha{background-position:0 -2277px!important}.a2a_i_rapidfeeds{background-position:0 -2294px!important}.a2a_i_read_it_later{background-position:0 -2311px!important}.a2a_i_reader{background-position:0 -2328px!important}.a2a_i_reddit{background-position:0 -2345px!important}.a2a_i_rediff{background-position:0 -2362px!important}.a2a_i_rssfwd{background-position:0 -2379px!important}.a2a_i_segnalo{background-position:0 -2396px!important}.a2a_i_share{background-position:0 -2413px!important}.a2a_i_shoutwire{background-position:0 -2430px!important}.a2a_i_simpy{background-position:0 -2447px!important}.a2a_i_sina_weibo{background-position:0 -2464px!important}.a2a_i_sitejot{background-position:0 -2481px!important}.a2a_i_skimbit{background-position:0 -2498px!important}.a2a_i_slashdot{background-position:0 -2515px!important}.a2a_i_smaknews{background-position:0 -2532px!important}.a2a_i_sodahead{background-position:0 -2549px!important}.a2a_i_sofomo{background-position:0 -2566px!important}.a2a_i_spaces{background-position:0 -2583px!important}.a2a_i_sphere{background-position:0 -2600px!important}.a2a_i_sphinn{background-position:0 -2616px!important}.a2a_i_spurl{background-position:0 -2633px!important}.a2a_i_squidoo{background-position:0 -2650px!important}.a2a_i_startaid{background-position:0 -2667px!important}.a2a_i_strands{background-position:0 -2684px!important}.a2a_i_stumbleupon{background-position:0 -2701px!important}.a2a_i_stumpedia{background-position:0 -2718px!important}.a2a_i_symbaloo{background-position:0 -2735px!important}.a2a_i_taggly{background-position:0 -2752px!important}.a2a_i_tagza{background-position:0 -2769px!important}.a2a_i_tailrank{background-position:0 -2786px!important}.a2a_i_technet{background-position:0 -2803px!important}.a2a_i_technorati{background-position:0 -2820px!important}.a2a_i_technotizie{background-position:0 -2837px!important}.a2a_i_thefreedictionary{background-position:0 -2854px!important}.a2a_i_thefreelibrary{background-position:0 -2871px!important}.a2a_i_thunderbird{background-position:0 -2888px!important}.a2a_i_tipd{background-position:0 -2905px!important}.a2a_i_toolbar_google{background-position:0 -2922px!important}.a2a_i_tuenti{background-position:0 -2939px!important}.a2a_i_tumblr{background-position:0 -2956px!important}.a2a_i_twiddla{background-position:0 -2973px!important}.a2a_i_twine{background-position:0 -2990px!important}.a2a_i_twitter{background-position:0 -3007px!important}.a2a_i_txtvox{background-position:0 -3024px!important}.a2a_i_typepad{background-position:0 -3041px!important}.a2a_i_uarr{background-position:0 -3058px!important}.a2a_i_uarr_wt{background-position:0 -3075px!important}.a2a_i_unalog{background-position:0 -3092px!important}.a2a_i_viadeo{background-position:0 -3109px!important}.a2a_i_vk{background-position:0 -3126px!important}.a2a_i_vodpod{background-position:0 -3143px!important}.a2a_i_webnews{background-position:0 -3160px!important}.a2a_i_webwag{background-position:0 -3178px!important}.a2a_i_wikio{background-position:0 -3195px!important}.a2a_i_windows_mail{background-position:0 -3212px!important}.a2a_i_wink{background-position:0 -3229px!important}.a2a_i_winksite{background-position:0 -3246px!important}.a2a_i_wists{background-position:0 -3263px!important}.a2a_i_wordpress{background-position:0 -3280px!important}.a2a_i_xerpi{background-position:0 -3297px!important}.a2a_i_xianguo{background-position:0 -3314px!important}.a2a_i_xing{background-position:0 -3331px!important}.a2a_i_yahoo{background-position:0 -3348px!important}.a2a_i_yample{background-position:0 -3365px!important}.a2a_i_yigg{background-position:0 -3382px!important}.a2a_i_yim{background-position:0 -3399px!important}.a2a_i_yoolink{background-position:0 -3416px!important}.a2a_i_youmob{background-position:0 -3433px!important}.a2a_i_zhuaxia{background-position:0 -3450px!important}.a2a_i_zune{background-position:0 -3467px!important}</style></head>
+
+
+<body><iframe id="a2apage_sm_ifr" height="1" width="1" style="border: 0px; left: 0px; top: 0px; position: absolute; z-index: 100000; display: none;" transparency="true" allowtransparency="true" frameborder="0" src="./ZooKeeper中的概念剖析   谋食谋道_files/sm9.html"></iframe><div style="position: static;"><div id="a2apage_dropdown" class="a2a_menu" onmouseover="a2a.onMouseOver_stay()" onmouseout="a2a.onMouseOut_delay()"><div class="a2a_menu_inside"><div id="a2apage_title_container" class="a2a_menu_title_container" style="display:none"><input id="a2apage_title" class="a2a_menu_title"></div><div class="a2apage_wide a2a_wide"><div class="a2a_tabs a2a_tabs_default"><div id="a2apage_DEFAULT" class="a2a_tab_selected" style="margin-right:1px" onclick="return a2a.tabs.open(&#39;DEFAULT&#39;)"><span class="a2a_i_a2a">分享</span></div></div><div class="a2a_tabs"><div title="通过电子邮件分享" id="a2apage_EMAIL" style="margin-right:1px" onclick="return a2a.tabs.open(&#39;EMAIL&#39;)"><span class="a2a_i_email_bw">电子邮件</span></div></div></div><div class="a2a_clear"></div><div id="a2apage_find_container" class="a2a_menu_find_container"><input id="a2apage_find" class="a2a_menu_find" type="text" onclick="a2a.focus_find()" onkeyup="a2a.do_find()" autocomplete="off" onfocus="a2a[&#39;page&#39;].find_focused=true;a2a.onMouseOver_stay()" title="动态查找任何用以添加的服务"><span id="a2apage_find_icon" class="a2a_i_find" onclick="a2a.focus_find()"></span></div><div id="a2apage_cols_container" class="a2a_cols_container"><div class="a2a_col1" id="a2apage_col1"><a id="a2apage_facebook" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_facebook">Facebook</span></a><a id="a2apage_twitter" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_twitter">Twitter</span></a><a id="a2apage_google_plus" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_google_plus">Google+</span></a><a id="a2apage_lockerz_grab" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_lockerz">Lockerz Grab</span></a><a id="a2apage_delicious" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_delicious">Delicious</span></a><a id="a2apage_digg" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_digg">Digg</span></a><a id="a2apage_google_bookmarks" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_google">Google Bookmarks</span></a><a id="a2apage_myspace" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_myspace">MySpace</span></a><a id="a2apage_stumbleupon" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_stumbleupon">StumbleUpon</span></a><a id="a2apage_reddit" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style=""><span class="a2a_i_reddit">Reddit</span></a><a id="a2apage_live" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_messenger">Messenger</span></a><a id="a2apage_vodpod" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_vodpod">Vodpod</span></a><a id="a2apage_yahoo_bookmarks" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_yahoo">Yahoo Bookmarks</span></a><a id="a2apage_bebo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_bebo">Bebo</span></a><a id="a2apage_mister_wong" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_mister-wong">Mister-Wong</span></a><a id="a2apage_wordpress" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_wordpress">WordPress</span></a><a id="a2apage_google_reader" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_reader">Google Reader</span></a><a id="a2apage_orkut" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_orkut">Orkut</span></a><a id="a2apage_xing" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_xing">XING</span></a><a id="a2apage_buffer" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_default">Buffer</span></a><a id="a2apage_evernote" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_evernote">Evernote</span></a><a id="a2apage_netvibes_share" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_netvibes">Netvibes Share</span></a><a id="a2apage_strands" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_strands">Strands</span></a><a id="a2apage_posterous" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_posterous">Posterous</span></a><a id="a2apage_business_exchange" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_business_exchange">Business Exchange</span></a><a id="a2apage_arto" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_arto">Arto</span></a><a id="a2apage_tipd" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_tipd">Tipd</span></a><a id="a2apage_smaknews" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_smaknews">SmakNews</span></a><a id="a2apage_plurk" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_plurk">Plurk</span></a><a id="a2apage_aim" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_aim">AIM</span></a><a id="a2apage_yahoo_messenger" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_yim">Yahoo Messenger</span></a><a id="a2apage_identi_ca" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_identica">Identi.ca</span></a><a id="a2apage_mozillaca" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_mozillaca">Mozillaca</span></a><a id="a2apage_blogger_post" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_blogger">Blogger Post</span></a><a id="a2apage_typepad_post" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_typepad">TypePad Post</span></a><a id="a2apage_box_net" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_box">Box.net</span></a><a id="a2apage_kindle_it" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_default">Kindle It</span></a><a id="a2apage_pinterest" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_pinterest">Pinterest</span></a><a id="a2apage_netlog" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_netlog">Netlog</span></a><a id="a2apage_technorati_favorites" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_technorati">Technorati Favorites</span></a><a id="a2apage_citeulike" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_citeulike">CiteULike</span></a><a id="a2apage_jumptags" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_jumptags">Jumptags</span></a><a id="a2apage_hemidemi" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_hemidemi">Hemidemi</span></a><a id="a2apage_funp" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_funp">FunP</span></a><a id="a2apage_instapaper" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_instapaper">Instapaper</span></a><a id="a2apage_phonefavs" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_phonefavs">PhoneFavs</span></a><a id="a2apage_xerpi" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_xerpi">Xerpi</span></a><a id="a2apage_netvouz" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_netvouz">Netvouz</span></a><a id="a2apage_wink" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_wink">Wink</span></a><a id="a2apage_diigo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_diigo">Diigo</span></a><a id="a2apage_bibsonomy" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_bibsonomy">BibSonomy</span></a><a id="a2apage_blogmarks" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_blogmarks">BlogMarks</span></a><a id="a2apage_tailrank" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_tailrank">Tailrank</span></a><a id="a2apage_startaid" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_startaid">StartAid</span></a><a id="a2apage_kledy" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_kledy">Kledy</span></a><a id="a2apage_khabbr" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_khabbr">Khabbr</span></a><a id="a2apage_meneame" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_meneame">Meneame</span></a><a id="a2apage_yoolink" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_yoolink">Yoolink</span></a><a id="a2apage_bookmarks_fr" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_bookmarks_fr">Bookmarks.fr</span></a><a id="a2apage_technotizie" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_technotizie">Technotizie</span></a><a id="a2apage_newsvine" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_newsvine">NewsVine</span></a><a id="a2apage_multiply" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_multiply">Multiply</span></a><a id="a2apage_friendfeed" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_friendfeed">FriendFeed</span></a><a id="a2apage_plaxo_pulse" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_plaxo">Plaxo Pulse</span></a><a id="a2apage_ping" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_ping">Ping</span></a><a id="a2apage_squidoo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_squidoo">Squidoo</span></a><a id="a2apage_protopage_bookmarks" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_protopage">Protopage Bookmarks</span></a><a id="a2apage_blinklist" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_blinklist">Blinklist</span></a><a id="a2apage_faves" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_faves">Faves</span></a><a id="a2apage_yigg" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_yigg">YiGG</span></a><a id="a2apage_webnews" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_webnews">Webnews</span></a><a id="a2apage_segnalo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_segnalo">Segnalo</span></a><a id="a2apage_pusha" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_pusha">Pusha</span></a><a id="a2apage_youmob" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_youmob">YouMob</span></a><a id="a2apage_slashdot" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_slashdot">Slashdot</span></a><a id="a2apage_fark" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_fark">Fark</span></a><a id="a2apage_allvoices" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_allvoices">Allvoices</span></a><a id="a2apage_jamespot" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_jamespot">Jamespot</span></a><a id="a2apage_imera_brazil" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_imera">Imera Brazil</span></a><a id="a2apage_twiddla" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_twiddla">Twiddla</span></a><a id="a2apage_linkagogo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_linkagogo">LinkaGoGo</span></a><a id="a2apage_unalog" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_unalog">unalog</span></a><a id="a2apage_hugg" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_hugg">Hugg</span></a><a id="a2apage_diglog" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_diglog">Diglog</span></a><a id="a2apage_nowpublic" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_nowpublic">NowPublic</span></a><a id="a2apage_tumblr" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_tumblr">Tumblr</span></a><a id="a2apage_livejournal" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_livejournal">LiveJournal</span></a><a id="a2apage_current" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_current">Current</span></a><a id="a2apage_hellotxt" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_hellotxt">HelloTxt</span></a><a id="a2apage_spurl" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_spurl">Spurl</span></a><a id="a2apage_yample" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_yample">Yample</span></a><a id="a2apage_oneview" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_oneview">Oneview</span></a><a id="a2apage_linkatopia" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_linkatopia">Linkatopia</span></a><a id="a2apage_simpy" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_simpy">Simpy</span></a><a id="a2apage_linkedin" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_linkedin">LinkedIn</span></a><a id="a2apage_buddymarks" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_buddymarks">BuddyMarks</span></a><a id="a2apage_ask_com_mystuff" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_ask">Ask.com MyStuff</span></a><a id="a2apage_viadeo" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_viadeo">Viadeo</span></a><a id="a2apage_maple" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_maple">Maple</span></a><a id="a2apage_wists" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_wists">Wists</span></a><a id="a2apage_connotea" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_connotea">Connotea</span></a><a id="a2apage_backflip" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_backflip">Backflip</span></a><a id="a2apage_mylinkvault" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_mylinkvault">MyLinkVault</span></a><a id="a2apage_sitejot" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_sitejot">SiteJot</span></a><a id="a2apage_sphinn" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_sphinn">Sphinn</span></a><a id="a2apage_dzone" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_dzone">DZone</span></a><a id="a2apage_care2_news" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_care2">Care2 News</span></a><a id="a2apage_hyves" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_hyves">Hyves</span></a><a id="a2apage_sphere" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_sphere">Sphere</span></a><a id="a2apage_bitty_browser" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_bitty">Bitty Browser</span></a><a id="a2apage_gabbr" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_gabbr">Gabbr</span></a><a id="a2apage_symbaloo_feeds" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_symbaloo">Symbaloo Feeds</span></a><a id="a2apage_tagza" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_tagza">Tagza</span></a><a id="a2apage_folkd" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_folkd">Folkd</span></a><a id="a2apage_newstrust" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_newstrust">NewsTrust</span></a><a id="a2apage_amazon_wish_list" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_amazon">Amazon Wish List</span></a><a id="a2apage_printfriendly" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_printfriendly">PrintFriendly</span></a><a id="a2apage_read_it_later" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_read_it_later">Read It Later</span></a><a id="a2apage_tuenti" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_tuenti">Tuenti</span></a><a id="a2apage_email" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_email">Email</span></a><a id="a2apage_rediff" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank" style="display: none;"><span class="a2a_i_rediff">Rediff MyPage</span></a></div><div id="a2apage_2_col1" style="display:none"><a id="a2apage_google_gmail" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank"><span class="a2a_i_gmail">Google Gmail</span></a><a id="a2apage_yahoo_mail" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank"><span class="a2a_i_yahoo">Yahoo Mail</span></a><a id="a2apage_hotmail" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank"><span class="a2a_i_live">Hotmail</span></a><a id="a2apage_aol_mail" rel="nofollow" class="a2a_i" href="http://readsandthoughts.sinaapp.com/" target="_blank"><span class="a2a_i_aol">AOL Mail</span></a><a id="a2apage_any_email" rel="nofollow" class="a2a_i a2a_emailer" href="http://readsandthoughts.sinaapp.com/" target="_blank"><span class="a2a_i_email">Any email</span></a><a id="a2apage_email_client" rel="nofollow" class="a2a_i a2a_emailer a2a_email_client" href="http://readsandthoughts.sinaapp.com/" target=""><span class="a2a_i_outlook">&nbsp;</span><span class="a2a_i_windows_mail">&nbsp;</span><span class="a2a_i_apple_mail">&nbsp;</span><span class="a2a_i_thunderbird">&nbsp;</span></a></div><div class="a2a_clear"></div></div><div id="a2apage_note_PTZ" class="a2a_note" style="display:none"></div><div class="a2apage_wide a2a_wide"><a href="javascript:void(0)" id="a2apage_show_more_less" class="a2a_menu_show_more_less" onclick="return a2a.show_more_less(0)" onmouseover="img=this.firstChild;if(a2a.c.color_arrow_hover==&#39;fff&#39;){if(img.className.indexOf(&#39;_wt&#39;)==-1)img.className+=&#39;_wt&#39;}else img.className=img.className.replace(/_wt/,&#39;&#39;)" onmouseout="img=this.firstChild;if(a2a.c.color_arrow==&#39;fff&#39;){if(img.className.indexOf(&#39;_wt&#39;)==-1)img.className+=&#39;_wt&#39;}else img.className=img.className.replace(/_wt/,&#39;&#39;)" title="显示全部服务"><span class="a2a_i_darr"></span></a></div><div class="a2a_menu_powered_by" id="a2apage_powered_by" onmouseover="if(this.innerHTML!=this.orig&amp;&amp;!window.opera)this.innerHTML=this.orig;this.style.textAlign=&#39;center&#39;">By <a href="http://share.lockerz.com/" target="_blank" title="Share Buttons">Lockerz</a></div></div></div></div><link href="./ZooKeeper中的概念剖析   谋食谋道_files/jiathis_counter.css" rel="stylesheet" type="text/css"><script src="./ZooKeeper中的概念剖析   谋食谋道_files/jiathis.php" charset="utf-8"></script><link href="./ZooKeeper中的概念剖析   谋食谋道_files/jiathis_share.css" rel="stylesheet" type="text/css"><iframe style="position: absolute; display: none; opacity: 0;" frameborder="0"></iframe><div class="jiathis_style" style="position: absolute; z-index: 1000000000; display: none; top: 50%; left: 50%; overflow: auto;"></div><div class="jiathis_style" style="position: absolute; z-index: 1000000000; display: none; overflow: auto;"></div><iframe style="display: none;" frameborder="0" src="./ZooKeeper中的概念剖析   谋食谋道_files/jiathis_utility.html"></iframe>
+<!-- wrap START -->
+<div id="wrap">
+
+<!-- container START -->
+<div id="container">
+
+<!-- header START -->
+<div id="header">
+
+	<!-- banner START -->
+		<!-- banner END -->
+
+	<div id="caption">
+		<h1 id="title"><a href="http://readsandthoughts.sinaapp.com/">谋食谋道</a></h1>
+		<div id="tagline">风吟|从杂文到散文的建设</div>
+	</div>
+
+	<div class="fixed"></div>
+</div>
+<!-- header END -->
+
+<!-- navigation START -->
+<div id="navigation">
+	<!-- menus START -->
+	<ul id="menus">
+		<li class="page_item"><a class="home" title="首页" href="http://readsandthoughts.sinaapp.com/">首页</a></li>
+		<li class="page_item page-item-7"><a href="http://readsandthoughts.sinaapp.com/recommend_posts/">推荐文章</a></li>
+<li class="page_item page-item-9"><a href="http://readsandthoughts.sinaapp.com/reads_posts/">读几卷书</a></li>
+<li class="page_item page-item-11"><a href="http://readsandthoughts.sinaapp.com/walks_posts/">行几步路</a></li>
+<li class="page_item page-item-13"><a href="http://readsandthoughts.sinaapp.com/thoughts_posts/">发几秒呆</a></li>
+<li class="page_item page-item-15"><a href="http://readsandthoughts.sinaapp.com/abouts/">作者与站</a></li>
+		<li><a class="lastmenu" href="javascript:void(0);"></a></li>
+	</ul>
+	<!-- menus END -->
+
+	<!-- searchbox START -->
+	<div id="searchbox">
+					<form action="http://www.google.com/cse" method="get">
+				<div class="content">
+					<input type="text" class="textfield searchtip" name="q" size="24">
+					<input type="submit" class="button" name="sa" value="">
+					<input type="hidden" name="cx" value="013500696100090045760:agmjzcjzocw">
+					<input type="hidden" name="ie" value="UTF-8">
+				</div>
+			</form>
+			</div>
+<script type="text/javascript">
+//<![CDATA[
+	var searchbox = MGJS.$("searchbox");
+	var searchtxt = MGJS.getElementsByClassName("textfield", "input", searchbox)[0];
+	var searchbtn = MGJS.getElementsByClassName("button", "input", searchbox)[0];
+	var tiptext = "请输入关键字...";
+	if(searchtxt.value == "" || searchtxt.value == tiptext) {
+		searchtxt.className += " searchtip";
+		searchtxt.value = tiptext;
+	}
+	searchtxt.onfocus = function(e) {
+		if(searchtxt.value == tiptext) {
+			searchtxt.value = "";
+			searchtxt.className = searchtxt.className.replace(" searchtip", "");
+		}
+	}
+	searchtxt.onblur = function(e) {
+		if(searchtxt.value == "") {
+			searchtxt.className += " searchtip";
+			searchtxt.value = tiptext;
+		}
+	}
+	searchbtn.onclick = function(e) {
+		if(searchtxt.value == "" || searchtxt.value == tiptext) {
+			return false;
+		}
+	}
+//]]>
+</script>
+	<!-- searchbox END -->
+
+	<div class="fixed"></div>
+</div>
+<!-- navigation END -->
+
+<!-- content START -->
+<div id="content">
+
+	<!-- main START -->
+	<div id="main">
+
+
+	<div id="postpath">
+		<a title="转到首页" href="http://readsandthoughts.sinaapp.com/">首页</a>
+		 &gt; <a href="http://readsandthoughts.sinaapp.com/category/reads/common_reads/" title="查看 读文字 中的全部文章" rel="category tag">读文字</a>		 &gt; ZooKeeper中的概念剖析	</div>
+
+	<div class="post" id="post-61">
+		<h2>ZooKeeper中的概念剖析</h2>
+		<div class="info">
+			<span class="date">2012年10月5日</span>
+                        
+			<span class="author"><a href="http://readsandthoughts.sinaapp.com/author/shupeng-lisp/" title="由 风吟 发布" rel="author">风吟</a></span>                        <span class="comments">267 次阅读</span>
+			                        
+							<span class="addcomment"><a href="http://readsandthoughts.sinaapp.com/understand_zk_concepts/#respond">发表评论</a></span>
+				<span class="comments"><a href="http://readsandthoughts.sinaapp.com/understand_zk_concepts/#comments">阅读评论</a></span>
+						<div class="fixed"></div>
+		</div>
+		<div class="content">
+			<p><a title="ZooKeeper" href="http://zookeeper.apache.org/" target="_blank" onclick="pageTracker._trackPageview(&#39;/outgoing/zookeeper.apache.org?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">ZooKeeper</a>作为一个分布式协调服务，涉及到了很多具有特色的名词与概念，本文意在对此部分内容进行下梳理。本文的内容是连接<a title="ZooKeeper论文阅读笔记" href="http://readsandthoughts.sinaapp.com/zookeeper_paper_notes/" target="_blank">ZooKeeper学术文章</a>是系统实现的纽带，增强本文的理解对ZooKeeper的整体的理解帮助巨大。</p>
+<p>本文主要内容来自于官方文档：<a title="zookeeperProgrammers" href="http://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html" target="_blank" onclick="pageTracker._trackPageview(&#39;/outgoing/zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">Developing Distributed Applications that use ZooKeeper</a></p>
+<h4><span style="color: #339966;">1. 数据模型</span></h4>
+<p>ZooKeeper具有和分布式文件系统一样的层次命名空间，不同之处在于每个节点(Node)可以有和孩子一样的数据，这一点和文件系统中目录也是文件一样（目录是一种特殊的文件）。节点路径都是标准的、以”/”分隔的绝对路径，没有相对路径。Unicode字符中除以下部分之外都可以用作路径：</p>
+<ul>
+<li>Null字符(\u0000)，在绑定c语言时会出问题；</li>
+<li>&nbsp;\u0001-\u0019，\u007F-\u009F，这些字符要么无法显示，要么显示有歧义；</li>
+<li>&nbsp;\ud800=uF8FFF,\uFFF0-uFFFF,\uXFFFE-\uXFFFF（X为数字1—E）,\uF0000-\uFFFFF；</li>
+<li>&nbsp;“.”可以用作部分名，但”.”、”..”不能单独用来表示一个节点。因为ZooKeeper不支持相对路径。</li>
+</ul>
+<h5><span style="color: #339966;">1.1&nbsp; Znodes</span></h5>
+<p>ZooKeeper树中的每一个节点被称为Znode。Znode维持一个包含数据改变、acl改变的版本号的Stat数据结构。Stat结构还包括了时间戳，版本号和时间戳一起来使得ZooKeeper可以验证缓存和协调更新。Znode的数据发生变化时，版本号递增。</p>
+<p>注意:在ZooKeeper中，</p>
+<ul>
+<li>Zonde表示数据节点</li>
+<li>Server表示组成ZooKeeper服务的机器</li>
+<li>Quorum peer表示组成全体的serve，</li>
+<li>Client表示使用ZooKeeper服务的任何主机或进程。</li>
+</ul>
+<p>为了保持原意，之后的名词将会原文与译文混合出现。</p>
+<p>Znode是程序员访问的主要实体，有如下几个显著特征：</p>
+<ul>
+<li>&nbsp;&nbsp;<strong>Watches</strong></li>
+</ul>
+<p>Client可以在Znode上设置watch，对该Znode做出改变将触发并清除watch。当watch被触发，ZooKeeper发送给Client一个通知。</p>
+<ul>
+<li>&nbsp;&nbsp;<strong>数据访问</strong></li>
+</ul>
+<p>存储在Znode的数据时原子性读写的：读得到该znode的所有数据字节，写替换所有数据。每个节点维护一个ACL来限制访问。</p>
+<p>ZooKeeper不是用来做通用数据库或存储大对象的，而是用来关系协调数据的。协调数据的特征就是都相当较小，以KB作单位计算足够了。ZooKeeper中有关于znode数据大小的健康型检查，默认是1MB。如果需要存储大数据，通常是将数据存储在如NFS和HDFS这样的大存储上，然后在ZooKeeper中存储存储位置的指针。</p>
+<ul>
+<li>&nbsp;&nbsp;&nbsp;<strong>短命节点（Ephemeral Node</strong><strong>）</strong></li>
+</ul>
+<p>只在创建znode的session是活动时才存在。Session中止则这些节点被自动删除，因此这种节点不能拥有孩子。</p>
+<ul>
+<li>&nbsp;&nbsp;&nbsp;<strong>顺序节点（Sequence Nodes</strong><strong>）—</strong><strong>唯一命名</strong></li>
+</ul>
+<p>在创建节点时，可以指定说明需要在路径名之后增加一个单调递增的计数器。这个计数器对于父znode来说是唯一的，这个计数器具有如下格式：%010d，计数器是有符号的int型，因此在超过2147483647后会溢出。</p>
+<h5><span style="color: #339966;">1.2&nbsp; 时间管理</span></h5>
+<p>ZooKeeper以多种方式跟踪时间：</p>
+<ul>
+<li>&nbsp; Zxid：ZooKeeper的事务ID，每个ZooKeeper状态改变都会接受到一个zxid形式的邮戳。这个暴露了ZooKeeper所有改变的全序关系，每个改变具有唯一的zxid，并且如果zxid1&lt;zxid2则zxid1发生在zxid2之前。</li>
+<li>&nbsp;版本号：node的每次改变都会触发其中一个版本号增加。三个版本号，version是用来表示znode数据改变数量的，cversion是用来表示znode孩子的改变数量的，aversion是用来表示znode的acl改变数量的。</li>
+<li>&nbsp;Ticks：在使用多机模式时，server使用tick来定义诸如状态上传、session超时、peers之间连接超时等事件定时。这个属性是通过最小session超时（2倍tick事件）来间接配置的。</li>
+<li>&nbsp;真实时间：除了在znode创建和修改时把时间戳放到stat结构时，ZooKeeper不使用真实时间（时钟时间）。</li>
+</ul>
+<h5><span style="color: #339966;">1.3&nbsp; Stat结构</span></h5>
+<p>每个znode的stat结构由以下几个字段组成：</p>
+<ul>
+<li>Czxid：引起创建znode的zxid的改变；</li>
+<li>Mzxid：最后修改该znode的zxid改变；</li>
+<li>Ctime：从znode创建的epoch（时期）开始以ms计数的时间；</li>
+<li>Mtime：从znode最后修改的epoch（时期）开始以ms计数的时间；</li>
+<li>Version：znode数据改变的数量；</li>
+<li>&nbsp;Cversion：znode孩子改变的数量；</li>
+<li>&nbsp;Aversion：znode的acl改变的数量；</li>
+<li>&nbsp;ephemeralOwner：如果是短命节点，则为该znode所有者的session id；如果不是短命节点，则为0；</li>
+<li>&nbsp;dataLength：znode的数据字段长度；</li>
+<li>&nbsp;numChildren：znode的孩子数量。</li>
+</ul>
+<h4><span style="color: #339966;">2. &nbsp;会话（Session）</span></h4>
+<p>ZooKeeper client通过使用语言绑定创建服务handle来与ZooKeeper服务建立会话。一旦会话建立，handle开始进入CONNECTING状态，客户库开始连接组成ZooKeeper服务的server，并在成功后转换为CONNECTED状态。如果发生会话过期、验证失败等不可恢复的错误，或者是应用程序显示关闭handle，则进入CLOSED状态。</p>
+<p>为了建立client会话，应用程序代码必须提供包含一组以逗号分隔的host:port对，然后会选择任意一个进行连接，在失败时会自动选择下一个server来重建连接。</p>
+<p>在3.2.0版本之后：一个可选的”chroot”后缀可以添加到连接字符串。</p>
+<p>在client获取到ZooKeeper服务的handle时，ZooKeeper创建了一个分配给client的64位数字表示的会话。如果client连接一个不同的ZooKeeper server，将把Seesion Id作为连接握手的一部分。</p>
+<p>创建session的一个参数是session超时的ms数。</p>
+<p>不建议在失去连接时建立一个新的session对象，ZooKeeper client库将自动重连。客户库有能处理羊群效应等的启发式方法。仅仅在被通知session过期后才重建session对象。Session过期由ZooKeeper集群管理。</p>
+<p>ZooKeeper会话建立调用的另一个参数是默认watcher。在client端发生任何变化时通知watcher。</p>
+<p>由client发送请求来保持session有效。如果session闲置了一段时间，client将发送一个PING请求。PING请求不但可以让server知道client是活动的，而且可以让client验证连接的server是活动的。</p>
+<p>连接丢失的两种情况：</p>
+<ul>
+<li>应用程序在一个不再存活/有效的会话上调用操作；</li>
+<li>Client在与有悬挂操作的server失去连接。比如，一个悬挂的异步调用。</li>
+</ul>
+<p>3.2.0新增：SessionMovedException，这是client不可见的内部错误。发生在请求在一个会话的连接中被接受，会话重建连接到另外一个server上了。</p>
+<h4><span style="color: #339966;">3. &nbsp;观察（watch）</span></h4>
+<p>ZooKeeper的所有读操作—-getData(), getChildren(), exists()都有设置watch的选项。</p>
+<p>Watch的定义：watch事件是一次触发的，在设置了watch的数据发生变化时，watch发送给设置它的client。</p>
+<ul>
+<li>&nbsp;一次触发：触发一次并被清理；</li>
+<li>发送到client：意味着在成功返回码到达发起改变的client之前，事件可能在去client的路上而还没有到达。Watch是异步发送给watcher的。ZooKeeper提供一个有序保证：client在它设置了watch的资源上，在看到watch事件之前看不到改变。关键点在于不同client看见的具有一直的顺序。</li>
+<li>&nbsp;Watch设置的数据：表示node可以以不同的方式改变。ZooKeeper有两种watch，数据watch和孩子watch。getData()和exists()设置数据watch，getChildren()设置孩子watch。</li>
+</ul>
+<p>Watch是由client连接的server本地维持的，这样可以使得watch可以轻量的设置、维持和分发。Watch可能丢失的场景在于：如果在znode断开连接器件创建并删除了znode，存在检查的watch将会丢失。</p>
+<h5><span style="color: #339966;">3.1&nbsp; 对watch的担保</span></h5>
+<ul>
+<li>相当于其它事件、其它watch和异步回复，watch是有序的。ZooKeeper客户库确保有序分发。</li>
+<li>如果设置了watch，Client先看到znode的watch事件，后看见响应的数据。</li>
+<li>Watch事件的顺序与ZooKeeper服务看见的更新顺序一致。</li>
+</ul>
+<h5><span style="color: #339966;">3.2&nbsp; watch注意事项</span></h5>
+<ul>
+<li>Watch是一次触发的。期望持续获得通知，在获取watch事件之后要重新设置。</li>
+<li>由于watch是一次触发，加上网络延迟，在得到event与重新设置watch之间，znode可能已经被改变了多次。不可能可靠的得到znode的每次改变。</li>
+<li>Watch对象，或者function/context对，对于一个给定的通知只会触发一次。</li>
+<li>如果从server失去连接，直到连接重建之后才能获取到watch。</li>
+</ul>
+<h4><span style="color: #339966;">4. 访问控制（Access control）</span></h4>
+<p>ZooKeeper使用ACLs来控制znode的访问。ACL实现非常类似UNIX文件访问权限：使用权限位来允许/不允许对权限位应用节点和范文的各种操作。与标准UNIX权限的不同之处是，ZooKeeper节点不是由用户、组和所有人三个标准范围来限制的，ZooKeeper没有znode所有者的概念，作为替代，ACL指定一组id和与这些id关联的权限。</p>
+<p>值得注意的是，ACL仅仅呼吁某个指定znode，不适用与孩子节点，ACLs不是递归的。</p>
+<p>ZooKeeper支持可插拔的验证模式；ACLs以（schema:expression, perms）对来表示。</p>
+<h5><span style="color: #339966;">4.1&nbsp; ACL权限</span></h5>
+<ul>
+<li>CREATE：可以创建一个孩子节点；</li>
+<li>READ：可以从节点得到数据，可以查看它的孩子列表；</li>
+<li>WRITE：可以给节点设置数据；</li>
+<li>DELETE：可以删除一个孩子节点；</li>
+<li>ADMIN：可以设置权限。</li>
+</ul>
+<p>ADMIN权限是因为ZooKeeper没有文件所有者的概念，ADMIN权限有一定的所有者意思。</p>
+<p>ZooKeeper不支持LOOKUP权限，每个人都有隐含的LOOKUP权限，允许stat一个节点，除此之外不能做其它的。</p>
+<h5><span style="color: #339966;">4.2&nbsp; 内建ACL模式</span></h5>
+<ul>
+<li>world：具有单id，anyone，表示任何人；</li>
+<li>auth：不使用任何id，表示任何通过验证的用户；</li>
+<li>digest：使用”username:password”字符串产生MD5哈希，随后使用这个值作为ACL ID标识。验证仪明文发送。在ACL表达式时将使用”username:base64”编码乘SHA1密码摘要。</li>
+<li>ip：使用client主机IP作为ACL ID标识。</li>
+</ul>
+<h4><span style="color: #339966;">5. 一致性保证（Consistence guarantees）</span></h4>
+<p>ZooKeeper读比写快的原因是由于读可以提供较早的数据，这是由于ZooKeeper具有一致性保证：</p>
+<ul>
+<li>顺序一致性：从一个client发出的申请将以发送的顺序采纳；</li>
+<li>原子性：更新要么成功，要么失败，不存在部分成功；</li>
+<li>单一系统镜像：client不管连接到哪个server，看到的服务视图是相同的；</li>
+<li>可靠性：一旦更新被采纳，从该时间点直到有client覆盖，该更新一直有效，这个保证由两个推论：
+<ul>
+<li>如果client得到成功返回码，更新被采纳。</li>
+<li>任何client可见的更新，包括读请求或成功的更新，在server失效也不会被回滚。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>时效性：系统的client视图在给定时间界限被更新（几十秒量级）。要么client在这个界限看见系统改变，要么client探测到服务终端。</li>
+<li>ZooKeeper<span style="color: #ff0000;">不担保</span>：跨client视图的同时一致。ZooKeeper自身不担保在所有servers的同步更新，但ZooKeeper原语可以用来构造提供有效client同步的高层功能。</li>
+</ul>
+<div style="float:left"><!-- JiaThis Button BEGIN -->
+<div class="jiathis_style_32x32">
+	<a class="jiathis_button_tsina" title="分享到新浪微博"><span class="jiathis_txt jtico jtico_tsina"></span></a>
+	<a class="jiathis_button_tqq" title="分享到腾讯微博"><span class="jiathis_txt jtico jtico_tqq"></span></a>
+        <a class="jiathis_button_douban" title="分享到豆瓣"><span class="jiathis_txt jtico jtico_douban"></span></a>
+        <a class="jiathis_button_qzone" title="分享到QQ空间"><span class="jiathis_txt jtico jtico_qzone"></span></a>
+        <a class="jiathis_button_fanfou" title="分享到饭否"><span class="jiathis_txt jtico jtico_fanfou"></span></a>
+	<a class="jiathis_button_renren" title="分享到人人网"><span class="jiathis_txt jtico jtico_renren"></span></a>
+	<a class="jiathis_button_kaixin001" title="分享到开心网"><span class="jiathis_txt jtico jtico_kaixin001"></span></a>
+	<a class="jiathis_button_hi" title="分享到百度空间"><span class="jiathis_txt jtico jtico_hi"></span></a>
+	<a class="jiathis_button_qingsina" title="分享到新浪轻博"><span class="jiathis_txt jtico jtico_qingsina"></span></a>
+	<a class="jiathis_button_email" title="分享到邮件"><span class="jiathis_txt jtico jtico_email"></span></a>
+	<a class="jiathis_button_fav" title="加入收藏夹"><span class="jiathis_txt jtico jtico_fav"></span></a>
+	<a href="http://www.jiathis.com/share?uid=1690615" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank" onclick="pageTracker._trackPageview(&#39;/outgoing/www.jiathis.com/share?uid=1690615&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"></a>
+	<a class="jiathis_counter_style"><span class="jiathis_button_expanded jiathis_counter jiathis_bubble_style" id="jiathis_counter_29" title="累计分享0次">0</span></a>
+</div>
+<script type="text/javascript">var jiathis_config = {data_track_clickback:true};</script>
+<script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/jia.js" charset="utf-8"></script><script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/plugin.client.js" charset="utf-8"></script><div style="position:absolute;width:0px;height:0px;"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="0" height="0" id="JIATHISSWF" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab"><param name="allowScriptAccess" value="always"><param name="swLiveConnect" value="true"><param name="movie" value="http://www.jiathis.com/code/swf/m.swf"><param name="FlashVars" value="z=a"><embed name="JIATHISSWF" src="http://www.jiathis.com/code/swf/m.swf" flashvars="z=a" width="0" height="0" allowscriptaccess="always" swliveconnect="true" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object></div>
+<!-- JiaThis Button END --></div><div class="addtoany_share_save_container"><div class="a2a_kit a2a_target addtoany_list" id="wpa2a_1"><a class="a2a_dd addtoany_share_save" href="http://www.addtoany.com/share_save#url=http%3A%2F%2Freadsandthoughts.sinaapp.com%2Funderstand_zk_concepts%2F&title=ZooKeeper%E4%B8%AD%E7%9A%84%E6%A6%82%E5%BF%B5%E5%89%96%E6%9E%90&description=" style="background:url(http://blog.shupeng.org/wp-content/plugins/add-to-any/favicon.png) no-repeat scroll 9px 0px !important;padding:0 0 0 30px;display:inline-block;height:16px;line-height:16px;vertical-align:middle" onclick="pageTracker._trackPageview(&#39;/outgoing/www.addtoany.com/share_save?referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span class="a2a_img a2a_img_text a2a_i_a2a"></span>书签</a></div>
+<script type="text/javascript"><!--
+wpa2a.script_load();
+//--></script>
+</div>                        <p><strong>声明:</strong> 本文来自谋食谋道，<a href="http://readsandthoughts.sinaapp.com/" target="_blank">http://readsandthoughts.sinaapp.com/</a>，自由转载，注明出处！</p>             
+			<div class="fixed"></div>
+		</div>
+		<div class="under">
+			<span class="categories">分类: </span><span><a href="http://readsandthoughts.sinaapp.com/category/reads/common_reads/" title="查看 读文字 中的全部文章" rel="category tag">读文字</a></span>			<span class="tags">标签: </span><span></span>		</div>
+	</div>
+
+	<!-- related posts START -->
+		<!-- related posts END -->
+
+	<a name="comments"></a>
+<div class="ds-thread" data-thread-id="9739670" data-title="ZooKeeper中的概念剖析" data-url="http://readsandthoughts.sinaapp.com/understand_zk_concepts/" id="ds-thread"><div id="ds-reset"><div class="ds-meta" style="display: none;"><a href="javascript:void(0)" class="ds-like-thread-button ds-rounded"><span class="ds-ui-icon"></span> <span class="ds-thread-like-text">喜欢</span><span class="ds-thread-cancel-like">取消喜欢</span></a><span class="ds-like-panel"></span></div><div class="ds-comments-info"><div class="ds-sort"><a class="ds-order-desc">最新</a><a class="ds-order-asc ds-current">最早</a><a class="ds-order-hot">最热</a></div><ul class="ds-comments-tabs"><li class="ds-tab"><a class="ds-comments-tab-duoshuo ds-current" href="javascript:void(0);"><span class="ds-highlight">0</span>条评论</a></li></ul></div><ul class="ds-comments"></ul><div class="ds-paginator" style="display: none;"><div class="ds-border"></div><a data-page="1" href="javascript:void(0);" class="ds-current">1</a></div><div class="ds-login-buttons"><p>社交帐号登录:</p><div class="ds-social-links"><ul class="ds-service-list"><li><a href="http://linfeng.duoshuo.com/login/weibo/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-weibo-active">微博</a></li><li><a href="http://linfeng.duoshuo.com/login/qq/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-qq-active">QQ</a></li><li><a href="http://linfeng.duoshuo.com/login/renren/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-renren-active">人人</a></li><li><a href="http://linfeng.duoshuo.com/login/douban/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-douban-active">豆瓣</a></li><li><a class="ds-more-services" href="javascript:void(0)">更多»</a></li></ul><ul class="ds-service-list ds-additional-services"><li><a href="http://linfeng.duoshuo.com/login/kaixin/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-kaixin-active">开心</a></li><li><a href="http://linfeng.duoshuo.com/login/netease/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-netease-active">网易</a></li><li><a href="http://linfeng.duoshuo.com/login/sohu/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-sohu-active">搜狐</a></li><li><a href="http://linfeng.duoshuo.com/login/baidu/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-baidu-active">百度</a></li><li><a href="http://linfeng.duoshuo.com/login/google/?sso=1&redirect_uri=http%3A%2F%2Fblog.shupeng.org%2Fwp-login.php%3Faction%3Dduoshuo_login%26redirect_to%3Dhttp%253A%252F%252Freadsandthoughts.sinaapp.com%252Funderstand_zk_concepts%252F" rel="nofollow" class="ds-service-link ds-google-active">谷歌</a></li></ul></div></div><a name="respond"></a><div class="ds-replybox"><a class="ds-avatar" href="javascript:void(0);" onclick="return false"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/noavatar_default.png" alt=""></a><form method="post"><input type="hidden" name="thread_id" value="1391729932611394966">
+<input type="hidden" name="parent_id" value=""><input type="hidden" name="author_name" value=""><input type="hidden" name="author_email" value=""><input type="hidden" name="author_url" value=""><div class="ds-textarea-wrapper ds-rounded-top"><textarea name="message" title="Ctrl+Enter快捷提交" placeholder="说点什么吧…"></textarea><pre class="ds-hidden-text"></pre></div><div class="ds-post-toolbar"><div class="ds-post-options ds-gradient-bg"><span class="ds-sync">不想登录？直接点击发布即可作为游客留言。</span></div><button class="ds-post-button" type="submit">发布</button><div class="ds-toolbar-buttons"><a class="ds-toolbar-button ds-add-emote" title="插入表情"></a></div></div></form></div><p class="ds-powered-by"><a href="http://duoshuo.com/" target="_blank" rel="nofollow">且听风吟正在使用多说</a></p></div></div>
+	<script type="text/javascript">
+	if (typeof DUOSHUO !== 'undefined')
+		DUOSHUO.EmbedThread('.ds-thread');
+</script>
+		<div id="ds-ssr">
+
+		
+            <ol id="commentlist">
+                            </ol>
+
+		            
+    </div>
+	<div id="postnavi">
+		<span class="prev"><a href="http://readsandthoughts.sinaapp.com/learn_mac_from_scratch_one/" rel="next">Mac新手入门配置之道</a></span>
+		<span class="next"><a href="http://readsandthoughts.sinaapp.com/zookeeper_paper_notes/" rel="prev">ZooKeeper论文阅读笔记</a></span>
+		<div class="fixed"></div>
+	</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35302856-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>	</div>
+	<!-- main END -->
+
+	
+<!-- sidebar START -->
+<div id="sidebar">
+
+<!-- sidebar north START -->
+<div id="northsidebar" class="sidebar">
+
+	<!-- feeds -->
+	<div class="widget widget_feeds">
+		<div class="content">
+			<div id="subscribe"><a rel="external nofollow" id="feedrss" title="订阅这个博客的文章" href="http://readsandthoughts.sinaapp.com/feed/">订阅</a><ul id="feed_readers" style="visibility: hidden; display: block;"><li id="google_reader"><a rel="external nofollow" class="reader" title="订阅到 Google" href="http://fusion.google.com/add?feedurl=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/fusion.google.com/add?feedurl=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span> Google</span></a></li><li id="youdao_reader"><a rel="external nofollow" class="reader" title="订阅到有道" href="http://reader.youdao.com/#url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/reader.youdao.com/_url=http_//readsandthoughts.sinaapp.com/feed/?referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span>有道</span></a></li><li id="xianguo_reader"><a rel="external nofollow" class="reader" title="订阅到鲜果" href="http://www.xianguo.com/subscribe.php?url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/www.xianguo.com/subscribe.php?url=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span>鲜果</span></a></li><li id="zhuaxia_reader"><a rel="external nofollow" class="reader" title="订阅到抓虾" href="http://www.zhuaxia.com/add_channel.php?url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/www.zhuaxia.com/add_channel.php?url=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span>抓虾</span></a></li><li id="yahoo_reader"><a rel="external nofollow" class="reader" title="订阅到 My Yahoo!" href="http://add.my.yahoo.com/rss?url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/add.my.yahoo.com/rss?url=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span> My Yahoo!</span></a></li><li id="newsgator_reader"><a rel="external nofollow" class="reader" title="订阅到 newsgator" href="http://www.newsgator.com/ngs/subscriber/subfext.aspx?url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/www.newsgator.com/ngs/subscriber/subfext.aspx?url=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span> newsgator</span></a></li><li id="bloglines_reader"><a rel="external nofollow" class="reader" title="订阅到 Bloglines" href="http://www.bloglines.com/sub/http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/www.bloglines.com/sub/http_//readsandthoughts.sinaapp.com/feed/?referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span> Bloglines</span></a></li><li id="inezha_reader"><a rel="external nofollow" class="reader last" title="订阅到哪吒" href="http://inezha.com/add?url=http://readsandthoughts.sinaapp.com/feed/" onclick="pageTracker._trackPageview(&#39;/outgoing/inezha.com/add?url=http_//readsandthoughts.sinaapp.com/feed/&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><span>哪吒</span></a></li></ul></div>
+						<div class="fixed"></div>
+		</div>
+	</div>
+
+	<!-- showcase -->
+			<div class="widget">
+						<div class="content">
+				橱窗			</div>
+		</div>
+	
+<div id="search-2" class="widget widget_search"><form role="search" method="get" id="searchform" action="http://readsandthoughts.sinaapp.com/">
+	<div><label class="screen-reader-text" for="s">搜索：</label>
+	<input type="text" value="" name="s" id="s">
+	<input type="submit" id="searchsubmit" value="搜索">
+	</div>
+	</form></div>		<div id="recent-posts-2" class="widget widget_recent_entries">		<h3>近期文章</h3>		<ul>
+				<li><a href="http://readsandthoughts.sinaapp.com/memory_management_of_java_part_one_foundation/" title="Java内存管理知识(基础篇)">Java内存管理知识(基础篇)</a></li>
+				<li><a href="http://readsandthoughts.sinaapp.com/garbage_collection_of_java_virtual_machine/" title="Java虚拟机之垃圾收集">Java虚拟机之垃圾收集</a></li>
+				<li><a href="http://readsandthoughts.sinaapp.com/wants_to_do_in_2013/" title="2013年想做的事">2013年想做的事</a></li>
+				<li><a href="http://readsandthoughts.sinaapp.com/read_notes_in_2012/" title="2012书单">2012书单</a></li>
+				<li><a href="http://readsandthoughts.sinaapp.com/maxmize_java_nio_and_nio2_for_application_responsiveness/" title="最大化Java NIO和NIO.2的五种方式 —利用NIO API构建高响应性的Java应用">最大化Java NIO和NIO.2的五种方式 —利用NIO API构建高响应性的Java应用</a></li>
+				</ul>
+		</div><div id="views-2" class="widget widget_views"><h3>全站热门</h3><ul>
+<li><a href="./ZooKeeper中的概念剖析   谋食谋道_files/ZooKeeper中的概念剖析   谋食谋道.html" title="ZooKeeper中的概念剖析">ZooKeeper中的概念剖析</a> - 267 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/zookeeper_paper_notes/" title="ZooKeeper论文阅读笔记">ZooKeeper论文阅读笔记</a> - 116 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/learn_mac_from_scratch_one/" title="Mac新手入门配置之道">Mac新手入门配置之道</a> - 71 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/zk_source_analysis_of_standalone_startup/" title="ZooKeeper源码分析之一——单机模式启动过程">ZooKeeper源码分析之一——单机模式启动过程</a> - 52 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/config_java_env_on_mac/" title="Mac下配置Java开发环境">Mac下配置Java开发环境</a> - 42 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/maxmize_java_nio_and_nio2_for_application_responsiveness/" title="最大化Java NIO和NIO.2的五种方式 —利用NIO API构建高响应性的Java应用">最大化Java NIO和NIO.2的五种方式 —利用NIO API构建高响应性的Java应用</a> - 41 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/put_fisrt_thing_first/" title="高效能人士的七个习惯:要事第一">高效能人士的七个习惯:要事第一</a> - 29 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/practice_in_object_c_j/" title="Object-c实践之路:第一章 起步">Object-c实践之路:第一章 起步</a> - 25 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/practice_in_objectc_object_message_method/" title="Object-c实践之路：第二章 对象、消息与方法">Object-c实践之路：第二章 对象、消息与方法</a> - 14 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/stranges_of_2012_celebrate/" title="2012国庆之诸现状">2012国庆之诸现状</a> - 12 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/read_notes_in_2012/" title="2012书单">2012书单</a> - 9 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/garbage_collection_of_java_virtual_machine/" title="Java虚拟机之垃圾收集">Java虚拟机之垃圾收集</a> - 8 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/wants_to_do_in_2013/" title="2013年想做的事">2013年想做的事</a> - 6 次阅读</li><li><a href="http://readsandthoughts.sinaapp.com/memory_management_of_java_part_one_foundation/" title="Java内存管理知识(基础篇)">Java内存管理知识(基础篇)</a> - 3 次阅读</li></ul>
+</div></div>
+<!-- sidebar north END -->
+
+<div id="centersidebar">
+
+	<!-- sidebar east START -->
+	<div id="eastsidebar" class="sidebar">
+	<div id="categories-2" class="widget widget_categories"><h3>分类目录</h3>		<ul>
+	<li class="cat-item cat-item-13"><a href="http://readsandthoughts.sinaapp.com/category/java/" title="查看 Java 下的所有文章">Java</a> (1)
+</li>
+	<li class="cat-item cat-item-5"><a href="http://readsandthoughts.sinaapp.com/category/thoughts/" title="读了书，走了路，需要发酵与升华">心得</a> (4)
+</li>
+	<li class="cat-item cat-item-6"><a href="http://readsandthoughts.sinaapp.com/category/tips/" title="乱弹一气，可能也会有奇思妙想的火花">杂谈</a> (2)
+</li>
+	<li class="cat-item cat-item-12"><a href="http://readsandthoughts.sinaapp.com/category/translates/" title="部分英文文章翻译，加强理解，增强语言组织力">译文</a> (1)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://readsandthoughts.sinaapp.com/category/reads/" title="阅读是让人快速认识世界的一条路">读书</a> (7)
+<ul class="children">
+	<li class="cat-item cat-item-7"><a href="http://readsandthoughts.sinaapp.com/category/reads/codes_reads/" title="专业方面的代码阅读">读代码</a> (1)
+</li>
+	<li class="cat-item cat-item-8"><a href="http://readsandthoughts.sinaapp.com/category/reads/common_reads/" title="大家都认识的文字">读文字</a> (4)
+</li>
+</ul>
+</li>
+		</ul>
+</div>	</div>
+	<!-- sidebar east END -->
+
+	<!-- sidebar west START -->
+	<div id="westsidebar" class="sidebar">
+	<div id="archives-2" class="widget widget_archive"><h3>文章归档</h3>		<ul>
+			<li><a href="http://readsandthoughts.sinaapp.com/2013/01/" title="2013 年一月">2013 年一月</a>&nbsp;(4)</li>
+	<li><a href="http://readsandthoughts.sinaapp.com/2012/10/" title="2012 年十月">2012 年十月</a>&nbsp;(9)</li>
+	<li><a href="http://readsandthoughts.sinaapp.com/2012/09/" title="2012 年九月">2012 年九月</a>&nbsp;(1)</li>
+		</ul>
+</div>	</div>
+	<!-- sidebar west END -->
+	<div class="fixed"></div>
+</div>
+
+<!-- sidebar south START -->
+<div id="southsidebar" class="sidebar">
+<div id="pages-2" class="widget widget_pages"><h3>页面</h3>		<ul>
+			<li class="page_item page-item-7"><a href="http://readsandthoughts.sinaapp.com/recommend_posts/">推荐文章</a></li>
+<li class="page_item page-item-9"><a href="http://readsandthoughts.sinaapp.com/reads_posts/">读几卷书</a></li>
+<li class="page_item page-item-11"><a href="http://readsandthoughts.sinaapp.com/walks_posts/">行几步路</a></li>
+<li class="page_item page-item-13"><a href="http://readsandthoughts.sinaapp.com/thoughts_posts/">发几秒呆</a></li>
+<li class="page_item page-item-15"><a href="http://readsandthoughts.sinaapp.com/abouts/">作者与站</a></li>
+		</ul>
+		</div><div id="recent-comments-2" class="widget widget_recent_comments"><h3>近期评论</h3><ul id="ds-recent-comments"><li class="ds-comment ds-show-avatars" data-post-id="1391729932612972912"><div class="ds-avatar"><a rel="nofollow author" target="_blank" href="http://weibo.com/searchbaozi" title="风吟"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/c167f0accbcbd4022e9be6a770c807da" alt="风吟" style="width:32px;height:32px"></a></div><div class="ds-meta"><a rel="nofollow author" target="_blank" href="http://weibo.com/searchbaozi">风吟</a><span class="ds-time" datetime="2013-01-08T22:49:06+08:00" title="2013年1月8日 9:49:06 AM">1月8日</span></div><div class="ds-thread-title">在 <a href="http://readsandthoughts.sinaapp.com/config_java_env_on_mac/#comments">Mac下配置Java开发环境</a> 中评论</div><div class="ds-excerpt">多谢指点~呵呵，我当时也没找到攻略，就在想怎么解决问题，就以一个简单的方式处理掉了，深层次原因倒没去考虑~</div></li><li class="ds-comment ds-show-avatars" data-post-id="1391729932612972910"><div class="ds-avatar"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/noavatar_default.png" alt="bingbing" style="width:32px;height:32px"></div><div class="ds-meta">bingbing<span class="ds-time" datetime="2012-12-27T16:45:47+08:00" title="2012年12月27日 3:45:47 AM">2012年12月27日</span></div><div class="ds-thread-title">在 <a href="http://readsandthoughts.sinaapp.com/config_java_env_on_mac/#comments">Mac下配置Java开发环境</a> 中评论</div><div class="ds-excerpt">apache的安装找不到gcc 是因为使用系统的apr apr-util，apt-config中的gcc指向的是OSX10.8.xctoolchain，这是系统内置apache的编译环境，正确做法是…</div></li><li class="ds-comment ds-show-avatars" data-post-id="1391729932612803634"><div class="ds-avatar"><a rel="nofollow author" target="_blank" href="http://wordpress.org/" title="WordPress 先生"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/noavatar_default.png" alt="WordPress 先生" style="width:32px;height:32px"></a></div><div class="ds-meta"><a rel="nofollow author" target="_blank" href="http://wordpress.org/">WordPress 先生</a><span class="ds-time" datetime="2012-09-28T19:09:14+08:00" title="2012年9月28日 7:09:14 AM">2012年9月28日</span></div><div class="ds-thread-title">在 <a href="http://readsandthoughts.sinaapp.com/hello-world/#comments">欢迎使用 WordPress for SAE
+</a> 中评论</div><div class="ds-excerpt">您好，这是一条评论。要删除评论，请先登录，然后再查看这篇文章的评论。在那里，您可以看到编辑或者删除评论的选项。</div></li></ul></div><div id="calendar-2" class="widget widget_calendar"><h3>&nbsp;</h3><div id="calendar_wrap"><table id="wp-calendar">
+	<caption>2013 年一月</caption>
+	<thead>
+	<tr>
+		<th scope="col" title="星期一">一</th>
+		<th scope="col" title="星期二">二</th>
+		<th scope="col" title="星期三">三</th>
+		<th scope="col" title="星期四">四</th>
+		<th scope="col" title="星期五">五</th>
+		<th scope="col" title="星期六">六</th>
+		<th scope="col" title="星期日">日</th>
+	</tr>
+	</thead>
+
+	<tfoot>
+	<tr>
+		<td colspan="3" id="prev"><a href="http://readsandthoughts.sinaapp.com/2012/10/" title="查看 2012 年十月的文章">« 十</a></td>
+		<td class="pad">&nbsp;</td>
+		<td colspan="3" id="next" class="pad">&nbsp;</td>
+	</tr>
+	</tfoot>
+
+	<tbody>
+	<tr>
+		<td colspan="1" class="pad">&nbsp;</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+	</tr>
+	<tr>
+		<td>7</td><td><a href="http://readsandthoughts.sinaapp.com/2013/01/08/" title="2012书单">8</a></td><td>9</td><td>10</td><td>11</td><td><a href="http://readsandthoughts.sinaapp.com/2013/01/12/" title="2013年想做的事, Java虚拟机之垃圾收集">12</a></td><td>13</td>
+	</tr>
+	<tr>
+		<td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td><a href="http://readsandthoughts.sinaapp.com/2013/01/20/" title="Java内存管理知识(基础篇)">20</a></td>
+	</tr>
+	<tr>
+		<td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td id="today">27</td>
+	</tr>
+	<tr>
+		<td>28</td><td>29</td><td>30</td><td>31</td>
+		<td class="pad" colspan="3">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table></div></div><div id="meta-2" class="widget widget_meta"><h3>功能</h3>			<ul>
+						<li><a href="http://blog.shupeng.org/wp-login.php" onclick="pageTracker._trackPageview(&#39;/outgoing/blog.shupeng.org/wp-login.php?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">登录</a></li>
+			<li><a href="http://readsandthoughts.sinaapp.com/feed/" title="使用 RSS 2.0 订阅本站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://readsandthoughts.sinaapp.com/comments/feed/" title="使用 RSS 订阅本站点的所有文章的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://cn.wordpress.org/" title="基于 WordPress，一个优美、先进的个人信息发布平台。" onclick="pageTracker._trackPageview(&#39;/outgoing/cn.wordpress.org/?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">WordPress.org</a></li>
+						</ul>
+</div>	<div class="widget">
+	<a id="saelogo" href="http://sae.sina.com.cn/" target="_blank" onclick="pageTracker._trackPageview(&#39;/outgoing/sae.sina.com.cn?referer=https%3A%2F%2Fwww.google.com%2F&#39;);"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/poweredby.png" title="Powered by Sina App Engine"></a>
+	</div>
+</div>
+<!-- sidebar south END -->
+
+</div>
+<!-- sidebar END -->
+	<div class="fixed"></div>
+</div>
+<!-- content END -->
+
+<!-- footer START -->
+<div id="footer">
+	<a id="gotop" href="http://readsandthoughts.sinaapp.com/understand_zk_concepts/#" onclick="MGJS.goTop();return false;">回到顶部</a>
+	<a id="powered" href="http://wordpress.org/" onclick="pageTracker._trackPageview(&#39;/outgoing/wordpress.org/?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">WordPress</a>
+	<div id="copyright">
+		版权所有 © 2012-2013 谋食谋道	</div>
+	<div id="themeinfo">
+		主题由 <a href="http://www.neoease.com/" onclick="pageTracker._trackPageview(&#39;/outgoing/www.neoease.com/?referer=https%3A%2F%2Fwww.google.com%2F&#39;);">NeoEase</a> 提供, 通过 <a href="http://validator.w3.org/check?uri=referer" onclick="pageTracker._trackPageview(&#39;/outgoing/validator.w3.org/check?uri=referer&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);">XHTML 1.1</a> 和 <a href="http://jigsaw.w3.org/css-validator/check/referer?profile=css3" onclick="pageTracker._trackPageview(&#39;/outgoing/jigsaw.w3.org/css-validator/check/referer?profile=css3&amp;referer=https%3A%2F%2Fwww.google.com%2F&#39;);">CSS 3</a> 验证.	</div>
+</div>
+<!-- footer END -->
+
+</div>
+<!-- container END -->
+</div>
+<!-- wrap END -->
+
+
+<script type="text/javascript"><!--
+wpa2a.targets=[
+{title:'ZooKeeper中的概念剖析',url:'http://readsandthoughts.sinaapp.com/understand_zk_concepts/'}];
+wpa2a.html_done=true;if(wpa2a.script_ready&&!wpa2a.done)wpa2a.init();wpa2a.script_load();
+//--></script>
+<script type="text/javascript">
+	DUOSHUO.RecentCommentsWidget('.widget_recent_comments #recentcomments', {template : 'wordpress'});
+</script>
+	<script type="text/javascript" src="./ZooKeeper中的概念剖析   谋食谋道_files/tongji.js"></script><img src="./ZooKeeper中的概念剖析   谋食谋道_files/tongji.do" border="0" width="1" height="1"><a href="http://tongji.linezing.com/report.html?unit_id=2985904" target="_blank"><img src="./ZooKeeper中的概念剖析   谋食谋道_files/stats.gif" border="0" alt="量子统计"></a><noscript>&lt;a href="http://www.linezing.com" onclick="pageTracker._trackPageview('/outgoing/www.linezing.com?referer=https%3A%2F%2Fwww.google.com%2F');"&gt;&lt;img src="http://img.tongji.linezing.com/2985904/tongji.gif"/&gt;&lt;/a&gt;</noscript>
+
+
+
+</body></html>

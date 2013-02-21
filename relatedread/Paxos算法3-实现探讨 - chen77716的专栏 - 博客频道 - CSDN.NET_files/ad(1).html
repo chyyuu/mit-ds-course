@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)http://blog.csdn.net/common/ad.html?t=4&containerId=ad_cen&frmId=ad_frm_0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>CSDN Ad</title>
+    <style type="text/css">
+    body { margin:0px; padding:0px;}
+    </style>
+</head>
+<body>
+<div id="div1"><!-- 广告位：博客内文页下方 760 90 -->
+<script charset="utf-8" async="" src="log.js"></script><script charset="utf-8" async="" src="cc.js"></script><script type="text/javascript">BAIDU_CLB_SLOT_ID = "117306";</script>
+<script type="text/javascript" src="o.js"></script><script charset="utf-8" src="ecom"></script><div id="baidu_clb_slot_117306"><div style="display:none">-</div> <iframe id="cproIframe1" src="uijs.html" width="728" height="90" align="center,center" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" allowtransparency="true"></iframe></div>
+</div>
+<script type="text/javascript">
+    window.onload = function () {
+
+        //这种给广告区域赋值的方式，对于有些JS广告不能完美的显示
+        //top.document.getElementById('ad_cen').innerHTML = document.getElementById('div1').innerHTML;
+
+        var h = document.body.offsetHeight + 2;
+        setTimeout(function () {
+            if (h > 800) h = document.getElementById('div1').offsetHeight + 4;
+            top.document.getElementById('ad_frm_0').style.height = h + 'px';
+        }, 100);        
+    };
+</script>
+
+
+</body></html>

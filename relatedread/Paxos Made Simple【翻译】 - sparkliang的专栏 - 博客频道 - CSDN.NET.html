@@ -1,0 +1,566 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0055)http://blog.csdn.net/sparkliang/article/details/5740882 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET</title>
+
+<meta name="description" content="Paxos一致性算法——分布式系统中的经典算法，论文本身也有一段有趣的故事。一致性问题是分布式系统的根本问题之一，在论文中，作者一步步的加强最初一致性问题（2.1节提出的问题）的约束条件，最终导出了一个可实现的一致性模型。当前Paxos算法的研究越来越多，相关实现也不少，而原论文依然是最不可少的资料。论文通篇没有一个数学公式，这是大牛的坚持！【】中的是我个人的注释。先解释文中几个关键词的翻译：Proposal译为“议案”，由proposer提出，被">
+<script type="text/javascript" async="" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ga.js"></script><script src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ad.js"></script>
+<link rel="Stylesheet" type="text/css" href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/style.css">
+<link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/sparkliang/rss/list">
+<link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+<link type="text/css" rel="stylesheet" href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/default.css">
+<link type="text/css" rel="stylesheet" href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/style(1).css"></head>
+<body>
+<script src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/pub_topnav_2011.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/navtop_2012.css">
+<div class="nav_top_2011">
+<p><span style="color:red;">您还未登录！</span>|<a href="https://passport.csdn.net/account/login" target="_top">登录</a>|<a href="https://passport.csdn.net/account/register" target="_top">注册</a>|<a href="https://passport.csdn.net/help/faq" target="_blank">帮助</a></p><ul>
+<li><a href="http://www.csdn.net/" target="_blank">首页</a></li>
+<li><a href="http://news.csdn.net/" target="_blank">业界</a></li>
+<li><a href="http://mobile.csdn.net/" target="_blank">移动</a></li>
+<li><a href="http://cloud.csdn.net/" target="_blank">云计算</a></li>
+<li><a href="http://sd.csdn.net/" target="_blank">研发</a></li>
+<li><a href="http://bbs.csdn.net/" target="_blank">论坛</a></li>
+<li><a href="http://blog.csdn.net/" target="_blank">博客</a></li>
+<li><a href="http://download.csdn.net/" target="_blank">下载</a></li>
+<li class="more"><h2 id="topnav_btnmore" onclick="showNavMore(this)"><a href="javascript:void(0);">更多</a></h2>
+<div id="topnav_hidlist">
+<iframe name="nav_frm" src="about:blank" width="92" height="178" scrolling="no" frameborder="no"></iframe>
+</div>
+</li>
+</ul>
+</div>
+
+
+<div id="container">
+<div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h1><a href="http://blog.csdn.net/sparkliang">sparkliang的专栏</a></h1>
+            <h2></h2>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg"></div>
+    <div class="navigator">
+        <ul>
+            <li id="btnContents"><a href="http://blog.csdn.net/sparkliang?viewmode=contents"><span><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+            <li id="btnView"><a href="http://blog.csdn.net/sparkliang?viewmode=list"><span><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+            <li id="btnRss"><a href="http://blog.csdn.net/sparkliang/rss/list"><span><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "sparkliang";
+    var blog_address = "http://blog.csdn.net/sparkliang";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";
+</script>
+        
+<div id="body">
+<div id="main">
+<div class="main">
+<div class="notice"> 
+
+<a href="http://surveies.csdn.net/survey/comein/546" target="_blank">
+<font color="blue">CSDN客服工作问卷调查   </font></a>
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/8572108" target="_blank"><font color="red">社区专家谈 12306</font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://bbs.csdn.net/topics/390366069" target="_blank"><font color="red">CSDN社区“海外程序员经验谈”活动正式上线 
+</font></a>
+
+<br>
+
+
+
+
+
+<a href="http://www.csdn.net/article/2013-02-17/2814150" target="_blank">
+<font color="red">专访王豫翔：编程道路上的“三少三多” </font></a>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnstudent/article/details/8077932" target="_blank">
+<font color="red">2013年全国百所高校巡讲讲师招募  </font></a>
+
+
+</div><div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Translated"></span>
+    <h3>
+        <span class="link_title"><a href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET.html">
+        Paxos Made Simple【翻译】
+        </a></span>
+    </h3>
+</div>
+
+        
+    <div class="article_manage">
+        <span class="link_categories">
+        分类：
+            <a href="http://blog.csdn.net/sparkliang/article/category/699896">分布式系统</a> 
+        </span>
+    <span class="link_postdate">2010-07-16 22:46</span>
+    <span class="link_view" title="阅读次数">4461人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/sparkliang/article/details/5740882#comments">评论</a>(4)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;Paxos Made Simple【翻译】&#39;,&#39;5740882&#39;);return false;" title="收藏">收藏</a></span>
+    <span class="link_report"><a href="http://blog.csdn.net/sparkliang/article/details/5740882#report" onclick="javascript:report(5740882,2);return false;" title="举报">举报</a></span>
+    
+</div>
+
+
+    
+<div style="clear:both"></div><div style="border:solid 1px #ccc; background:#eee; float:left; min-width:200px;padding:4px 10px;"><p style="text-align:right;margin:0;"><span style="float:left;">目录<a href="http://blog.csdn.net/sparkliang/article/details/5740882#" title="系统根据文章中H1到H6标签自动生成文章目录">(?)</a></span><a href="http://blog.csdn.net/sparkliang/article/details/5740882#" onclick="javascript:return openct(this);" title="展开">[+]</a></p><ol style="display:none;margin-left:14px;padding-left:14px;line-height:160%;"><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t0">Paxos Made Simple</a></li><ol><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t1">简介</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t2">介绍</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t3">一致性算法</a></li><ol><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t4">问题的提出</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t5">选择决议</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t6">处理流程</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t7">实现</a></li></ol><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t8">实现状态机模型</a></li><li><a href="http://blog.csdn.net/sparkliang/article/details/5740882#t9">参考文献</a></li></ol></ol></div><div style="clear:both"></div><div id="article_content" class="article_content">
+<p>Paxos一致性算法——分布式系统中的经典算法，论文本身也有一段有趣的故事。一致性问题是分布式系统的根本问题之一，在论文中，作者一步步的加强最初一致性问题（2.1节提出的问题）的约束条件，最终导出了一个可实现的一致性模型。当前Paxos算法的研究越来越多，相关实现也不少，而原论文依然是最不可少的资料。论文通篇没有一个数学公式，这是大牛的坚持！<br>
+【】中的是我个人的注释。<br>
+先解释文中几个关键词的翻译：<br>
+Proposal译为“议案”，由proposer提出，被aceeptor批准或否决<br>
+Value译为“决议”，它是议案的内容，一个议案就是一个{编号，决议}对<br>
+Accept译为“批准”，表示议案被acceptor批准<br>
+Choose译为“选择”，表示议案“被选择”，也就是被多数acceptor批准</p>
+<h1 style="text-align: center;"><a name="t0"></a>Paxos Made Simple</h1>
+<p style="text-align: center;">Leslie Lamport<br>
+2001.11.1</p>
+<h2><a name="t1"></a>简介</h2>
+<p>Paxos算法，纯文本方式描述，非常简单。【论文第一版没多少人理会，郁闷了:)】</p>
+<h2><a name="t2"></a>1 介绍</h2>
+<p>为实现具有容错能力的分布式系统而提出的Paxos算法，曾被认为难以理解，可能因为对于大部分读者而言，原来的描述是基于希腊故事的[5]。【为了描述Paxos算法，Lamport设计了一个虚拟的希腊城邦Paxos】实际上，它是最简单和直观的分布式算法之一【这个…，其实没那么简单吧】。它的核心是一个一致性算法——[5]中提出的“synod”算法。下一节描述这个一致性算法，并遵从我们要求的性质。最后一节解释了完整的Paxos算法，从一致性的直观应用到构建分布式系统的有限状态机模型——应该是总所周知的模型，因为它是论文[5]的主题——它可能是分布式系统理论被引用最多的论文。</p>
+<h2><a name="t3"></a>2 一致性算法</h2>
+<h3><a name="t4"></a>2.1 问题的提出</h3>
+<p>设想一组可以提出决议（value）的process。一致性算法保证所有提出的决议中，有一个决议会被选择（chosen）。如果没有提出决议，那么将不会有选择。如果一个决议被选择，那么process最终都能知道这个被选择的决议。一致性的安全性包括：<br>
+——决议只有被提出后才可能被选择，<br>
+——只有一个决议被选择，并且<br>
+——process永远不会获知一个决议被选择了，除非这个决议确实已经被选择。<br>
+我们将不会特别明确精确的时间性要求。然而，其目标是最终有一个提出的决议被选择，并且process最终会获知被选择的决议，如果有的话。<br>
+我们为一致性算法划分3个角色，并分别以代理：proposer（提出者），acceptor（批准者）和listener（接收者）表示。实现中，允许一个process扮演多个代理，这里我们不关心从代理到process的映射。<br>
+假设代理之间用消息通信。我们采用异步、非拜占庭模型【拜占庭模型（Byzantine model），消息可能丢失、重复或者内容损坏。换而言之，非拜占庭模型就是允许消息的丢失或者重复，但是不会出现内容损坏的情况】：<br>
+——代理以任意的速度操作，可能会因为停机而失效，可能会重启。因为任一个代理都可能会在决议被选择后停机再重启，因此解决方案要求代理必须能够记忆某些信息，从而能在重启后重新载入。<br>
+——消息传送速度不可预测，可能会重复或丢失，但是内容不会损坏。</p>
+<h3><a name="t5"></a>2.2 选择决议</h3>
+<p>最简单的方法就是用单个acceptor代理。Proposer发送议案（proposal）给这个acceptor，它选择最先收到的议案。尽管简单，但是如果acceptor停机了，那么系统就不能继续运行了，这个方案并不能满足要求。【明显的单点问题】<br>
+看来我们需要选择另外的方法，我们用多个acceptor代理，而非一个，proposer向一组acceptor提出议案。一个acceptor可能批准该议案，当有足够大的acceptor集合批准了这个议案时，决议【议案是一个{编号，决议}对】就被选择了。那么这个集合多大才足够呢？为了保证只有一个决议被选择，我们可以让这个集合包含多数的代理【后面也会称之为多数派】。因为任意两个多数派至少有一个相同的代理，如果一个acceptor最多只能批准一个决议，这就是可行的。<br>
+假设没有失败或者消息丢失，即使仅有一个proposer提出了一个决议，我们也希望能选择一个决议。这就导出了下面的需求：<br>
+<strong>P1. Acceptor必须批准它接收到的第一个决议。</strong>
+<br>
+但是该需求会导致一个问题。同时可能有几个proposer提出了几个不同的决议，从而导致每个acceptor都批准了一个决议，但是没有一个决议被多数派批准。即使只有两个决议，如果每个都被半数的acceptor批准，单个的acceptor失效也会导致不可能知道到底哪个决议被选择了。<br>
+一个决议要经过多数派的批准才能被选择，这个需求和P1暗示了acceptor必须能够批准多个议案。我们为每个议案分配一个编号来记录不同的议案，因此一个议案由编号和决议构成【也就是议案={编号，决议}】。为避免混淆，我们要求议案的编号是唯一的。这个取决于实现，我们假设可以做到这一点。如果一个议案{n, v}通过多数派的批准，那么决议v就被选择了。这种情况下，我们称议案（包括其决议v）被选择了。<br>
+我们允许选择多个议案，但是必须保证所有选择的议案包括相同的决议。对议案编号归纳，可以保证：<br>
+<strong>P2. 如果一个议案{n, v}被选择，那么所有被选择的议案（编号更高）包含的决议都是v。</strong>
+<br>
+因为编号是全序的，P2保证了“只有一个决议被选择”这一关键安全属性。议案必须至少被一个acceptor批准才可能被选择。因此只要满足下面的条件，就可以满足P2:<br>
+<strong>P2A. 如果一个议案{n, v}被选择，那么任何acceptor批准的议案（编号更高）包含的决议都是v。</strong>
+<br>
+我们依然保证P1来确认选择了某些议案。因为通信是异步的，在特殊情况下，某些acceptor c没有接收到过任何议案，它们可能会【错误的】批准一个议案。设想一个新的proposer“醒来”并提出了一个更高编号的议案（包含不同的决议）。根据P1的要求，c应该批准这个议案，但是这违反了P2A。为了同时保证P1和P2A，我们需要增强P2A：<br>
+<strong>P2B. 如果一个议案{n, v}被选择，那么此后，任何proposer提出的议案（编号更高）包含的决议都是v。</strong>
+<br>
+因为一个议案必须在被proposer提出后才能被acceptor批准，因此P2B包含了P2A，进而包含了P2。<br>
+如何才能满足P2B呢，让我们来考虑如何证明它是成立的。我们假设某个议案{m, v}被选择，然后证明任何编号n&gt;m的议案的决议都是v。对n归纳可以简化证明，根据条件：每个提出的议案（编号从m到n-1）的决议都是v，我们可以证明编号为n的议案的决议是v。对于选择的议案（编号为m），必定存在一个集合C（acceptor的多数派），C中的每个acceptor都批准了该议案。结合归纳假设，m被选择这一前提意味着：<br>
+C中的每个acceptor都批准了一个编号在m到n-1范围内的议案，并且议案的决议为v。<br>
+因为任何由多数派组成的集合S都至少包含C中的一个成员，我们可以得出结论：如果下面的不变性成立，那么编号为n的议案的决议就是v：<br>
+<strong>P2C. 对于任意的v和n，如果议案{n, v}被提出，那么存在一个由acceptor的多数派组成的集合S，或者a) S中没有acceptor批准过编号小于n的议案，或者b) 在S的任何acceptor批准的所有议案（编号小于n）中，v是编号最大的议案的决议。</strong>
+<br>
+通过保持P2C，我们就能满足P2B。<br>
+为了保持不变性P2C，准备提出议案（编号为n）的proposer必须知道所有编号小于n的议案中编号最大的那个，如果存在的话，它已经或将要被acceptor的某个多数派批准。获取已经批准的议案是简单的，但是预知将来可能批准的议案是困难的。Proposer并不做预测，而是假定不会有这样的情况。也就是说，proposer要求acceptor不能批准任何编号小于n的议案。这引出了下面提出议案的算法【这就是两阶段提交了】。<br>
+1 proposer选择一个新编号n，向某个acceptor集合中的所有成员发送请求，【prepare请求阶段，n是prepare请求的编号，也是下面accept请求的议案编号】并要求回应：<br>
+a) 一个永不批准编号小于n的议案的承诺，以及<br>
+b) 在它已经批准的所有编号小于n的议案中，编号最大的议案，如果存在的话。<br>
+我把这样的请求称为prepare请求n。<br>
+2 如果proposer收到了多数acceptor的回应，那么它就可以提出议案{n, v}，其中v是所有回应中编号最高的议案的决议，或者是proposer选择的任意值，如果acceptor们回应说还没有批准过议案。<br>
+一个proposer向一个acceptor集合发送已经被批准的议案（不一定是回应proposer初始请求的acceptor集合），我们称之为accept请求。<br>
+我们已经描述了proposer的算法。那么acceptor呢？它可以接收两种来自proposer的请求： prepare请求和accept请求。Acceptor可以忽略任何请求，而不用担心安全性。因此，我们只需要描述它需要回应请求的情况。任何时候它都可以回应prepare请求【本文中，回应就意味着接受了这个prepare请求和编号n】，它可以回应accept请求，并批准议案，当且仅当它没有承诺过【承诺批准或批准一个更高编号的议案】。换句话讲：<br>
+<strong>P1A. acceptor可以批准一个编号为n的议案，当且仅当它没有回应过一个编号大于n的prepare请求。</strong>
+<br>
+P1A蕴含了P1。<br>
+现在我们得到了一个完整的决议选择算法，并满足我们要求的安全属性——假设议案编号唯一。通过一些简单优化就能得到最终算法。<br>
+假设一个acceptor接收到一个编号为n的prepare请求，但是它已经回应了一个编号大于n的prepare请求。于是acceptor就没有必要回应这个prepare请求了，因为它不会批准这个编号为n的议案。它还可以忽略已经批准过的议案的prepare请求。<br>
+有了这些优化，acceptor只需要保存它已经批准的最高编号的议案（包括编号和决议），以及它已经回应的所有prepare请求的最高编号。因为任何情况下，都需要保证P2C，acceptor必须记住这些信息，包括失效并重启之后。注意，proposer可以随意的抛弃一个议案——只要它永远不会使用相同的编号来提出另一个议案。<br>
+结合proposer和acceptor的行为，我们将把算法可以分为两个阶段来执行。<br>
+<strong>阶段1. </strong>
+<br>
+a) Proposer选择一个议案编号n，向acceptor的多数派发送编号也为n的prepare请求。<br>
+b) Acceptor：如果接收到的prepare请求的编号n大于它已经回应的任何prepare请求，它就回应已经批准的编号最高的议案（如果有的话），并承诺不再回应任何编号小于n的议案；<br>
+<strong>阶段2.</strong>
+<br>
+a) Proposer：如果收到了多数acceptor对prepare请求（编号为n）的回应，它就向这些acceptor发送议案{n, v}的accept请求，其中v是所有回应中编号最高的议案的决议，或者是proposer选择的值，如果回应说还没有议案。<br>
+b) Acceptor：如果收到了议案{n, v}的accept请求，它就批准该议案，除非它已经回应了一个编号大于n的议案。<br>
+Proposer可以提出多个议案，只要它遵循上面的算法。它可以在任何时刻放弃一个议案。（这不会破坏正确性，即使在议案被放弃后，议案的请求或者回应消息才到达目标）如果其它的proposer已经开始提出更高编号的议案，那么最好能放弃当前的议案。因此，如果acceptor忽略一个prepare或者accept请求（因为已经收到了更高编号的prepare请求），它应该告知proposer放弃议案。这是一个性能优化，而不影响正确性。<br>
+<strong>2.3 获知选择的决议</strong>
+<br>
+Learner必须找到一个被多数acceptor批准的议案，才能知道一个决议被选择了。一个显而易见的算法就是，让每个acceptor在批准议案时通知所有的learner。于是learner可以尽快知道选择的决议，但是要求每个acceptor通知每个learner——需要的消息个数等于learner数和acceptor数的乘积。<br>
+基于非拜占庭假设，一个learner可以从另一个learner得知被选择的决议。我们可以让acceptor将批准情况回应给一个主Learner，它再把被选择的决议通知给其它的learner。这增加了一次额外的消息传递，也不可靠，因为主learner可能会失效，但是要求的消息个数仅是learner数和acceptor数的总和。<br>
+更一般的，可以有多个主Learner，每个都能通知其它所有的acceptor。主learner越多越可靠，但是通信代价会增加【消息个数越多】。<br>
+由于消息丢失，可能没有learner知道选择了一个决议。Learner可以向acceptor询问批准的议案，但是由于acceptor的失效，可能难以得知多数派是否批准了一个议案。这样，learner只能在新的议案被选择时才能知道acceptor选择的决议。如果learner需要知道是否已经选择了一个决议，它可以让proposer根据上面的算法提出一个议案【提出请求就有回应，并且新的提案的决议就是当前选择的决议】。</p>
+<h3><a name="t6"></a>2.4 处理流程</h3>
+<p>很容易构造这样一个场景，两个proposer轮流提出一系列编号递增的议案，但是都没有被选择。Propoer p选择议案的编号为n1，并结束阶段1。接着，另外一个proposer q选择了议案编号n2&gt;n1，并结束阶段1。于是p在阶段2的accept请求将被忽略，因为acceptor已经承诺不再批准编号小于n2的议案。于是p再回到阶段1并选择了编号n3 &gt; n2，这又导致q第二阶段的accept请求被忽略，…<br>
+为了保证流程，必须选择一个主proposer，只有主proposer才能提出议案。如果主proposer和多数acceptor成功通信，并提出一个编号更高的议案，议案将被批准。如果它得知已经有编号更高的议案，它将放弃当前的议案，并最终能选择一个足够大的编号。<br>
+如果系统中有足够的组件（proposer，acceptor和网络）能正常工作，通过选择一个主proposer，系统就能保持响应。Fischer、Lynch和Patterson的著名结论[1]表明：选择proposer的可靠算法必须是随机的或者实时的——例如，使用超时机制。然而不管选择成功与否，安全性都能得到保证。</p>
+<h3><a name="t7"></a>2.5 实现</h3>
+<p>Paxos算法[5]假设了一组网络进程。在其一致性算法中，每个process都同时扮演proposer、acceptor和learner的角色。算法选择一个leader，它就是主proposer和主learner。Paxos一致性算法就是上面描述的那个，请求和响应都用消息发送（响应会被打上对应议案的编号，以防止混淆）。使用持久化存储来保证acceptor失效后也能记起必要的信息。Acceptor在发送响应前必须持久化存储该响应。<br>
+接下来就是描述保证任何两个议案的编号都不相同的机制。proposer从互不相交的集合中选择议案编号，因此两个不同的proposer永远不会提出相同编号的议案。【假设有5个proposer，编号为0~4，可以使proposer i的议案编号选择序列为：5*j + i（j &gt;= 0），就能保证永不重复，且递增】每个proposer都持久化保存它已经提出的编号最高的议案，并使用一个更高的议案编号来开始阶段1。</p>
+<h2><a name="t8"></a>3 实现状态机模型</h2>
+<p>实现分布式系统的简单方式就是使用一些客户端向中心服务器发送命令【就是C/S模式了】。服务器可以看作是根据一定顺序执行客户端命令的确定状态自动机。状态机包含当前状态，每读入一个命令并产生相应的结果，它就执行一步。比如，分布式银行系统的客户端可能是出纳员，状态机的状态由所有用户的账户余额构成。取款操作将会执行一条状态机命令：减少账户余额，输出新旧余额数（当且仅当余额大于取款值）。<br>
+使用单个中心服务器的实现是不可靠的，因此我们使用一组服务器，每一个都独立的执行状态机。因为状态机是确定的，如果执行相同的命令序列，所有的服务器将会产生同样的状态序列和输出【非拜占庭模型假设再一次起作用了】。客户端发起命令后，可以使用任何服务器的输出。<br>
+为了保证所有的服务器执行的是相同的命令序列，我们执行一个paxos一致性算法的实例（instance）序列【注解#】，每个实例是一个独立运行的paxos一致性算法，第i个实例选择的决议就是序列的第i个状态机命令。在算法的每个实例中，每个server都扮演所有的角色（proposer、acceptor和learner）。现在，假设服务器组固定，所有的实例都使用相同的代理。<br>
+【注解#】<br>
+某些资料会把“实例”称为“轮”（round），每轮选择一个决议，但每轮可能会执行多次一致性算法，比如如果主proposer在阶段1提出的prepare请求被否决了，那么它将会选择新的议案编号，重新提出议案请求，直到议案被多数acceptor批准（消息发送失败也会导致重传请求）。引入轮（就是实例啦）这一概念后，可以做到各轮并行运行，同时批准多个决议，互不干涉，更有效率。<br>
+【end #】<br>
+正常操作下，一个服务器被选择为leader，它就是所有的实例的主proposer（唯一能够提出议案的）。客户端向leader发送命令，leader决定命令的顺序。如果leader决定某个客户端命令应该是第15个命令，它将试图把该命令选择为第135个实例的决议，通常都能成功。有可能因为失效而失败，或者另外的一个服务器相信它是leader，有另外的选择。但是一致性算法保证最多只能有一个命令被选成第135个。<br>
+Paxos一致性算法有效性的关键在于，决议直到阶段2才会真正提出。回忆proposer算法的阶段1结束后，或者要提的决议已经决定了，或者proposer可以提出任何决议。我将描述正常操作下Paxos状态机的执行情况。接下来，再讨论可能的错误情况。我会考虑前一个leader失效、新的leader被选择后会发生什么情况（系统启动是个特例，这时还没有提出命令）。<br>
+【在下面的部分，因为客户端的命令就是议案的决议，因此决议就是命令，会混用，并不影响理解】<br>
+在一致性算法的所有实例中，新的leader也是learner，应该知道已经选择的命令。假设它知道命令1–134、138和139——也就是算法实例1–134、138和139选择的决议（后面将看到命令序列中的间隔是如何引起的）。然后leader为实例135-137和所有大于139的实例执行阶段1（后面会说明是怎么做到的）。假设这些执行的输出将决定实例135和140提出的决议，但是不会影响其它实例的决议。然后leader为实例135和140执行阶段2，并选择了第135和140个命令。<br>
+Leader和其它所有知道leader命令的服务器，现在可以执行命令1-135。但是不能执行命令138-140（虽然它们也知道），因为必须选择命令136和137。Leader也可以把客户端提出的后面两个命令选为命令136和137。我们希望尽快的消除间隔，于是为命令136和137提出一个特殊的“noop”命令（不改变状态）（为命令136和137执行阶段2）。一旦noop命令被选择，命令138-140就能执行了。<br>
+现在命令1-140已经被选择了。Leader还已经为所有大于140的实例完成了一致性算法的阶段1的操作【注解*】，并可以在阶段2中提出任何决议。它把客户端的下一条命令编号为141，并当作实例141的阶段2的决议。再把下一条编号为142，以此执行。<br>
+【注解*】<br>
+对于同一个leader而言，如果它在执行实例i中执行了阶段1，那么后续的执行实例就不需要再次执行阶段1了，而直接执行阶段2，原因如下：<br>
+1. 因为它提出的议案编号总是递增的，acceptor必定接受阶段1的prepare请求；<br>
+2. 每个实例都是独立运行的paxos算法，互不干扰，决议互相独立；<br>
+减少了一个阶段，效率也必定有所提高。<br>
+【end*】<br>
+在知道提出的命令141被选择之前，Leader可以提出命令142。它提出命令141的消息可能都丢失了，还可能在其他服务器知道leader提出命令141之前，命令142已经被选择了。 当leader在实例141的阶段2中没有收到期望的回应后，它将重传这些消息。如果一切顺利，它提出的命令将被选择。然而，也可能会失败，在命令序列中留下了一个间隔。一般来说，假设leader可以预取r个命令——也就是说，在命令1到i被选择之后，它就可以同步提出命令i+1, …, i+r。那么最多可以产生r-1个间隔【容易理解，前面的r-1个命令都失败了】。<br>
+新选出的leader要为算法的无限个实例执行阶段1——在上面的场景中，是实例135-137，和139之后的所有实例【我的理解是，为了这些实例，它总共只需要成功的执行一次阶段1，理由见上面的注解*，当然多次执行也不会出问题，就像下面所说的那样】。它可以向其他的服务器发送一条简单的合理短消息，并为所有实例使用相同的议案编号。在阶段1，仅当acceptor已经收到了一个来自其它proposer的阶段2的消息时，除了简单的OK，它的回应会包含额外的消息，（在上述场景中，仅实例135和140是这样的【像前面所描述的，实例135-137和139执行的输出将决定实例135和140提出的决议】）。因此，服务器（作为acceptor）可以为所有实例回应一条简单的短消息。多次执行阶段1并不会出问题。<br>
+因为leader的失效和由此引发的选举应该是小概率事件，有效执行一条状态机命令的开销——达到对命令/决议的一致性——仅仅是一致性算法的阶段2的开销【又一次验证了阶段1并不需要多次执行】。可以证明，在允许失效的情况下，在所有的同类（一致性）算法中， paxos一致性算法的阶段2具有最小可能的【时间】复杂度[2]。因此paxos算法在本质上就是优化的。<br>
+上面对系统正常操作的讨论假设一直存在单个leader，除去在当前leader失效和选举新leader之间的一小段时间。在异常环境中，leader选择可能失败。如果没有服务器被选为leader，那么将不能接受命令。如果多个服务器都认为自己是leader，在同一个算法实例中，它们将都能提出议案，这可能会导致所有的议案都不能被选择。然而，安全属性是满足的——两个不同的服务器将永远不会在第i个状态机命令的选择上达成一致。选择单一的leader只是为了保证流程【避免冲突】。<br>
+如果服务器组可以变动，必须有方法能检测哪些服务器执行的是算法的哪些实例。最简单的做法就是让状态机自己检测。当前的服务器组可以作为状态的一部分，并能被原生的状态机命令修改。我们可以让leader预取r个命令，并将执行算法实例i+r的服务器组的状态设置成执行第i个状态机命令后的状态。于是你可以使用简单的重配置算法来进一步增强算法的可靠性【如果半数服务器同时失效，重配置机制也束手无策，然而这种概率太低了】。<br>
+【下面wiki的两篇文章也是paxos很好的参考资料，一篇中文，一篇英文，然而内容并不重复】<br>
+http://en.wikipedia.org/wiki/Paxos_algorithm<br>
+http://www.wikilib.com/wiki/Paxos%E7%AE%97%E6%B3%95<br>
+【还有两个重要的问题就是如何选举leader，以及server间数据的同步，可以参看zookeeper的实现；这些内容整理好下次再单独发出来:)】</p>
+<h2><a name="t9"></a>参考文献</h2>
+<p>[1] Michael J. Fischer, Nancy Lynch, and Michael S. Paterson. Impossibility of distributed consensus with one faulty process. Journal of the ACM, 32(2):374–382, April 1985.<br>
+[2] Idit Keidar and Sergio Rajsbaum. On the cost of fault-tolerant consensus when there are no faults—a tutorial. TechnicalReport MIT-LCS-TR-821, Laboratory for Computer Science, Massachusetts Institute Technology, Cambridge, MA, 02139, May 2001. also published in SIGACT News 32(2) (June 2001).<br>
+[3] Leslie Lamport. The implementation of reliable distributed multiprocess systems. Computer Networks, 2:95–114, 1978.<br>
+[4] Leslie Lamport. Time, clocks, and the ordering of events in a distributed system. Communications of the ACM, 21(7):558–565, July 1978.<br>
+[5] Leslie Lamport. The part-time parliament. ACM Transactions on Computer Systems, 16(2):133–169, May 1998.<br>
+<br></p>
+</div>
+<div class="share_buttons" id="sharePanel"><span>分享到：</span> <a name="sina" class="share_sina" title="分享到新浪微博"></a><a name="qq" class="share_qq" title="分享到腾讯微博"></a></div>
+<!--192.168.1.237-->
+<div class="article_next_prev">
+    <li class="prev_article"><span>上一篇：</span><a href="http://blog.csdn.net/sparkliang/article/details/5712629">A Digital Signature Based on a Conventional Encryption Function【翻译】</a></li>
+    <li class="next_article"><span>下一篇：</span><a href="http://blog.csdn.net/sparkliang/article/details/5909127">转个不错的云计算blog</a></li>
+</div>
+
+
+    
+</div>
+<div id="ad_cen"><iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 732px; height: 97px;" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ad(1).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(4, 'ad_cen');
+</script>
+<div id="comment_title" class="panel_head">查看评论<a name="comments"></a></div>
+<div id="comment_list"><dl class="comment_item comment_topic" id="comment_item_2124264"><dt class="comment_head" floor="2">2楼 <span class="user"><a class="username" href="http://blog.csdn.net/techq" target="_blank">techq</a> <span class="ptime">2012-03-09 11:13发表</span>  <a href="http://blog.csdn.net/sparkliang/article/details/5740882#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display: none;" commentid="2124264" username="techq"> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/techq" target="_blank"><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/3_techq.jpg" width="40" height="40"></a></dd><dd class="comment_body">楼主你好，看到你的文章分析得很出色，我想请教下我下面理解的一个例子是否正确<br><br>所有的commands(1-134, 138, 139) 提议已经完成（完成 phase 2）, 但并命令并没有实际被执行<br>command1: account1 存款 $1000<br>command2: account2 取款 $200<br>command3: account3 存款$50<br>...<br>command134: account134 转账 $1000<br>command135: commands (1-135, 138, 139) 将会对135提出的决议产生影响. 比如, command135(对account1做了改变) 依赖于之前的 commands，比如说是command1(同样对account1改变).<br>command136: 对于同一账户如account136，在一阶段提议过程中或者二阶段发送请求接受(accept!)给acceptors的时候丢失或者在一阶段后被其他更高的投票覆盖了，比如说被137投票覆盖了<br>command137: 同上<br>command138: 对account136的操作(command136, command137, command138)，两阶段执行完毕<br>command139: account139 转账 $1000<br>command140: 和135同样的情形<br><br>请问下 这样的理解是否正确？</dd></dl><dl class="comment_item comment_topic" id="comment_item_1596445"><dt class="comment_head" floor="1">1楼 <span class="user"><a class="username" href="http://blog.csdn.net/enjoying20100428" target="_blank">enjoying20100428</a> <span class="ptime">2011-02-21 15:30发表</span>  <a href="http://blog.csdn.net/sparkliang/article/details/5740882#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display: none;" commentid="1596445" username="enjoying20100428"> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/enjoying20100428" target="_blank"><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/3_enjoying20100428.jpg" width="40" height="40"></a></dd><dd class="comment_body">想请教楼主一个问题：在fast paxos算法中，首先选出一个leader，然后由leader提案。我想不通的是选leader本身就是一个一致性问题，难道是先用其他一致性算法选出一个leader再进行paxos算法？</dd><dl class="comment_item comment_reply" id="comment_item_2198400"><dt class="comment_head" floor="1">Re: <span class="user"><a class="username" href="http://blog.csdn.net/navylq" target="_blank">navylq</a> <span class="ptime">2012-04-28 08:49发表</span>  <a href="http://blog.csdn.net/sparkliang/article/details/5740882#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display: none;" commentid="2198400" username="navylq"> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/navylq" target="_blank"><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/3_navylq.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复enjoying20100428：选leader 很简单啊，每个server 都声称自己是leader，然后广播自己的配置信息，默认配置信息最高的是leader。</dd></dl><dl class="comment_item comment_reply" id="comment_item_1600170"><dt class="comment_head" floor="1">Re: <span class="user"><a class="username" href="http://blog.csdn.net/sparkliang" target="_blank">sparkliang</a> <span class="ptime">2011-02-25 16:56发表</span>  <a href="http://blog.csdn.net/sparkliang/article/details/5740882#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="1600170" username="sparkliang"> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/sparkliang/article/details/5740882#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/sparkliang" target="_blank"><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/3_sparkliang.jpg" width="40" height="40"></a></dd><dd class="comment_body">回复 enjoying20100428：没仔细看fast paxos；<br>paxos内部必须有一个leader啊，这个过程其实也是paxos算法的过程，提出议案，等待批准，其它服务器接受leader，改变自身状态。</dd></dl></dl><div class="clear"></div></div>
+<div id="comment_bar" style="display: none;"></div>
+<div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:csdn.showLogin(function (dat) {js_logined(dat.data.userName);});">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fsparkliang%2Farticle%2Fdetails%2F5740882">[注册]</a></div></div>
+<div class="announce">* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+<script type="text/javascript">
+    var fileName = '5740882';
+    var commentscount = 4;
+    var islock = false
+</script>
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/comment.js"></script>
+<div id="ad_bot"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 732px; height: 170px;" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ad(2).html"></iframe></div>
+<script type="text/javascript">
+    new Ad(5, 'ad_bot');
+</script>
+<div id="report_dialog"></div>
+
+<div id="d-top" style="display: none;">
+<a id="d-top-a" href="http://blog.csdn.net/sparkliang/article/details/5740882#" title="回到顶部">
+<img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/top.png" alt="TOP"></a>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var d_top=$('#d-top');
+        document.onscroll=function(){
+            var scrTop=(document.body.scrollTop||document.documentElement.scrollTop);
+            if(scrTop>500){
+                d_top.show();
+            }else{
+                d_top.hide();
+            }
+        }
+        $('#d-top-a').click(function(){
+            scrollTo(0,0);
+            this.blur();
+            return false;
+        });
+    });
+</script>
+
+
+
+<div class="clear"></div>
+</div>
+</div>
+
+<div id="side">
+<div class="side">
+<div id="panel_Profile" class="panel">
+    <ul class="panel_head"><span>个人资料</span></ul>
+    <ul class="panel_body profile">
+        <div id="blog_userface">
+            <a href="http://my.csdn.net/sparkliang" target="_blank">
+            <img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/1_sparkliang.jpg" title="访问我的空间" style="max-width:90%">
+            </a>
+            <br>
+            <span><a href="http://my.csdn.net/sparkliang" class="user_name" target="_blank">sparkliang</a></span>
+        </div>
+<div class="interact">
+<!--<a href="#" class="attented" title="已关注"></a>-->
+<a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+<a href="javascript:void(0);" class="letter" onclick="loginto(1)" title="[发私信]"></a>
+</div>
+        <div id="blog_medal">
+        <div id="bms_box"></div></div>
+        <ul id="blog_rank">
+            <li>访问：<span>305948次</span></li>
+            <li>积分：<span>3256分</span></li>
+            <li>排名：<span>第1604名</span></li>
+        </ul>
+        <ul id="blog_statistics">
+            <li>原创：<span>68篇</span></li>
+            <li>转载：<span>15篇</span></li>
+            <li>译文：<span>4篇</span></li>
+            <li>评论：<span>310条</span></li>
+        </ul>
+    </ul>
+</div>
+<script type="text/javascript">
+    var _blogger = 'sparkliang';
+</script>
+
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>文章分类</span></ul>
+    <ul class="panel_body">
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/488400">C/C++语言</a><span>(22)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/806112">ICE相关</a><span>(2)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/660506">libevent分析</a><span>(14)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/635072">Linux</a><span>(7)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/503089">STL</a><span>(4)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/534835">Windows程序设计</a><span>(8)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/699896">分布式系统</a><span>(15)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/488397">算法艺术</a><span>(8)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/614184">网络程序设计</a><span>(31)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/488399">虚拟现实</a><span>(1)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/641160">软件架构</a><span>(11)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/488398">随笔</a><span>(7)</span>
+        </li>
+        <li>
+        <a href="http://blog.csdn.net/sparkliang/article/category/1342001">Leveldb</a><span>(2)</span>
+        </li>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+    <ul class="panel_head"><span>文章存档</span></ul>
+    <ul class="panel_body">
+        <div id="archive_list"><li><a href="http://blog.csdn.net/sparkliang/article/month/2013/02">2013年02月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2012/11">2012年11月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2012/10">2012年10月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2012/05">2012年05月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2012/02">2012年02月</a><span>(1)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/sparkliang/article/month/2011/12">2011年12月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2011/11">2011年11月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2011/07">2011年07月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2011/06">2011年06月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2011/04">2011年04月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/10">2010年10月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/09">2010年09月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/07">2010年07月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/06">2010年06月</a><span>(7)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/05">2010年05月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/04">2010年04月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/03">2010年03月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/02">2010年02月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2010/01">2010年01月</a><span>(8)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/12">2009年12月</a><span>(14)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/11">2009年11月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/08">2009年08月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/07">2009年07月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/06">2009年06月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/04">2009年04月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/03">2009年03月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2009/01">2009年01月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2008/12">2008年12月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/sparkliang/article/month/2008/11">2008年11月</a><span>(1)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>阅读排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5279393" title="一致性hash算法 - consistent hashing">一致性hash算法 - consistent hashing</a><span>(36163)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957667" title="libevent源码深度剖析一">libevent源码深度剖析一</a><span>(33740)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957744" title="libevent源码深度剖析二">libevent源码深度剖析二</a><span>(21069)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4770655" title="Linux Epoll介绍和程序实例">Linux Epoll介绍和程序实例</a><span>(17980)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957820" title="libevent源码深度剖析三">libevent源码深度剖析三</a><span>(17969)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4974876" title="libevent源码深度剖析五">libevent源码深度剖析五</a><span>(12538)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5202394" title="libevent源码深度剖析PDF">libevent源码深度剖析PDF</a><span>(11704)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957885" title="libevent源码深度剖析四">libevent源码深度剖析四</a><span>(10860)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4985955" title="libevent源码深度剖析六">libevent源码深度剖析六</a><span>(10141)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4987751" title="libevent源码深度剖析七">libevent源码深度剖析七</a><span>(9114)</span>
+        </li>
+    </ul>
+</div>
+<div id="hotarticls2" class="panel">
+    <ul class="panel_head"><span>评论排行</span></ul>
+    <ul class="panel_body itemlist">
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5279393" title="一致性hash算法 - consistent hashing">一致性hash算法 - consistent hashing</a><span>(63)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4770655" title="Linux Epoll介绍和程序实例">Linux Epoll介绍和程序实例</a><span>(39)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5359634" title="C/C++语言实现动态数组">C/C++语言实现动态数组</a><span>(20)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957667" title="libevent源码深度剖析一">libevent源码深度剖析一</a><span>(18)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5350272" title="开源网络框架HPServer0.2.10版发布">开源网络框架HPServer0.2.10版发布</a><span>(14)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957744" title="libevent源码深度剖析二">libevent源码深度剖析二</a><span>(12)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/4957820" title="libevent源码深度剖析三">libevent源码深度剖析三</a><span>(12)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5284579" title="KMP算法真的很简单1">KMP算法真的很简单1</a><span>(10)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5681820" title="Chord：一个用于网络应用的可扩展的P2P查询服务（下）">Chord：一个用于网络应用的可扩展的P2P查询服务（下）</a><span>(9)</span>
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/sparkliang/article/details/5306809" title="libevent源码深度剖析十三——libevent信号处理注意点">libevent源码深度剖析十三——libevent信号处理注意点</a><span>(8)</span>
+        </li>
+    </ul>
+</div>
+<div id="homepageArticles" class="panel">
+    <ul class="panel_head"><span>推荐文章</span></ul>
+    <ul class="panel_body" id="ad_commend">
+    <iframe id="ad_frm_2" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 182px; height: 222px;" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ad.html"></iframe></ul>
+</div>
+<script type="text/javascript">
+    new Ad(12, 'ad_commend');
+</script><div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/5279393#comments">一致性hash算法 - consistent hashing</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/zhouxiaoqingelse" class="user_name">zhouxiaoqingelse</a>:
+非常清晰，感谢。
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4957667#comments">libevent源码深度剖析一</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/dawnshit" class="user_name">dawnshit</a>:
+@swizard04:貌似
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4957667#comments">libevent源码深度剖析一</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/swizard04" class="user_name">swizard04</a>:
+弱弱滴问一下，“MS大牛们”中的MS是嘛意思 ？Microsoft ？
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/7260267#comments">规模是个大问题</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/wallyjj" class="user_name">wallyjj</a>:
+博主能否给个IM，方便向你请教
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4957667#comments">libevent源码深度剖析一</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/lmp1987" class="user_name">拥有你才更好</a>:
+准备学习一下.
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4770655#comments">Linux Epoll介绍和程序实例</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/xiaoyao3857" class="user_name">xiaoyao3857</a>:
+目前还没接触，不是很懂!
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/5279393#comments">一致性hash算法 - consistent hashing</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/sparkliang" class="user_name">sparkliang</a>:
+@sight_:首先新加入的节点，将会把后继节点的部分数据分流给自己；后面的新数据将会根据hash结...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/5279393#comments">一致性hash算法 - consistent hashing</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/sight_" class="user_name">sight_</a>:
+楼主，有个问题请教一下,这个算法是如何保证后面添加的服务器能承担更多的任务，我应该如何控制"更多"这...
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4957885#comments">libevent源码深度剖析四</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/dyingfair" class="user_name">dyingfair</a>:
+学习中，谢谢。
+    </p>
+    </li>
+    <li>
+    <a href="http://blog.csdn.net/sparkliang/article/details/4770655#comments">Linux Epoll介绍和程序实例</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/herodot" class="user_name">herodot</a>:
+受教了！ select/poll 和 epoll 的对比讲的很清楚。不过PPC/TPC是另一层面的模...
+    </p>
+    </li>
+</ul>
+</div>
+</div>
+<div class="clear"></div>
+</div>
+
+<div class="clear"></div>
+</div>
+
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/newblog.min.js"></script>
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/showblogmedal.ashx"></script>
+
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/publib_footer.js"></script><link rel="stylesheet" type="text/css" href="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/pub_footer_2012.css"><div class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd>京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>北京创新乐知信息技术有限公司 版权所有</dd><dd>世纪乐知(北京)网络技术有限公司 提供技术支持</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/ico_email.gif" alt="" title=""> 联系邮箱：webmaster(at)csdn.net</dd><dd>Copyright © 1999-2012, CSDN.NET, All Rights Reserved&nbsp;<a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div><script type="text/javascript" charset="utf-8" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/tracking.js"></script>
+
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./Paxos Made Simple【翻译】 - sparkliang的专栏 - 博客频道 - CSDN.NET_files/msg.popup.js"></script>
+
+
+</div>
+
+</body></html>

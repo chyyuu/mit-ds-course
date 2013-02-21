@@ -1,0 +1,43 @@
+body{/*margin:0; padding:0;*/}
+/* public top */
+.nav_top_2011{width:auto; min-width:960px; height:27px; margin:0 0 1px 0; padding:0; /*border-bottom:1px solid #ccc;*/ background:#fff; font:normal 12px/28px Helvetica, Tahoma, Arial, sans-serif;}
+/* login information */
+.nav_top_2011 p{float:right; margin:0; padding:0; text-align:right;}
+.nav_top_2011 p a{margin:0 8px;}
+.nav_top_2011 p a:link,
+.nav_top_2011 p a:visited{color:#333; text-decoration:none;}
+.nav_top_2011 p a:hover,
+.nav_top_2011 p a:active{color:#f00; text-decoration:none;}
+.nav_top_2011 p em{padding:0 6px; color:#f00; font-style:normal; font-weight:bold;}
+.nav_top_2011 p a.notice_num{/*display:inline-block;*/ width:auto; height:11px; /*overflow:hidden;*/ margin:0 20px 0 0; padding:2px 6px; border-radius:3px; -webkit-border-radius:3px; -moz-border-radius:3px; -khtml-border-radius:3px; background:#ddd; color:#666 !important; font-size:11px; line-height:11px; text-decoration:none;}
+.nav_top_2011 p a.user{color:#f00; font-weight:bold; text-decoration:none;}
+.nav_top_2011 p a.red{color:#f00;}
+
+/* channel */
+.nav_top_2011 ul{float:left; margin:0; padding:0 0 0 9px; text-align:left;}
+.nav_top_2011 ul li{float:left; margin-left:0; padding:0 16px 0 0; list-style:none;}
+.nav_top_2011 ul li a{display:inline-block; width:auto; height:28px; padding:0;}
+.nav_top_2011 ul li a:link,
+.nav_top_2011 ul li a:visited{color:#333; text-decoration:none;}
+.nav_top_2011 ul li a:hover,
+.nav_top_2011 ul li a:active{color:#f00; text-decoration:none;}
+.nav_top_2011 ul li.more{position:relative; z-index:501; width:auto; margin-left:-10px; text-align:left; font-weight:normal;}
+.nav_top_2011 ul li.more a{width:34px; padding:0 10px; background:url(http://csdnimg.cn/pubnav/images/arrow_drop.gif) no-repeat 38px 12px; font-weight:normal;}
+.nav_top_2011 ul li.more a.open{height:28px; padding:0 9px; border-right:solid 1px #ccc; border-left:solid 1px #ccc;}
+
+.nav_top_2011 ul li.more h2{position:relative; z-index:501; margin:0; font-weight:normal !important; font-size:12px; line-height:28px;}
+.nav_top_2011 ul li.more h2.open{height:28px; padding:0 5px 0 9px; border-right:solid 1px #ccc; border-left:solid 1px #ccc; background:#fff;}
+.nav_top_2011 ul li.more h2.open a{width:41px; height:28px; padding:0; background:#fff url(http://csdnimg.cn/pubnav/images/arrow_drop.gif) no-repeat 28px 12px;}
+
+.nav_top_2011 ul li dl,
+#topnav_hidlist{display:none; position:absolute; top:27px; left:0; z-index:500; margin:0; }
+.nav_top_2011 ul li dt{margin:0; padding:0;}
+.nav_top_2011 ul li dt a{width:34px; background:url(http://csdnimg.cn/pubnav/images/arrow_drop.gif) no-repeat 38px 12px;}
+.nav_top_2011 ul li dd,
+.nav_top_2011 ul li li{display:block; float:none; margin:0; padding:0; line-height:24px;}
+.nav_top_2011 ul li.more dd a,
+.nav_top_2011 ul li.more li a{display:block; width:auto; padding:0; background:none;}
+
+.navbody { margin:0; padding:0;}
+.navbody .nav_top_2011 { width:90px; min-width:90px; border:1px solid #ccc; background:#fff;height:176px;}
+.navbody .nav_top_2011 ul li { padding:0; display:inline-block; width:76px;}

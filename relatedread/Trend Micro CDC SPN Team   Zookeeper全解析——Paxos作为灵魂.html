@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<!-- saved from url=(0118)http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/ -->
+<html dir="ltr" lang="en-US"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shares.php" charset="utf-8"></script>
+
+
+<title>Trend Micro CDC SPN Team  | Zookeeper全解析——Paxos作为灵魂</title>
+
+<link rel="stylesheet" type="text/css" media="all" href="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/style.css">
+<link rel="pingback" href="http://www.spnguru.com/xmlrpc.php">
+<link rel="pingback" href="http://www.spnguru.com/xmlrpc.php">
+
+
+<link rel="alternate" type="application/rss+xml" title="Trend Micro CDC SPN Team » Feed" href="http://www.spnguru.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Trend Micro CDC SPN Team » Comments Feed" href="http://www.spnguru.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Trend Micro CDC SPN Team » Zookeeper全解析——Paxos作为灵魂 Comments Feed" href="http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/feed/">
+<script type="text/javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jquery.js"></script>
+<script type="text/javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/comment-reply.js"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.spnguru.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.spnguru.com/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="HBase源码分析 – RPC机制:客户端" href="http://www.spnguru.com/2010/08/hbase%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90-%e2%80%93-rpc%e6%9c%ba%e5%88%b6%e5%ae%a2%e6%88%b7%e7%ab%af/">
+<link rel="next" title="HBase中Region分配问题的探讨" href="http://www.spnguru.com/2010/08/region%e5%88%86%e9%85%8d/">
+<meta name="generator" content="WordPress 3.3">
+<link rel="canonical" href="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂.html">
+<link rel="shortlink" href="http://www.spnguru.com/?p=232">
+	<link href="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/SyntaxHighlighter.css" type="text/css" rel="stylesheet">
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+
+</head>
+<body class="single single-post postid-232 single-format-standard col-2-right fixed title-zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82 category-cloudcomputing category-zookeeper tag-zookeeper-paxos author-harry_ding browser-chrome"><link href="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jiathis_counter.css" rel="stylesheet" type="text/css"><script src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jiathis.php" charset="utf-8"></script><link href="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jiathis_share.css" rel="stylesheet" type="text/css"><iframe style="position: absolute; display: none; opacity: 0;" frameborder="0"></iframe><div class="jiathis_style" style="position: absolute; z-index: 1000000000; display: none; top: 50%; left: 50%; overflow: auto;"></div><div class="jiathis_style" style="position: absolute; z-index: 1000000000; display: none; overflow: auto;"></div><iframe style="display: none;" frameborder="0" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jiathis_utility.html"></iframe>
+
+ 
+ <!-- page -->
+ <div id="page">
+
+    <div id="page-ext">
+
+    <!-- header -->
+    <div id="header">
+      <div class="page-content">
+        <div id="site-title" class="clear-block">
+          <div id="logo"><a href="http://www.spnguru.com/">Trend Micro CDC SPN Team</a></div>          <div class="headline">趋势科技中国研发中心  SPN研发团队</div>        </div>
+      </div>
+
+      <div class="shadow-left page-content">
+        <div class="shadow-right nav nav-main">
+          <div class="menu-menu-pages-container"><ul id="menu-menu-pages" class="menu fadeThis clear-block"><li class="home "><a href="http://www.spnguru.com/" title="Home Page">Home<span class="p"></span></a></li><li class="page-about"><a href="http://www.spnguru.com/about/">About<span class="p"></span></a></li></ul></div>        </div>
+      </div>
+
+    </div>
+    <!-- /header -->
+
+    <!-- main -->
+    <div id="main" class="page-content">
+      <div id="main-ext" class="clear-block">
+
+  <!-- main content: primary + sidebar(s) -->
+  <div id="mask-3" class="clear-block">
+    <div id="mask-2">
+      <div id="mask-1">
+
+        <!-- primary content -->
+        <div id="primary-content">
+
+          
+          
+          
+          <div class="post-links clear-block">
+            <div class="alignleft">« <a href="http://www.spnguru.com/2010/08/hbase%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90-%e2%80%93-rpc%e6%9c%ba%e5%88%b6%e5%ae%a2%e6%88%b7%e7%ab%af/" rel="prev">HBase源码分析 – RPC机制:客户端</a></div>
+            <div class="alignright"><a href="http://www.spnguru.com/2010/08/region%e5%88%86%e9%85%8d/" rel="next">HBase中Region分配问题的探讨</a> »</div>
+          </div>
+
+          <!-- post -->
+          <div id="post-232" class="post-232 post type-post status-publish format-standard hentry category-cloudcomputing category-zookeeper tag-zookeeper-paxos primary count-1 odd author-harry_ding first">
+
+                        <h1 class="title">Zookeeper全解析——Paxos作为灵魂</h1>
+            
+            <div class="post-content clear-block">
+             <p>原计划在介绍完ZK Client之后就着手ZK Server的介绍，但是发现ZK Server所包含的内容实在太多，并不是简简单单一篇Blog就能搞定的。于是决定从基础搞起比较好。</p>
+<p>那么ZK Server最基础的东西是什么呢？我想应该是Paxos了。所以本文会介绍Paxos以及它在ZK Server中对应的实现。</p>
+<p>先说Paxos，它是一个基于消息传递的一致性算法，Leslie Lamport在1990年提出，近几年被广泛应用于分布式计算中，Google的Chubby，Apache的Zookeeper都是基于它的理论来实现的，Paxos还被认为是到目前为止唯一的分布式一致性算法，其它的算法都是Paxos的改进或简化。有个问题要提一下，Paxos有一个前提：没有拜占庭将军问题。就是说Paxos只有在一个可信的计算环境中才能成立，这个环境是不会被入侵所破坏的。</p>
+<p>关于Paxos的具体描述可以在Wiki中找到：<a href="http://zh.wikipedia.org/zh-cn/Paxos%E7%AE%97%E6%B3%95">http://zh.wikipedia.org/zh-cn/Paxos算法</a>。网上关于Paxos分析的文章也很多。这里希望用最简单的方式加以描述并建立起Paxos和ZK Server的对应关系。</p>
+<p>Paxos描述了这样一个场景，有一个叫做Paxos的小岛(Island)上面住了一批居民，岛上面所有的事情由一些特殊的人决定，他们叫做议员(Senator)。议员的总数(Senator Count)是确定的，不能更改。岛上每次环境事务的变更都需要通过一个提议(Proposal)，每个提议都有一个编号(PID)，这个编号是一直增长的，不能倒退。每个提议都需要超过半数((Senator Count)/2 +1)的议员同意才能生效。每个议员只会同意大于当前编号的提议，包括已生效的和未生效的。如果议员收到小于等于当前编号的提议，他会拒绝，并告知对方：你的提议已经有人提过了。这里的当前编号是每个议员在自己记事本上面记录的编号，他不断更新这个编号。整个议会不能保证所有议员记事本上的编号总是相同的。现在议会有一个目标：保证所有的议员对于提议都能达成一致的看法。</p>
+<p>好，现在议会开始运作，所有议员一开始记事本上面记录的编号都是0。有一个议员发了一个提议：将电费设定为1元/度。他首先看了一下记事本，嗯，当前提议编号是0，那么我的这个提议的编号就是1，于是他给所有议员发消息：1号提议，设定电费1元/度。其他议员收到消息以后查了一下记事本，哦，当前提议编号是0，这个提议可接受，于是他记录下这个提议并回复：我接受你的1号提议，同时他在记事本上记录：当前提议编号为1。发起提议的议员收到了超过半数的回复，立即给所有人发通知：1号提议生效！收到的议员会修改他的记事本，将1好提议由记录改成正式的法令，当有人问他电费为多少时，他会查看法令并告诉对方：1元/度。</p>
+<p>现在看冲突的解决：假设总共有三个议员S1-S3，S1和S2同时发起了一个提议:1号提议，设定电费。S1想设为1元/度, S2想设为2元/度。结果S3先收到了S1的提议，于是他做了和前面同样的操作。紧接着他又收到了S2的提议，结果他一查记事本，咦，这个提议的编号小于等于我的当前编号1，于是他拒绝了这个提议：对不起，这个提议先前提过了。于是S2的提议被拒绝，S1正式发布了提议: 1号提议生效。S2向S1或者S3打听并更新了1号法令的内容，然后他可以选择继续发起2号提议。</p>
+<p>好，我觉得Paxos的精华就这么多内容。现在让我们来对号入座，看看在ZK Server里面Paxos是如何得以贯彻实施的。</p>
+<p>小岛(Island)——ZK Server Cluster</p>
+<p>议员(Senator)——ZK Server</p>
+<p>提议(Proposal)——ZNode Change(Create/Delete/SetData…)</p>
+<p>提议编号(PID)——Zxid(ZooKeeper Transaction Id)</p>
+<p>正式法令——所有ZNode及其数据</p>
+<p>貌似关键的概念都能一一对应上，但是等一下，Paxos岛上的议员应该是人人平等的吧，而ZK Server好像有一个Leader的概念。没错，其实Leader的概念也应该属于Paxos范畴的。如果议员人人平等，在某种情况下会由于提议的冲突而产生一个“活锁”（所谓活锁我的理解是大家都没有死，都在动，但是一直解决不了冲突问题）。Paxos的作者Lamport在他的文章”<a rel="nofollow" href="http://research.microsoft.com/users/lamport/pubs/lamport-paxos.pdf">The Part-Time Parliament</a>“中阐述了这个问题并给出了解决方案——在所有议员中设立一个总统，只有总统有权发出提议，如果议员有自己的提议，必须发给总统并由总统来提出。好，我们又多了一个角色：总统。</p>
+<p>总统——ZK Server Leader</p>
+<p>又一个问题产生了，总统怎么选出来的？oh, my god! It’s a long story. 在淘宝核心系统团队的Blog上面有一篇文章是介绍如何选出总统的，有兴趣的可以去看看：<a href="http://rdc.taobao.com/blog/cs/?p=162">http://rdc.taobao.com/blog/cs/?p=162</a></p>
+<p>现在我们假设总统已经选好了，下面看看ZK Server是怎么实施的。</p>
+<p>情况一：</p>
+<p>屁民甲(Client)到某个议员(ZK Server)那里询问(Get)某条法令的情况(ZNode的数据)，议员毫不犹豫的拿出他的记事本(local storage)，查阅法令并告诉他结果，同时声明：我的数据不一定是最新的。你想要最新的数据？没问题，等着，等我找总统Sync一下再告诉你。</p>
+<p>情况二：</p>
+<p>屁民乙(Client)到某个议员(ZK Server)那里要求政府归还欠他的一万元钱，议员让他在办公室等着，自己将问题反映给了总统，总统询问所有议员的意见，多数议员表示欠屁民的钱一定要还，于是总统发表声明，从国库中拿出一万元还债，国库总资产由100万变成99万。屁民乙拿到钱回去了(Client函数返回)。</p>
+<p>情况三：</p>
+<p>总统突然挂了，议员接二连三的发现联系不上总统，于是各自发表声明，推选新的总统，总统大选期间政府停业，拒绝屁民的请求。</p>
+<p>呵呵，到此为止吧，当然还有很多其他的情况，但这些情况总是能在Paxos的算法中找到原型并加以解决。这也正是我们认为Paxos是Zookeeper的灵魂的原因。当然ZK Server还有很多属于自己特性的东西：Session, Watcher，Version等等等等，需要我们花更多的时间去研究和学习。</p>
+<br><div style="float:left"><!-- JiaThis Button BEGIN -->
+<div id="jiathis_style_32x32">
+	<a class="jiathis_button_qzone" title="分享到QQ空间"><span class="jiathis_txt jtico jtico_qzone"></span></a>
+	<a class="jiathis_button_tsina" title="分享到新浪微博"><span class="jiathis_txt jtico jtico_tsina"></span></a>
+	<a class="jiathis_button_tqq" title="分享到腾讯微博"><span class="jiathis_txt jtico jtico_tqq"></span></a>
+	<a class="jiathis_button_renren" title="分享到人人网"><span class="jiathis_txt jtico jtico_renren"></span></a>
+	<a class="jiathis_button_kaixin001" title="分享到开心网"><span class="jiathis_txt jtico jtico_kaixin001"></span></a>
+	<a href="http://www.jiathis.com/share/" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	<a class="jiathis_counter_style"><span class="jiathis_button_expanded jiathis_counter jiathis_bubble_style" id="jiathis_counter_15" title="累计分享21次">21</span></a>
+</div>
+<script type="text/javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/jia.js" charset="utf-8"></script><script type="text/javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/plugin.client.js" charset="utf-8"></script><div style="position:absolute;width:0px;height:0px;"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="0" height="0" id="JIATHISSWF" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab"><param name="allowScriptAccess" value="always"><param name="swLiveConnect" value="true"><param name="movie" value="http://www.jiathis.com/code/swf/m.swf"><param name="FlashVars" value="z=a"><embed name="JIATHISSWF" src="http://www.jiathis.com/code/swf/m.swf" flashvars="z=a" width="0" height="0" allowscriptaccess="always" swliveconnect="true" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object></div>
+<!-- JiaThis Button END --></div><br><br><br>            </div>
+
+            
+                        <div class="post-tags clear-block">
+              <a href="http://www.spnguru.com/tag/zookeeper-paxos/" rel="tag">Zookeeper Paxos</a>            </div>
+            
+
+            
+            <div class="post-meta">
+
+              <div class="details">
+                <p>
+                This entry was posted by <a href="http://www.spnguru.com/author/harry_ding/" title="Posts by Harry_Ding ">Harry_Ding</a> on August 12, 2010 at 12:54 pm, and is filed under <a href="http://www.spnguru.com/category/cloudcomputing/" title="View all posts in CloudingComputing" rel="category tag">CloudingComputing</a>, <a href="http://www.spnguru.com/category/cloudcomputing/zookeeper/" title="View all posts in Zookeeper Research" rel="category tag">Zookeeper Research</a>. Follow any responses to this post through <a href="http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/feed/" title="RSS 2.0">RSS 2.0</a>.
+                Both comments and pings are currently closed.                </p>
+               </div>
+
+            </div>
+            
+            <div class="controls">
+                          </div>
+
+          </div>
+          <!-- /post -->
+
+          
+          
+
+<h3 class="title">
+  11 comments</h3>
+
+<ul id="comments">
+  
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-16" class="comment even thread-even depth-1 clear-block with-avatars reader name-tao">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/147f0845c4a1bfa4e0abf7f7c1c80a9f" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">Tao</span> <span class="d">(896 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-16">
+       <div class="comment-content clear-block" id="comment-content-16">
+
+         
+         <div class="comment-text">
+           <p>Interesting blog.  Learned a lot!<br>
+Thanks <img src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/icon_smile.gif" alt=":)" class="wp-smiley"> </p>
+         </div>
+
+         <a id="comment-reply-16"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-22" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-justforfun">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/2314317f1a93c49ce47f1b091c0fcc44" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">justforfun</span> <span class="d">(889 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-22">
+       <div class="comment-content clear-block" id="comment-content-22">
+
+         
+         <div class="comment-text">
+           <p>不错,写的很容易理解！</p>
+         </div>
+
+         <a id="comment-reply-22"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-176" class="comment even thread-even depth-1 clear-block with-avatars reader name-kunlun">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/02055d3f3e44a4a6e0006162045ae3cd" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">kunlun</span> <span class="d">(784 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-176">
+       <div class="comment-content clear-block" id="comment-content-176">
+
+         
+         <div class="comment-text">
+           <p>最近正好在研究paxos算法, 这篇文章真是浅显易懂啊</p>
+         </div>
+
+         <a id="comment-reply-176"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-186" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-%e5%a4%a7%e8%b1%a1%e6%a3%ae%e6%9e%97">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.huaxionline.info/2011/01/zookeeper-research/" rel="external nofollow" class="url">Zookeeper研究和应用 « 大象|森林</a></span> <span class="d">(778 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-186">
+       <div class="comment-content clear-block" id="comment-content-186">
+
+         
+         <div class="comment-text">
+           <p>[...] 这几乎就是Paxos的全部了.具体的执行过程举例可以在Zookeeper全解析——Paxos作为灵魂中找到,在此不再赘述. Zookeeper完全实现了Paoxs算法,zk cluster中每个节点都保持了一份完整的数据模型,当任何一个client通过某集群节点向集群发起读写请求时,该节点会向Leader节点发出投票请求,如果投票通过(超过一半节点同意)则该请求被执行,否则该请求被驳回. 通过paoxs算法,zookeeper的保持了数据模型的一致性,同时保持了任何操作的原子性. [...]</p>
+         </div>
+
+         <a id="comment-reply-186"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-238" class="pingback even thread-even depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-webguo%e7%9a%84%e7%a7%91%e6%8a%80%e5%8d%9a%e5%ae%a2">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.webguo.com/2011/01/18/zookeeper_intro.html" rel="external nofollow" class="url">Zookeeper研究和应用 - webguo的科技博客</a></span> <span class="d">(765 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-238">
+       <div class="comment-content clear-block" id="comment-content-238">
+
+         
+         <div class="comment-text">
+           <p>[...] having a number greater than n.这几乎就是Paxos的全部了.具体的执行过程举例可以在Zookeeper全解析——Paxos作为灵魂中找到,在此不再赘述.Zookeeper完全实现了Paoxs算法,zk [...]</p>
+         </div>
+
+         <a id="comment-reply-238"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-257" class="pingback odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-zookeeper%e7%a0%94%e7%a9%b6%e5%92%8c%e5%ba%94%e7%94%a8-%e6%90%9c%e7%b4%a2%e6%8a%80%e6%9c%af%e5%8d%9a%e5%ae%a2%ef%bc%8d%e6%b7%98%e5%ae%9d">
+
+        <div class="avatar">
+          </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://www.searchtb.com/2011/01/zookeeper-research.html" rel="external nofollow" class="url">Zookeeper研究和应用 « 搜索技术博客－淘宝</a></span> <span class="d">(759 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-257">
+       <div class="comment-content clear-block" id="comment-content-257">
+
+         
+         <div class="comment-text">
+           <p>[...] 这几乎就是Paxos的全部了.具体的执行过程举例可以在Zookeeper全解析——Paxos作为灵魂中找到,在此不再赘述. Zookeeper完全实现了Paoxs算法,zk cluster中每个节点都保持了一份完整的数据模型,当任何一个client通过某集群节点向集群发起读写请求时,该节点会向Leader节点发出投票请求,如果投票通过(超过一半节点同意)则该请求被执行,否则该请求被驳回. 通过paoxs算法,zookeeper的保持了数据模型的一致性,同时保持了任何操作的原子性. [...]</p>
+         </div>
+
+         <a id="comment-reply-257"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-568" class="comment even thread-even depth-1 clear-block with-avatars reader name-anonymous">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/933285225d6a05a99fe35d72b38ff17e" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">anonymous</span> <span class="d">(652 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-568">
+       <div class="comment-content clear-block" id="comment-content-568">
+
+         
+         <div class="comment-text">
+           <p>这么说Paxos有着几个问题，是吗？<br>
+1. 不能保证百分百的一致性：“同时声明：我的数据不一定是最新的”<br>
+2. 对可用性没有保证：“总统大选期间政府停业，拒绝屁民的请求”</p>
+         </div>
+
+         <a id="comment-reply-568"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-773" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-jacobs-wu">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/d0e0d96850c0fd51a754017eeefdce09" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://blog.sina.com.cn/u/1793692835" rel="external nofollow" class="url">Jacobs Wu</a></span> <span class="d">(595 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-773">
+       <div class="comment-content clear-block" id="comment-content-773">
+
+         
+         <div class="comment-text">
+           <p>调研代码受益于本文，感谢。我增加了FastLeaderElection分析和时序图，请参考我的博客：http://blog.sina.com.cn/u/1793692835</p>
+         </div>
+
+         <a id="comment-reply-773"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-898" class="comment even thread-even depth-1 clear-block with-avatars reader name-black">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/71f6cafb19982a5278e9050928fb1a9a" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">black</span> <span class="d">(566 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-898">
+       <div class="comment-content clear-block" id="comment-content-898">
+
+         
+         <div class="comment-text">
+           <p>写得真好，很容易理解啊</p>
+         </div>
+
+         <a id="comment-reply-898"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-940" class="comment odd alt thread-odd thread-alt depth-1 clear-block with-avatars reader name-xuqiang">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/8ef79f0f1b4692c5b143fc4e1eac82f1" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a"><a href="http://xuqiang.cnblogs.com/" rel="external nofollow" class="url">xuqiang</a></span> <span class="d">(548 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-940">
+       <div class="comment-content clear-block" id="comment-content-940">
+
+         
+         <div class="comment-text">
+           <p>我想算法本来应该是这样有趣的，非常棒的文章。</p>
+         </div>
+
+         <a id="comment-reply-940"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+
+<!-- comment entry -->
+<li class="entry">
+  <div id="comment-964" class="comment even thread-even depth-1 clear-block with-avatars reader name-bhjackson">
+
+        <div class="avatar">
+      <img alt="" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/907fdaa572599a3efc4ffa2515b34c84" class="avatar avatar-48 photo" height="48" width="48">    </div>
+    
+    <div class="comment-head">
+      <div class="ext clear-block">
+        <span class="a">bhjackson</span> <span class="d">(509 days)</span>       </div>
+    </div>
+
+    <div class="comment-body" id="comment-body-964">
+       <div class="comment-content clear-block" id="comment-content-964">
+
+         
+         <div class="comment-text">
+           <p>哈哈，写的真好，清晰易懂！</p>
+         </div>
+
+         <a id="comment-reply-964"></a>
+       </div>
+
+       <div class="controls">
+                         </div>
+
+    </div>
+
+  </div>
+</li>
+</ul>
+
+
+
+								
+          
+
+        </div>
+        <!-- /primary content -->
+
+        
+  <!-- 1st sidebar -->
+  <div id="sidebar">
+
+    <ul class="blocks">
+
+      <li class="block"><div class="block-content block-widget_search clear-block" id="instance-search-4"><div class="title"><h3>站内搜索</h3><div class="bl"></div><div class="br"></div></div>
+<!-- search form -->
+<div class="search-form">
+  <form method="get" class="search-form clear-block" name="search-form" id="search-form" action="http://www.spnguru.com/">
+    <a href="http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/#" class="submit" onclick="document.getElementById(&#39;search-form&#39;).submit();">Search Website</a>
+    <fieldset>
+      <input type="text" name="s" alt="Search Website" class="text alignleft" value="" placeholder="Search">
+      <input type="hidden" value="submit">
+    </fieldset>
+  </form>
+</div>
+<!-- /search form --></div></li>		<li class="block"><div class="block-content block-widget_recent_entries clear-block" id="instance-recent-posts-3">		<div class="title"><h3>Recent Posts</h3><div class="bl"></div><div class="br"></div></div>		<ul>
+				<li><a href="http://www.spnguru.com/2011/10/rest_authentication/" title="REST和认证">REST和认证</a></li>
+				<li><a href="http://www.spnguru.com/2011/09/%e9%9d%a2%e5%90%91%e8%bf%90%e7%bb%b4%e7%9a%84%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95/" title="面向运维的性能测试">面向运维的性能测试</a></li>
+				<li><a href="http://www.spnguru.com/2011/09/hbase-%e5%a2%9e%e9%87%8f%e5%a4%87%e4%bb%bd%e5%92%8c%e8%bf%98%e5%8e%9f%e5%b7%a5%e5%85%b7/" title="HBase 增量备份和还原工具">HBase 增量备份和还原工具</a></li>
+				<li><a href="http://www.spnguru.com/2011/08/hadoop%e5%b0%8f%e6%96%87%e4%bb%b6%e5%ad%98%e5%8f%96%e7%9a%84%e8%ae%a8%e8%ae%ba/" title="Hadoop小文件存取的讨论">Hadoop小文件存取的讨论</a></li>
+				<li><a href="http://www.spnguru.com/2011/07/678/" title="HBase 之访问控制">HBase 之访问控制</a></li>
+				</ul>
+		</div></li><li class="block"><div class="block-content block-widget_tag_cloud clear-block" id="instance-tag_cloud-5"><div class="title"><h3>Tags</h3><div class="bl"></div><div class="br"></div></div><div class="tagcloud"><a href="http://www.spnguru.com/tag/cap/" class="tag-link-27" title="1 topic" style="font-size: 8pt;">CAP</a>
+<a href="http://www.spnguru.com/tag/client-api/" class="tag-link-32" title="1 topic" style="font-size: 8pt;">Client API</a>
+<a href="http://www.spnguru.com/tag/client-hbase-regionserver/" class="tag-link-18" title="1 topic" style="font-size: 8pt;">Client HBase RegionServer</a>
+<a href="http://www.spnguru.com/tag/cloud-computing/" class="tag-link-46" title="2 topics" style="font-size: 10.8636363636pt;">Cloud Computing</a>
+<a href="http://www.spnguru.com/tag/debug/" class="tag-link-38" title="4 topics" style="font-size: 14.3636363636pt;">Debug</a>
+<a href="http://www.spnguru.com/tag/gc/" class="tag-link-36" title="1 topic" style="font-size: 8pt;">GC</a>
+<a href="http://www.spnguru.com/tag/git/" class="tag-link-53" title="1 topic" style="font-size: 8pt;">git</a>
+<a href="http://www.spnguru.com/tag/git-github/" class="tag-link-56" title="1 topic" style="font-size: 8pt;">git github</a>
+<a href="http://www.spnguru.com/tag/hadoop/" class="tag-link-39" title="2 topics" style="font-size: 10.8636363636pt;">Hadoop</a>
+<a href="http://www.spnguru.com/tag/hbase/" class="tag-link-15" title="14 topics" style="font-size: 22pt;">HBase</a>
+<a href="http://www.spnguru.com/tag/hbase-bigtable-%e6%af%94%e8%be%83/" class="tag-link-12" title="1 topic" style="font-size: 8pt;">HBase BigTable 比较</a>
+<a href="http://www.spnguru.com/tag/hbaseclient%e6%ba%90%e7%a0%81/" class="tag-link-47" title="1 topic" style="font-size: 8pt;">HBaseClient源码</a>
+<a href="http://www.spnguru.com/tag/hbase-hdfs-%e5%ad%98%e5%82%a8/" class="tag-link-20" title="1 topic" style="font-size: 8pt;">HBase HDFS 存储</a>
+<a href="http://www.spnguru.com/tag/hbase-rpc/" class="tag-link-48" title="1 topic" style="font-size: 8pt;">HBase RPC</a>
+<a href="http://www.spnguru.com/tag/hbase-troubleshooting-crash-%e9%97%ae%e9%a2%98/" class="tag-link-60" title="1 topic" style="font-size: 8pt;">Hbase troubleshooting crash 问题</a>
+<a href="http://www.spnguru.com/tag/hbase-%e5%ad%98%e5%82%a8%e6%9e%b6%e6%9e%84/" class="tag-link-21" title="1 topic" style="font-size: 8pt;">HBase 存储架构</a>
+<a href="http://www.spnguru.com/tag/hlog/" class="tag-link-58" title="2 topics" style="font-size: 10.8636363636pt;">HLog</a>
+<a href="http://www.spnguru.com/tag/insert/" class="tag-link-52" title="2 topics" style="font-size: 10.8636363636pt;">insert</a>
+<a href="http://www.spnguru.com/tag/java/" class="tag-link-35" title="1 topic" style="font-size: 8pt;">Java</a>
+<a href="http://www.spnguru.com/tag/lily/" class="tag-link-55" title="1 topic" style="font-size: 8pt;">Lily</a>
+<a href="http://www.spnguru.com/tag/mapreduce/" class="tag-link-40" title="2 topics" style="font-size: 10.8636363636pt;">MapReduce</a>
+<a href="http://www.spnguru.com/tag/masterserver/" class="tag-link-57" title="1 topic" style="font-size: 8pt;">MasterServer</a>
+<a href="http://www.spnguru.com/tag/performance/" class="tag-link-41" title="2 topics" style="font-size: 10.8636363636pt;">Performance</a>
+<a href="http://www.spnguru.com/tag/qa/" class="tag-link-44" title="2 topics" style="font-size: 10.8636363636pt;">QA</a>
+<a href="http://www.spnguru.com/tag/redis/" class="tag-link-54" title="1 topic" style="font-size: 8pt;">Redis</a>
+<a href="http://www.spnguru.com/tag/regionserver/" class="tag-link-17" title="1 topic" style="font-size: 8pt;">RegionServer</a>
+<a href="http://www.spnguru.com/tag/rpc/" class="tag-link-14" title="2 topics" style="font-size: 10.8636363636pt;">RPC</a>
+<a href="http://www.spnguru.com/tag/rp-opp/" class="tag-link-19" title="1 topic" style="font-size: 8pt;">RP OPP</a>
+<a href="http://www.spnguru.com/tag/splunk-hbase-log4j/" class="tag-link-9" title="1 topic" style="font-size: 8pt;">splunk HBase log4j</a>
+<a href="http://www.spnguru.com/tag/spn/" class="tag-link-23" title="1 topic" style="font-size: 8pt;">SPN</a>
+<a href="http://www.spnguru.com/tag/statistic/" class="tag-link-42" title="2 topics" style="font-size: 10.8636363636pt;">Statistic</a>
+<a href="http://www.spnguru.com/tag/trend-micro/" class="tag-link-22" title="1 topic" style="font-size: 8pt;">Trend Micro</a>
+<a href="http://www.spnguru.com/tag/wal/" class="tag-link-59" title="1 topic" style="font-size: 8pt;">WAL</a>
+<a href="http://www.spnguru.com/tag/wal-log-hbase/" class="tag-link-10" title="1 topic" style="font-size: 8pt;">WAL Log HBase</a>
+<a href="http://www.spnguru.com/tag/xen/" class="tag-link-49" title="1 topic" style="font-size: 8pt;">Xen</a>
+<a href="http://www.spnguru.com/tag/xen-hypervisor-paravirtualized/" class="tag-link-50" title="1 topic" style="font-size: 8pt;">Xen Hypervisor Paravirtualized</a>
+<a href="http://www.spnguru.com/tag/zookeeper-paxos/" class="tag-link-33" title="1 topic" style="font-size: 8pt;">Zookeeper Paxos</a>
+<a href="http://www.spnguru.com/tag/zookeeper/" class="tag-link-31" title="1 topic" style="font-size: 8pt;">Zookeeper Research</a>
+<a href="http://www.spnguru.com/tag/%e4%ba%91%e8%ae%a1%e7%ae%97/" class="tag-link-25" title="1 topic" style="font-size: 8pt;">云计算</a>
+<a href="http://www.spnguru.com/tag/%e5%88%86%e5%b8%83%e5%bc%8f%e7%b3%bb%e7%bb%9f/" class="tag-link-28" title="1 topic" style="font-size: 8pt;">分布式系统</a>
+<a href="http://www.spnguru.com/tag/%e6%80%a7%e8%83%bd/" class="tag-link-51" title="1 topic" style="font-size: 8pt;">性能</a>
+<a href="http://www.spnguru.com/tag/%e6%ba%90%e7%a0%81/" class="tag-link-26" title="1 topic" style="font-size: 8pt;">源码</a>
+<a href="http://www.spnguru.com/tag/%e7%bb%9f%e8%ae%a1%e5%ad%a6/" class="tag-link-43" title="3 topics" style="font-size: 12.7727272727pt;">统计学</a>
+<a href="http://www.spnguru.com/tag/%e8%b6%8b%e5%8a%bf%e7%a7%91%e6%8a%80/" class="tag-link-24" title="1 topic" style="font-size: 8pt;">趋势科技</a>
+<a href="http://www.spnguru.com/tag/%e8%bd%af%e4%bb%b6%e6%b5%8b%e8%af%95/" class="tag-link-45" title="3 topics" style="font-size: 12.7727272727pt;">软件测试</a></div>
+</div></li><li class="block"><div class="block-content block-widget_recent_comments clear-block" id="instance-recent-comments-3"><div class="title"><h3>Recent Comments</h3><div class="bl"></div><div class="br"></div></div><ul id="recentcomments"><li class="recentcomments">fengzanfeng on <a href="http://www.spnguru.com/2011/08/hadoop%e5%b0%8f%e6%96%87%e4%bb%b6%e5%ad%98%e5%8f%96%e7%9a%84%e8%ae%a8%e8%ae%ba/#comment-965">Hadoop小文件存取的讨论</a></li><li class="recentcomments">bhjackson on <a href="http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/#comment-964">Zookeeper全解析——Paxos作为灵魂</a></li><li class="recentcomments">John_Yang on <a href="http://www.spnguru.com/2011/08/hadoop%e5%b0%8f%e6%96%87%e4%bb%b6%e5%ad%98%e5%8f%96%e7%9a%84%e8%ae%a8%e8%ae%ba/#comment-963">Hadoop小文件存取的讨论</a></li><li class="recentcomments">someone on <a href="http://www.spnguru.com/2011/08/hadoop%e5%b0%8f%e6%96%87%e4%bb%b6%e5%ad%98%e5%8f%96%e7%9a%84%e8%ae%a8%e8%ae%ba/#comment-962">Hadoop小文件存取的讨论</a></li><li class="recentcomments">JerryTian on <a href="http://www.spnguru.com/2011/07/%e9%a3%8e%e6%a0%bc%e4%b9%8b%e4%ba%89%ef%bc%9acoroutine-vs-callback/#comment-961">风格之争：Coroutine vs Callback</a></li></ul></div></li><li class="block"><div class="block-content block-widget_tag_cloud clear-block" id="instance-tag_cloud-4"><div class="title"><h3>Tags</h3><div class="bl"></div><div class="br"></div></div><div class="tagcloud"><a href="http://www.spnguru.com/tag/cap/" class="tag-link-27" title="1 topic" style="font-size: 8pt;">CAP</a>
+<a href="http://www.spnguru.com/tag/client-api/" class="tag-link-32" title="1 topic" style="font-size: 8pt;">Client API</a>
+<a href="http://www.spnguru.com/tag/client-hbase-regionserver/" class="tag-link-18" title="1 topic" style="font-size: 8pt;">Client HBase RegionServer</a>
+<a href="http://www.spnguru.com/tag/cloud-computing/" class="tag-link-46" title="2 topics" style="font-size: 10.8636363636pt;">Cloud Computing</a>
+<a href="http://www.spnguru.com/tag/debug/" class="tag-link-38" title="4 topics" style="font-size: 14.3636363636pt;">Debug</a>
+<a href="http://www.spnguru.com/tag/gc/" class="tag-link-36" title="1 topic" style="font-size: 8pt;">GC</a>
+<a href="http://www.spnguru.com/tag/git/" class="tag-link-53" title="1 topic" style="font-size: 8pt;">git</a>
+<a href="http://www.spnguru.com/tag/git-github/" class="tag-link-56" title="1 topic" style="font-size: 8pt;">git github</a>
+<a href="http://www.spnguru.com/tag/hadoop/" class="tag-link-39" title="2 topics" style="font-size: 10.8636363636pt;">Hadoop</a>
+<a href="http://www.spnguru.com/tag/hbase/" class="tag-link-15" title="14 topics" style="font-size: 22pt;">HBase</a>
+<a href="http://www.spnguru.com/tag/hbase-bigtable-%e6%af%94%e8%be%83/" class="tag-link-12" title="1 topic" style="font-size: 8pt;">HBase BigTable 比较</a>
+<a href="http://www.spnguru.com/tag/hbaseclient%e6%ba%90%e7%a0%81/" class="tag-link-47" title="1 topic" style="font-size: 8pt;">HBaseClient源码</a>
+<a href="http://www.spnguru.com/tag/hbase-hdfs-%e5%ad%98%e5%82%a8/" class="tag-link-20" title="1 topic" style="font-size: 8pt;">HBase HDFS 存储</a>
+<a href="http://www.spnguru.com/tag/hbase-rpc/" class="tag-link-48" title="1 topic" style="font-size: 8pt;">HBase RPC</a>
+<a href="http://www.spnguru.com/tag/hbase-troubleshooting-crash-%e9%97%ae%e9%a2%98/" class="tag-link-60" title="1 topic" style="font-size: 8pt;">Hbase troubleshooting crash 问题</a>
+<a href="http://www.spnguru.com/tag/hbase-%e5%ad%98%e5%82%a8%e6%9e%b6%e6%9e%84/" class="tag-link-21" title="1 topic" style="font-size: 8pt;">HBase 存储架构</a>
+<a href="http://www.spnguru.com/tag/hlog/" class="tag-link-58" title="2 topics" style="font-size: 10.8636363636pt;">HLog</a>
+<a href="http://www.spnguru.com/tag/insert/" class="tag-link-52" title="2 topics" style="font-size: 10.8636363636pt;">insert</a>
+<a href="http://www.spnguru.com/tag/java/" class="tag-link-35" title="1 topic" style="font-size: 8pt;">Java</a>
+<a href="http://www.spnguru.com/tag/lily/" class="tag-link-55" title="1 topic" style="font-size: 8pt;">Lily</a>
+<a href="http://www.spnguru.com/tag/mapreduce/" class="tag-link-40" title="2 topics" style="font-size: 10.8636363636pt;">MapReduce</a>
+<a href="http://www.spnguru.com/tag/masterserver/" class="tag-link-57" title="1 topic" style="font-size: 8pt;">MasterServer</a>
+<a href="http://www.spnguru.com/tag/performance/" class="tag-link-41" title="2 topics" style="font-size: 10.8636363636pt;">Performance</a>
+<a href="http://www.spnguru.com/tag/qa/" class="tag-link-44" title="2 topics" style="font-size: 10.8636363636pt;">QA</a>
+<a href="http://www.spnguru.com/tag/redis/" class="tag-link-54" title="1 topic" style="font-size: 8pt;">Redis</a>
+<a href="http://www.spnguru.com/tag/regionserver/" class="tag-link-17" title="1 topic" style="font-size: 8pt;">RegionServer</a>
+<a href="http://www.spnguru.com/tag/rpc/" class="tag-link-14" title="2 topics" style="font-size: 10.8636363636pt;">RPC</a>
+<a href="http://www.spnguru.com/tag/rp-opp/" class="tag-link-19" title="1 topic" style="font-size: 8pt;">RP OPP</a>
+<a href="http://www.spnguru.com/tag/splunk-hbase-log4j/" class="tag-link-9" title="1 topic" style="font-size: 8pt;">splunk HBase log4j</a>
+<a href="http://www.spnguru.com/tag/spn/" class="tag-link-23" title="1 topic" style="font-size: 8pt;">SPN</a>
+<a href="http://www.spnguru.com/tag/statistic/" class="tag-link-42" title="2 topics" style="font-size: 10.8636363636pt;">Statistic</a>
+<a href="http://www.spnguru.com/tag/trend-micro/" class="tag-link-22" title="1 topic" style="font-size: 8pt;">Trend Micro</a>
+<a href="http://www.spnguru.com/tag/wal/" class="tag-link-59" title="1 topic" style="font-size: 8pt;">WAL</a>
+<a href="http://www.spnguru.com/tag/wal-log-hbase/" class="tag-link-10" title="1 topic" style="font-size: 8pt;">WAL Log HBase</a>
+<a href="http://www.spnguru.com/tag/xen/" class="tag-link-49" title="1 topic" style="font-size: 8pt;">Xen</a>
+<a href="http://www.spnguru.com/tag/xen-hypervisor-paravirtualized/" class="tag-link-50" title="1 topic" style="font-size: 8pt;">Xen Hypervisor Paravirtualized</a>
+<a href="http://www.spnguru.com/tag/zookeeper-paxos/" class="tag-link-33" title="1 topic" style="font-size: 8pt;">Zookeeper Paxos</a>
+<a href="http://www.spnguru.com/tag/zookeeper/" class="tag-link-31" title="1 topic" style="font-size: 8pt;">Zookeeper Research</a>
+<a href="http://www.spnguru.com/tag/%e4%ba%91%e8%ae%a1%e7%ae%97/" class="tag-link-25" title="1 topic" style="font-size: 8pt;">云计算</a>
+<a href="http://www.spnguru.com/tag/%e5%88%86%e5%b8%83%e5%bc%8f%e7%b3%bb%e7%bb%9f/" class="tag-link-28" title="1 topic" style="font-size: 8pt;">分布式系统</a>
+<a href="http://www.spnguru.com/tag/%e6%80%a7%e8%83%bd/" class="tag-link-51" title="1 topic" style="font-size: 8pt;">性能</a>
+<a href="http://www.spnguru.com/tag/%e6%ba%90%e7%a0%81/" class="tag-link-26" title="1 topic" style="font-size: 8pt;">源码</a>
+<a href="http://www.spnguru.com/tag/%e7%bb%9f%e8%ae%a1%e5%ad%a6/" class="tag-link-43" title="3 topics" style="font-size: 12.7727272727pt;">统计学</a>
+<a href="http://www.spnguru.com/tag/%e8%b6%8b%e5%8a%bf%e7%a7%91%e6%8a%80/" class="tag-link-24" title="1 topic" style="font-size: 8pt;">趋势科技</a>
+<a href="http://www.spnguru.com/tag/%e8%bd%af%e4%bb%b6%e6%b5%8b%e8%af%95/" class="tag-link-45" title="3 topics" style="font-size: 12.7727272727pt;">软件测试</a></div>
+</div></li><li class="block"><div class="block-content block-widget_meta clear-block" id="instance-meta-3"><div class="title"><h3>功能</h3><div class="bl"></div><div class="br"></div></div>			<ul>
+						<li><a href="http://www.spnguru.com/wp-login.php">Log in</a></li>
+			<li><a href="http://www.spnguru.com/feed/" title="Syndicate this site using RSS 2.0">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://www.spnguru.com/comments/feed/" title="The latest comments to all posts in RSS">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>
+						</ul>
+</div></li>    </ul>
+
+  </div>
+  <!-- /1st sidebar -->
+
+      </div>
+    </div>
+  </div>
+  <!-- /main content -->
+
+
+   </div>
+ </div>
+ <!-- /main -->
+
+ 
+ <!-- footer -->
+ <div class="shadow-left page-content">
+   <div class="shadow-right">
+
+     <div id="footer">
+
+       <div id="copyright">
+
+         <a href="http://www.spnguru.com/" title="Trend Micro CDC SPN Team" rel="home"><strong>Trend Micro CDC SPN Team</strong></a>
+
+         © 2010 |
+
+         Powered by <a href="http://wordpress.org/">WordPress</a> and Mystique theme by <a href="http://digitalnature.eu/themes/mystique/">digitalnature</a>
+         <br>
+
+         35 queries in 0.76 seconds
+         (22.01M)
+       </div>
+
+     </div>
+
+   </div>
+ </div>
+ <!-- /footer -->
+
+ <a class="go-top" href="http://www.spnguru.com/2010/08/zookeeper%e5%85%a8%e8%a7%a3%e6%9e%90%e2%80%94%e2%80%94paxos%e7%9a%84%e7%81%b5%e9%ad%82/#page">Go to Top</a>
+
+ </div>
+ <!-- /page-ext -->
+
+ </div>
+ <!-- page -->
+
+ <script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shCore.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushCSharp.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushPhp.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushJScript.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushJava.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushVb.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushSql.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushXml.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushDelphi.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushPython.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushRuby.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushCss.js"></script>
+<script class="javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/shBrushCpp.js"></script>
+<script class="javascript">
+dp.SyntaxHighlighter.ClipboardSwf = 'http://www.spnguru.com/wp-content/plugins/google-syntax-highlighter/Scripts/clipboard.swf';
+dp.SyntaxHighlighter.HighlightAll('code');
+</script>
+<p id="statsbywpslimstat" style="text-align: center; display: none;"><a href="http://www.duechiacchiere.it/wp-slimstat" title="A simple but powerful web analytics plugin for Wordpress"><img src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/wp-slimstat-antipixel.png" width="80" height="15" alt="WP SlimStat"></a></p><script type="text/javascript">slimstat_tid='141f50';slimstat_path='http://www.spnguru.com/wp-content/plugins/wp-slimstat';slimstat_blog_id='0';slimstat_session_id='14c59236c342145b6377cd73b4a75637';</script><script type="text/javascript" src="./Trend Micro CDC SPN Team   Zookeeper全解析——Paxos作为灵魂_files/wp-slimstat.js"></script>
+ <!-- 38 queries in 0.76 seconds -->
+ 
+
+
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Served from: www.spnguru.com @ 2013-02-20 15:54:33 --></body></html>

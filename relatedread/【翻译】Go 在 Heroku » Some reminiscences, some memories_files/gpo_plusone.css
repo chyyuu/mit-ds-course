@@ -1,0 +1,23 @@
+#bottomcontainerBox {
+  width: 50%;
+  padding-top: 1px;
+}
+#bottomcontainerBox .buttons {
+  float: left;
+  margin: 4px 4px 4px 4px;
+}
+#bottomcontainerBox.manual {
+  display: inline-block;
+  padding-top: 1px;
+  vertical-align: middle;
+  width: auto;
+}
+#leftcontainerBox {
+  float:left;
+}
+#leftcontainerBox .buttons {
+  float:left;
+  clear:both;
+  margin:4px 4px 4px 4px;
+  padding-bottom:2px;
+}

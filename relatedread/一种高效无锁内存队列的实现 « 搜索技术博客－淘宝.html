@@ -1,0 +1,655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0062)http://www.searchtb.com/2012/10/introduction_to_disruptor.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="zh-CN"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	
+	<title>一种高效无锁内存队列的实现 «  搜索技术博客－淘宝</title>
+	
+	<link rel="stylesheet" href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/style.css" type="text/css" media="screen">
+	<link rel="pingback" href="http://www.searchtb.com/xmlrpc.php">
+	<script type="text/javascript" async="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/ga.js"></script><script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/jquery.min.js"></script>
+		
+	<link rel="alternate" type="application/rss+xml" title="搜索技术博客－淘宝 » feed" href="http://www.searchtb.com/feed">
+<link rel="alternate" type="application/rss+xml" title="搜索技术博客－淘宝 » 评论 feed" href="http://www.searchtb.com/comments/feed">
+<link rel="alternate" type="application/rss+xml" title="搜索技术博客－淘宝 » 一种高效无锁内存队列的实现 评论 feed" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html/feed">
+<script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/comment-reply.js"></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.searchtb.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.searchtb.com/wp-includes/wlwmanifest.xml"> 
+<link rel="index" title="搜索技术博客－淘宝" href="http://www.searchtb.com/">
+<link rel="start" title="淘宝搜索技术博客 开博了" href="http://www.searchtb.com/2010/08/hello-world.html">
+<link rel="prev" title="libmemcached的MEMCACHED_MAX_BUFFER问题" href="http://www.searchtb.com/2012/09/libmemcached_and_memcached_max_buffer.html">
+<link rel="next" title="JsonCpp使用优化" href="http://www.searchtb.com/2012/11/jsoncpp-optimization.html">
+
+<link rel="canonical" href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/一种高效无锁内存队列的实现 « 搜索技术博客－淘宝.html">
+<link rel="shortlink" href="http://www.searchtb.com/?p=2717">
+
+<link rel="stylesheet" href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/wp-syntax.css" type="text/css" media="screen">
+		<script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/jquery.min(1).js"></script>
+			<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+<link rel="stylesheet" type="text/css" href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/shCore.css"><link rel="stylesheet" type="text/css" href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/shThemeDefault.css"><meta id="syntaxhighlighteranchor" name="syntaxhighlighter-version" content="3.1.1">
+	
+</head>
+
+<body class="single single-post postid-2717">
+
+	<div id="nav">
+	    <div class="container">
+	        <ul><li class=" page_item"><a href="http://www.searchtb.com/" title=""><span>Home</span></a></li><li class="page_item page-item-44"><a href="http://www.searchtb.com/%e6%ac%a2%e8%bf%8e%e5%8a%a0%e7%9b%9f" title="欢迎加盟"><span>欢迎加盟</span></a></li>
+<li class="page_item page-item-2"><a href="http://www.searchtb.com/about" title="关于我们"><span>关于我们</span></a></li>
+<li class="page_item page-item-880"><a href="http://www.searchtb.com/hot" title="热门文章"><span>热门文章</span></a></li>
+</ul>
+	    </div>
+	</div>
+		
+	<div id="header" class="clear">
+	    <div class="container cheader">
+	    	<h1 id="blogtitle"><a href="http://www.searchtb.com/">搜索技术博客－淘宝</a></h1><p class="blogdesc">关注技术  关注搜索  关注淘宝</p>		</div>
+
+	</div> <!-- end of #header -->
+	<div id="navcat">
+    	<div class="container">
+    	<!--Error 4 Start -->	<ul>	<li class="cat-item cat-item-7"><a href="http://www.searchtb.com/category/%e6%90%9c%e7%b4%a2%e5%bc%95%e6%93%8e" title="查看 搜索引擎 下的所有文章">搜索引擎</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.searchtb.com/category/%e5%89%8d%e7%ab%af%e6%8a%80%e6%9c%af" title="查看 前端技术 下的所有文章">前端技术</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://www.searchtb.com/category/%e6%95%b0%e6%8d%ae%e6%8c%96%e6%8e%98" title="查看 数据挖掘 下的所有文章">数据挖掘</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="http://www.searchtb.com/category/%e5%af%bc%e8%b4%ad%e6%90%9c%e7%b4%a2" title="查看 导购搜索 下的所有文章">导购搜索</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.searchtb.com/category/%e6%90%9c%e7%b4%a2%e5%8a%a8%e6%80%81" title="查看 搜索动态 下的所有文章">搜索动态</a>
+</li>
+	<li class="cat-item cat-item-76"><a href="http://www.searchtb.com/category/distributed-system" title="查看 分布式技术 下的所有文章">分布式技术</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.searchtb.com/category/uncategorized" title="查看 其他 下的所有文章">其他</a>
+</li>
+	<li class="cat-item cat-item-119"><a href="http://www.searchtb.com/category/optimization" title="包含硬件比如CPU相关设置、操作系统内核和glibc、应用程序调优等方面的文章。">性能优化</a>
+</li>
+</ul><!--Error 4 End -->
+		</div>
+	</div>
+	<div class="clear"></div>
+	
+<div id="wrapper" class="container">
+		
+	<div id="content" class="subcontainer fleft">
+	
+		<div class="post-2717 post type-post hentry category-7 tag-disruptor tag-lock-free tag-non-blocking" id="post-2717">
+		
+			<div class="posthead">
+				<div class="maindate fleft">
+					11<br>
+				 	<span>十 </span>
+				</div>
+			
+                                <h1 class="maintitle fleft"><a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/一种高效无锁内存队列的实现 « 搜索技术博客－淘宝.html" rel="bookmark" title="Permanent Link to 一种高效无锁内存队列的实现">一种高效无锁内存队列的实现</a>
+                                <div class="clear"></div>
+                                 <span class="author">   <a href="http://www.searchtb.com/author/%e6%82%9f%e6%97%b6/" title="由 悟时 发表">悟时</a> </span>
+                                </h1>
+				<div class="clear"></div>
+			</div>
+			
+			<div class="entry">
+				<p>Disruptor是LMAX公司开源的一个高效的内存无锁队列。这两天看了一下相关的设计文档和博客，下面尝试进行一下总结。</p>
+<p>	<strong>第一部分。引子</strong><br>
+谈到并发程序设计，有几个概念是避免不了的。</p>
+<p><strong>1.锁</strong>：锁是用来做并发最简单的方式，当然其代价也是最高的。内核态的锁的时候需要操作系统进行一次上下文切换，等待锁的线程会被挂起直至锁释放。在上下文切换的时候，cpu之前缓存的指令和数据都将失效，对性能有很大的损失。用户态的锁虽然避免了这些问题，但是其实它们只是在没有真实的竞争时才有效。下面是一个计数实验中不加锁、使用锁、使用CAS及定义volatile变量之间的性能对比。</p>
+<p><strong>2. CAS</strong>： CAS的涵义不多介绍了。使用CAS时不像上锁那样需要一次上下文切换，但是也需要处理器锁住它的指令流水线来保证原子性，并且还要加上Memory Barrier来保证其结果可见。</p>
+<p><strong>3. Memory Barrier</strong>: 大家都知道现代CPU是乱序执行的，也就是程序顺序与实际的执行顺序很可能是不一致的。在单线程执行时这不是个问题，但是在多线程环境下这种乱序就可能会对执行结果产生很大的影响了。memory barrier提供了一种控制程序执行顺序的手段, 关于其更多介绍，可以参考 http://en.wikipedia.org/wiki/Memory_barrier</p>
+<p><strong>4. Cache Line</strong>：cache line解释起来其实很简单，就是CPU在做缓存的时候有个最小缓存单元，在同一个单元内的数据被同时被加载到缓存中，充分利用 cache line可以大大降低数据读写的延迟，错误利用cache line也会导致缓存不同替换，反复失效。</p>
+<p>好，接下来谈一谈设计并发内存队列时需要考虑的问题。一就是数据结构的问题，是选用定长的数组还是可变的链表，二是并发控问题，是使用锁还是CAS操作，是使用粗粒度的一把锁还是将队列的头、尾、和容量三个变量分开控制，即使分开，能不能避免它们落入同一个Cache line中呢。<br>
+我们再回过头来思考一下队列的使用场景。通常我们的处理会形成一条流水线或者图结构，队列被用来作为这些流程中间的衔接表示它们之间的依赖关系，同时起到一个缓冲的作用。但是使用队列并不是没有代价的，实际上数据的入队和出队都是很耗时的，尤其在性能要求极高的场景中，这种消耗更显得奢侈。如果这种依赖能够不通过在各个流程之间放一个队列来表示那就好啦！<br>
+	<strong>第二部分 正文</strong><br>
+现在开始来介绍我们的Disruptor啦，有了前面这么多的铺垫，我想可以直入主题了。接下来我们就从队列的三种基本问题来细细分析下disruptor吧。</p>
+<p><strong>1.列队中的元素如何存储？</strong><br>
+Disruptor的中心数据结构是一个基于定长数组的环形队列，如图1。<br>
+在数组创建时可以预先分配好空间，插入新元素时只要将新元素数据拷贝到已经分配好的内存中即可。对数组的元素访问对CPU cache 是非常友好的。关于数组的大小选择有一个讲究，大家都知道环形队列中会用到取余操作， 在大部分处理器上，取余操作并不高效。因此可以将数组大小设定为2的指数倍，这样计算余数只需要通过位操作 index &amp; ( size -1 )就能够得到实际的index。<br>
+Disruptor对外只有一个变量，那就是队尾元素的下标：cursor，这也避免了对head/tail这两个变量的操作和协同。生产者和消费者对disruptor的访问分别需要通过producer barrier和consumer barrier来协调。关于这两个barrier是啥，后面会介绍。<br>
+<a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/ringbuffer0.jpg"><img class="aligncenter size-full wp-image-2718" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/ringbuffer0.jpg" alt="ring buffer"></a><br>
+图1. RingBuffer,当前的队尾元素位置为18</p>
+<p><strong>2.生产者如何向队列中插入元素？</strong><br>
+生产者插入元素分为两个步骤，第一步申请一个空的slot, 每个slot只会被一个生产者占用，申请到空的slot的生产者将新元素的数据拷贝到该slot；第二步是发布，发布之后，新元素才能为消费者所见。如果只有一个生产者，第一步申请操作无需同步即可完成。如果有多个生产者，那么会有一个变量：claimSequence来记录申请位置，申请操作需要通过CAS来同步，例如图二中，如果两个生产者都想申请第19号slot, 则它们会同时执行CAS(&amp;claimSequence, 18, 19)，执行成功的人得到该slot，另一个则需要继续申请下一个可用的slot。在disruptor中，发布成功的顺序与申请的顺序是严格保持一致的，在实现上，发布事件实际上就是修改cursor的值，操作等价于CAS(&amp;cursor, myslot-1, myslot)，从此操作也可以看出，发布执行成功的顺序必定是slot, slot 1, slot 2 ….严格有序的。另外，为了防止生产者生产过快，在环形队列中覆盖消费者的数据，生产者要对消费者的消费情况进行跟踪，实现上就是去读取一下每个消费者当前的消费位置。例如一个环形队列的大小是8，有两个消费者的分别消费到第13和14号元素，那么生产者生产的新元素是不能超过20的。插入元素的过程图示如下：<br>
+<a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher10.jpg"><img class="aligncenter size-full wp-image-2728" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher10.jpg" alt="publisher1"></a><br>
+图2. RingBuffer当前的队尾位置序号为18.生产者提出申请。<br>
+<a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher20.jpg"><img class="aligncenter size-full wp-image-2729" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher20.jpg" alt=""></a><br>
+图3. 生产者申请得到第19号位置，并且19号位置是独占的，可以写入生产元素。此时19号元素对消费者是不可见的。<br>
+<a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher30.jpg"><img class="aligncenter size-full wp-image-2730" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/publisher30.jpg" alt=""></a><br>
+图4，生产者成功写入19号位置后，将cursor修改为19，从而完成发布，之后消费者可以消费19号元素。</p>
+<p><strong>3.消费者如何获知有新的元素进来了？</strong><br>
+消费者需要等待有新元素进入方能继续消费，也就是说cursor大于自己当前的消费位置。等待策略有多种。可以选择sleep wait, busy spin等等，在使用disruptor时，可以根据场景选择不同的等待策略。</p>
+<p><strong>4.批量</strong><br>
+如果消费者发现cursor相比其最后的一次消费位置前进了不止一个位置，它就可以选择批量消费这区段的元素，而不是一次一个的向前推进。这种做法在提高吞吐量的同时还可以使系统的延迟更加平滑。</p>
+<p><strong>5.依赖图</strong><br>
+前面也提过，在传统的系统中，通常使用队列来表示多个处理流程之间的依赖，并且一步依赖就需要多添加一个队列。在Disruptor中，由于生产者和消费者是分开考虑和控制的，因此有可能能够通过一个核心的环形队列来表示全部的依赖关系，可以大大提高吞吐，降低延迟。当然，要达到这个目的，还需要用户细心地去设计。下面举一个简单的例子来说明如何使用disruptor来表示依赖关系。</p>
+<div><div id="highlighter_807161" class="syntaxhighlighter  plain"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div><div class="line number33 index32 alt2">33</div><div class="line number34 index33 alt1">34</div><div class="line number35 index34 alt2">35</div><div class="line number36 index35 alt1">36</div><div class="line number37 index36 alt2">37</div><div class="line number38 index37 alt1">38</div><div class="line number39 index38 alt2">39</div><div class="line number40 index39 alt1">40</div><div class="line number41 index40 alt2">41</div><div class="line number42 index41 alt1">42</div><div class="line number43 index42 alt2">43</div><div class="line number44 index43 alt1">44</div><div class="line number45 index44 alt2">45</div><div class="line number46 index45 alt1">46</div><div class="line number47 index46 alt2">47</div><div class="line number48 index47 alt1">48</div><div class="line number49 index48 alt2">49</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain plain">/**</code></div><div class="line number2 index1 alt1"><code class="plain plain">* 场景描述：生产者p1生产出来的数据需要经过消费者ep1和ep2的处理，然后传递给消费者ep3</code></div><div class="line number3 index2 alt2"><code class="plain plain">*</code></div><div class="line number4 index3 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number5 index4 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp; -----&gt;| EP1 |------</code></div><div class="line number6 index5 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number7 index6 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; v</code></div><div class="line number8 index7 alt1"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number9 index8 alt2"><code class="plain plain">* | P1 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | EP3 |</code></div><div class="line number10 index9 alt1"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number11 index10 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^</code></div><div class="line number12 index11 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number13 index12 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp; -----&gt;| EP2 |------</code></div><div class="line number14 index13 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number15 index14 alt2"><code class="plain plain">*</code></div><div class="line number16 index15 alt1"><code class="plain plain">*</code></div><div class="line number17 index16 alt2"><code class="plain plain">* 基于队列的解决方案</code></div><div class="line number18 index17 alt1"><code class="plain plain">* ============</code></div><div class="line number19 index18 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; take&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; put</code></div><div class="line number20 index19 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp; put&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp; take</code></div><div class="line number21 index20 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp; -----&gt;| Q1 |&lt;---| EP1 |---&gt;| Q3 |&lt;------</code></div><div class="line number22 index21 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number23 index22 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number24 index23 alt1"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number25 index24 alt2"><code class="plain plain">* | P1 |---&gt;| Q2 |&lt;---| EP2 |---&gt;| Q4 |&lt;---| EP3 |</code></div><div class="line number26 index25 alt1"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number27 index26 alt2"><code class="plain plain">*</code></div><div class="line number28 index27 alt1"><code class="plain plain">* 使用Disruptor的解决方案:</code></div><div class="line number29 index28 alt2"><code class="plain plain">* 以一个RingBuffer为中心，生产者p1生产事件写到ringbuffer中，</code></div><div class="line number30 index29 alt1"><code class="plain plain">* 消费者ep1和ep2仅需要根据队尾位置来进行判断是否有可消费事件即可，</code></div><div class="line number31 index30 alt2"><code class="plain plain">* 消费者ep3则需要根据消费者ep1和ep2的位置来判断是否有可消费事件。生产者需要跟踪ep3的位置，防止覆盖未消费事件。</code></div><div class="line number32 index31 alt1"><code class="plain plain">* ==========</code></div><div class="line number33 index32 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; track to prevent wrap</code></div><div class="line number34 index33 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------------------------------</code></div><div class="line number35 index34 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number36 index35 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; v</code></div><div class="line number37 index36 alt2"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number38 index37 alt1"><code class="plain plain">* | P1 |---&gt;| RB |&lt;--------------| SB2 |&lt;---| EP3 |</code></div><div class="line number39 index38 alt2"><code class="plain plain">*&nbsp; ----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----</code></div><div class="line number40 index39 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; claim&nbsp;&nbsp; ^&nbsp; get&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; waitFor</code></div><div class="line number41 index40 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number42 index41 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number43 index42 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | SB1 |&lt;---| EP1 |&lt;-----</code></div><div class="line number44 index43 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =====&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number45 index44 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number46 index45 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code></div><div class="line number47 index46 alt2"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------| EP2 |&lt;-----</code></div><div class="line number48 index47 alt1"><code class="plain plain">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; waitFor&nbsp;&nbsp; -----</code></div><div class="line number49 index48 alt2"><code class="plain plain">*/</code></div></div></td></tr></tbody></table></div></div>
+<p><strong>第三部分 结束语</strong><br>
+disruptor本身是用java写的，但是笔者认为在c 中更能体现其优点，自己也山寨了一个c 版本。在一个生产者和一个消费者的场景中测试表明，无锁队列相比有锁队列，qps有大约10倍的提升，latency更是有几百倍的提升。不管怎么样，现在大家都渐渐都这么一个意识了：锁是性能杀手。所以这些无锁的数据结构和算法，可以尝试借鉴来使用在合适的场景中。</p>
+			</div>
+			
+			<p class="postinfo clear">
+				<span class="category">Filed under - <a href="http://www.searchtb.com/category/%e6%90%9c%e7%b4%a2%e5%bc%95%e6%93%8e" title="查看 搜索引擎 的全部文章" rel="category tag">搜索引擎</a></span> 
+				<span class="comment"><a href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html#comments" title="一种高效无锁内存队列的实现 上的评论">17 Comments</a> so far.</span><br>
+			</p>
+			<p class="tag">标签：<a href="http://www.searchtb.com/tag/disruptor" rel="tag">disruptor</a>, <a href="http://www.searchtb.com/tag/lock-free" rel="tag">lock-free</a>, <a href="http://www.searchtb.com/tag/non-blocking" rel="tag">non-blocking</a> </p>
+			<p></p>
+		</div>
+
+	
+		<div class="related">
+	<h3>相关文章</h3>
+	<ul>
+		<li><a href="http://www.searchtb.com/2012/08/zeromq-primer.html" rel="bookmark" title="Permanent Link: ZeroMQ的学习和研究">ZeroMQ的学习和研究</a></li><li><a href="http://www.searchtb.com/2010/08/%e6%b5%8b%e8%af%95%ef%bc%9a%e6%b7%98%e5%ae%9d%e7%bd%91%e6%8b%9b%e8%81%98%e5%b9%b3%e5%8f%b0%e7%8e%b0%e5%a4%84%e6%b5%8b%e8%af%95%e9%98%b6%e6%ae%b5-%e6%ad%a3%e5%bc%8f%e4%b8%8a%e7%ba%bf%e5%9c%a8%e5%8d%b3.html" rel="bookmark" title="Permanent Link: 测试：淘宝网招聘平台现处测试阶段 正式上线在即">测试：淘宝网招聘平台现处测试阶段 正式上线在即</a></li><li><a href="http://www.searchtb.com/2011/07/%e5%ad%97%e7%ac%a6%e4%b8%b2%e5%8c%b9%e9%85%8d%e9%82%a3%e4%ba%9b%e4%ba%8b%ef%bc%88%e4%b8%80%ef%bc%89.html" rel="bookmark" title="Permanent Link: 字符串匹配那些事（一）">字符串匹配那些事（一）</a></li><li><a href="http://www.searchtb.com/2012/07/opentsdb-monitoring-system.html" rel="bookmark" title="Permanent Link: OpenTSDB监控系统的研究和介绍">OpenTSDB监控系统的研究和介绍</a></li> 
+        </ul>
+ 	
+ <br class="clear">
+</div>
+
+<!-- You can start editing here. -->
+<div id="comments">
+	<h2 class="mainhead">17 Responses</h2>
+
+	<span class="fleft"></span> <span class="fright"></span>
+	<br class="clear">
+
+	<ol class="commentlist">
+			<li class="comment even thread-even depth-1" id="li-comment-5845">
+		<div id="comment-5845">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/ed60050521f346acef12b4d908155fd2" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">jack on 11 十 2012</div>			
+								<p>弱问，图1~图4用啥画的？</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=5845#respond" onclick="return addComment.moveForm(&quot;comment-5845&quot;, &quot;5845&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+<ul class="children">
+	<li class="comment odd alt depth-2" id="li-comment-5923">
+		<div id="comment-5923">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/2efaad5a1fb88a0fcccc6dc8c3d38b62" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">悟时 on 17 十 2012</div>			
+								<p>额 这个图是从别的地方搞过来的</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=5923#respond" onclick="return addComment.moveForm(&quot;comment-5923&quot;, &quot;5923&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment even depth-2" id="li-comment-5943">
+		<div id="comment-5943">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/3323b5458c275f2ee25e02e52254deb2" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">gy on 18 十 2012</div>			
+								<p>同问</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=5943#respond" onclick="return addComment.moveForm(&quot;comment-5943&quot;, &quot;5943&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment odd alt depth-2" id="li-comment-6051">
+		<div id="comment-6051">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/149b42ebb50eb75ba66b4e1f4156c21e" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://www.cnfn.org/" rel="external nofollow" class="url">Cnfn</a> on 22 十 2012</div>			
+								<p>vim的插件DrawIt</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6051#respond" onclick="return addComment.moveForm(&quot;comment-6051&quot;, &quot;6051&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment even depth-2" id="li-comment-6056">
+		<div id="comment-6056">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/149b42ebb50eb75ba66b4e1f4156c21e" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://www.cnfn.org/" rel="external nofollow" class="url">Cnfn</a> on 22 十 2012</div>			
+								<p>抱歉, 刚才看错了, 还以为您说的是下面那几幅ASCII码图呢…</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6056#respond" onclick="return addComment.moveForm(&quot;comment-6056&quot;, &quot;6056&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+<ul class="children">
+	<li class="comment odd alt depth-3" id="li-comment-8077">
+		<div id="comment-8077">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/7cd87ef38e7791bab5b6b5c7489a709a" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://xn--9kr22gnbw3z/" rel="external nofollow" class="url">E7</a> on 28 一 2013</div>			
+								<p>不是ascii码图，是上面那些，drawit画的都是ascii码的，同问</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=8077#respond" onclick="return addComment.moveForm(&quot;comment-8077&quot;, &quot;8077&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+</ul>
+</li>
+</ul>
+</li>
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-5964">
+		<div id="comment-5964">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/406beec69e78a247f10df15f8d49910f" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://none/" rel="external nofollow" class="url">byhh</a> on 19 十 2012</div>			
+								<p>用户态的锁虽然避免了这些问题，但是其实它们只是在没有真实的竞争时才有效</p>
+<p>这里是指什么竞争？ 在何种条件下，用户态的锁会出问题？谢谢</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=5964#respond" onclick="return addComment.moveForm(&quot;comment-5964&quot;, &quot;5964&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment odd alt thread-even depth-1" id="li-comment-5965">
+		<div id="comment-5965">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/72e1ce97f1e3964d4ab683ebab666814" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://www.cnblogs.com/egmkang" rel="external nofollow" class="url">egmkang</a> on 19 十 2012</div>			
+								<p>如果消费者的消费能力很差,就不适用无锁队列,这个时候用有锁队列反而更简单.</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=5965#respond" onclick="return addComment.moveForm(&quot;comment-5965&quot;, &quot;5965&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-6050">
+		<div id="comment-6050">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/149b42ebb50eb75ba66b4e1f4156c21e" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://www.cnfn.org/" rel="external nofollow" class="url">Cnfn</a> on 22 十 2012</div>			
+								<p>在您的文章中只有”消费者如何获知有新的元素进来了”, 怎么没有”多个消费者是如何实现防止重复新进来的元素的呢?”, 这部分才是最重要的吧?</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6050#respond" onclick="return addComment.moveForm(&quot;comment-6050&quot;, &quot;6050&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+<ul class="children">
+	<li class="comment odd alt depth-2" id="li-comment-6055">
+		<div id="comment-6055">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/149b42ebb50eb75ba66b4e1f4156c21e" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://www.cnfn.org/" rel="external nofollow" class="url">Cnfn</a> on 22 十 2012</div>			
+								<p>感谢您的文章!<br>
+在上一条回复之后我突然想到多个消费者也可以像生产者一样通过CAS来同步, 于是问题解决了, 也写了一个C++版, 谢谢…<br>
+刚刚接触多线程和无锁队列, 让您见笑了~~~</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6055#respond" onclick="return addComment.moveForm(&quot;comment-6055&quot;, &quot;6055&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+</ul>
+</li>
+	<li class="comment even thread-even depth-1" id="li-comment-6149">
+		<div id="comment-6149">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/05f9423f085ef84a94c8f4f75cf6cdda" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://blog.csdn.net/cuiran" rel="external nofollow" class="url">崔冉</a> on 26 十 2012</div>			
+								<p>不错，还需要多看</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6149#respond" onclick="return addComment.moveForm(&quot;comment-6149&quot;, &quot;6149&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-6379">
+		<div id="comment-6379">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/163c1f588fcfd4531fe2e26b7c8f4742" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://blog.solrex.org/" rel="external nofollow" class="url">Solrex</a> on 02 十一 2012</div>			
+								<p>&gt; 另外，为了防止生产者生产过快，在环形队列中覆盖消费者的数据，生产者要对消费者的消费情况进行跟踪，实现上就是去读取一下每个消费者当前的消费位置。</p>
+<p>这是怎么做到的？效率如何？</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6379#respond" onclick="return addComment.moveForm(&quot;comment-6379&quot;, &quot;6379&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment even thread-even depth-1" id="li-comment-6572">
+		<div id="comment-6572">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/1377fc90919003183deff62a906ec5f3" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">李 on 10 十一 2012</div>			
+								<p>无锁的情况例如cas 操作，如果遇到高并发的时候，会不会就比较悲剧了，可能遇到很多冲突的情况，到时候就要占用很多cpu，进行自旋</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=6572#respond" onclick="return addComment.moveForm(&quot;comment-6572&quot;, &quot;6572&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-7401">
+		<div id="comment-7401">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/fb095804003017aebe3b20e802198f08" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">itechdog on 18 十二 2012</div>			
+								<p>你的C版本发来看看</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=7401#respond" onclick="return addComment.moveForm(&quot;comment-7401&quot;, &quot;7401&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="comment even thread-even depth-1" id="li-comment-7516">
+		<div id="comment-7516">
+		  
+			<div class="comment-author fleft">
+				<img alt="" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/3b266503103ad1ef05079eabb38108b0" class="avatar avatar-60 photo" height="60" width="60"> 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info">Aden on 26 十二 2012</div>			
+								<p>请教一个问题：如果多个消费端消费同一份数据，消费端的消费能力有快有慢，怎么平衡这些消费端？慢的影响快的这么办？</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=7516#respond" onclick="return addComment.moveForm(&quot;comment-7516&quot;, &quot;7516&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="pingback odd alt thread-odd thread-alt depth-1" id="li-comment-8207">
+		<div id="comment-8207">
+		  
+			<div class="comment-author fleft">
+				 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://ifeve.com/%e5%89%96%e6%9e%90disruptor%e4%b8%ba%e4%bb%80%e4%b9%88%e4%bc%9a%e8%bf%99%e4%b9%88%e5%bf%ab%ef%bc%9f%e5%9b%9b%e6%8f%ad%e7%a7%98%e5%86%85%e5%ad%98%e5%b1%8f%e9%9a%9c/" rel="external nofollow" class="url">剖析Disruptor:为什么会这么快？(四)揭秘内存屏障 | 并发编程网 - ifeve.com</a> on 03 二 2013</div>			
+								<p>[...] [1] &nbsp;一种高效无锁内存队列的实现 [...]</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=8207#respond" onclick="return addComment.moveForm(&quot;comment-8207&quot;, &quot;8207&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	<li class="pingback even thread-even depth-1" id="li-comment-8221">
+		<div id="comment-8221">
+		  
+			<div class="comment-author fleft">
+				 
+			</div>
+			  
+			<div class="comment-info fright">
+				<div class="c_info"><a href="http://ifeve.com/disruptor-memory-barrier/" rel="external nofollow" class="url">剖析Disruptor:为什么会这么快？(三)揭秘内存屏障 | 并发编程网 - ifeve.com</a> on 04 二 2013</div>			
+								<p>[...] [1] &nbsp;一种高效无锁内存队列的实现 [...]</p>
+								<div class="reply fleft">
+					<a rel="nofollow" class="comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html?replytocom=8221#respond" onclick="return addComment.moveForm(&quot;comment-8221&quot;, &quot;8221&quot;, &quot;respond&quot;, &quot;2717&quot;)">回复</a>				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	 
+</li>
+	</ol>
+
+	<span class="fleft"></span> <span class="fright"></span>
+	<br class="clear">
+
+
+
+
+	<div id="respond">
+		<h2 class="mainhead">留言</h2>		
+		<div class="cancel-comment-reply"> <a rel="nofollow" id="cancel-comment-reply-link" href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html#respond" style="display:none;">Cancel</a> </div>
+
+		<div class="res_1 fleft">
+		
+					<form action="http://www.searchtb.com/wp-comments-post.php" method="post" id="commentform">
+							
+				<p><label for="author">Name (required)</label><input type="text" title="名字" name="author" id="author" value="" size="22" tabindex="1" aria-required="true" class="tagged"></p>
+				<p><label for="email">Email (required)</label><input type="text" title="邮件地址" name="email" id="email" value="" size="22" tabindex="2" aria-required="true" class="tagged"></p>
+				<p><label for="url">URL</label><input type="text" title="博客地址" name="url" id="url" value="" size="22" tabindex="3" class="tagged"></p>
+				<p><input name="submit" type="submit" id="submit" tabindex="5" value="提交"><input type="hidden" name="comment_post_ID" value="2717" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p>
+					</form></div>			
+			<div class="res_2 fright">
+				<p><label for="commentt">Comment</label><textarea class="fright tagged" name="comment" title="留言" id="comment" cols="100%" rows="10" tabindex="4"></textarea></p>
+				
+				<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="2a9ec1b0dc"></p>			</div>
+			<div class="clear"></div>	
+			
+	</div>
+</div>
+
+</div>
+<div id="sidebar" class="sidecontainer fright">
+
+	<div class="widgets">
+		<h2 class="mainhead">订阅</h2>
+		<p class="feed"><a href="http://www.searchtb.com/feed">Subscribe to feed <br><span>get the latest updates!</span></a></p>
+		<form method="get" id="ksearchform" action="http://www.searchtb.com/">
+			<div>
+				<input type="text" size="18" value="" name="s" id="s">
+				<input type="submit" id="ksearchsubmit" value="搜索" class="btn">
+			</div>
+			<br class="clear">
+		</form>
+	</div>
+
+	<ul>
+				<li class="widgets">		<h2 class="mainhead">最近更新</h2>		<ul>
+				<li><a href="http://www.searchtb.com/2013/01/stl-string-overload-functions-and-implicit-conversion.html" title="不得不留意的STL string重载函数和隐式类型转换">不得不留意的STL string重载函数和隐式类型转换</a></li>
+				<li><a href="http://www.searchtb.com/2012/12/google-cpu-profiler.html" title="Google CPU Profiler使用指南及小工具">Google CPU Profiler使用指南及小工具</a></li>
+				<li><a href="http://www.searchtb.com/2012/12/%e7%8e%a9%e8%bd%accpu-topology.html" title="玩转CPU Topology">玩转CPU Topology</a></li>
+				<li><a href="http://www.searchtb.com/2012/11/icbu-p4p-intro.html" title="国际站P4P引擎系统简介">国际站P4P引擎系统简介</a></li>
+				<li><a href="http://www.searchtb.com/2012/11/pora.html" title="个性化离线实时分析系统pora">个性化离线实时分析系统pora</a></li>
+				<li><a href="http://www.searchtb.com/2012/11/jsoncpp-optimization.html" title="JsonCpp使用优化">JsonCpp使用优化</a></li>
+				<li><a href="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/一种高效无锁内存队列的实现 « 搜索技术博客－淘宝.html" title="一种高效无锁内存队列的实现">一种高效无锁内存队列的实现</a></li>
+				<li><a href="http://www.searchtb.com/2012/09/libmemcached_and_memcached_max_buffer.html" title="libmemcached的MEMCACHED_MAX_BUFFER问题">libmemcached的MEMCACHED_MAX_BUFFER问题</a></li>
+				</ul>
+		</li><li class="widgets"><h2 class="mainhead">标签云</h2><div><a href="http://www.searchtb.com/tag/ab-test" class="tag-link-30" title="2 个话题" style="font-size: 11.230769230769pt;">A/B Test</a>
+<a href="http://www.searchtb.com/tag/autoconf" class="tag-link-57" title="1 个话题" style="font-size: 8pt;">autoconf</a>
+<a href="http://www.searchtb.com/tag/bts" class="tag-link-46" title="1 个话题" style="font-size: 8pt;">BTS</a>
+<a href="http://www.searchtb.com/tag/c" class="tag-link-80" title="2 个话题" style="font-size: 11.230769230769pt;">c++</a>
+<a href="http://www.searchtb.com/tag/cassandra" class="tag-link-20" title="1 个话题" style="font-size: 8pt;">Cassandra</a>
+<a href="http://www.searchtb.com/tag/checkstyle" class="tag-link-42" title="1 个话题" style="font-size: 8pt;">checkstyle</a>
+<a href="http://www.searchtb.com/tag/cppunit" class="tag-link-32" title="1 个话题" style="font-size: 8pt;">CppUnit</a>
+<a href="http://www.searchtb.com/tag/google" class="tag-link-17" title="2 个话题" style="font-size: 11.230769230769pt;">Google</a>
+<a href="http://www.searchtb.com/tag/gpu" class="tag-link-26" title="1 个话题" style="font-size: 8pt;">GPU</a>
+<a href="http://www.searchtb.com/tag/hadoop" class="tag-link-14" title="11 个话题" style="font-size: 22pt;">Hadoop</a>
+<a href="http://www.searchtb.com/tag/hbase" class="tag-link-69" title="3 个话题" style="font-size: 13.384615384615pt;">hbase</a>
+<a href="http://www.searchtb.com/tag/java" class="tag-link-41" title="1 个话题" style="font-size: 8pt;">java</a>
+<a href="http://www.searchtb.com/tag/jni" class="tag-link-37" title="1 个话题" style="font-size: 8pt;">JNI</a>
+<a href="http://www.searchtb.com/tag/junit" class="tag-link-33" title="1 个话题" style="font-size: 8pt;">JUnit</a>
+<a href="http://www.searchtb.com/tag/leslie-lamport" class="tag-link-50" title="1 个话题" style="font-size: 8pt;">Leslie Lamport</a>
+<a href="http://www.searchtb.com/tag/linux" class="tag-link-28" title="6 个话题" style="font-size: 17.871794871795pt;">Linux</a>
+<a href="http://www.searchtb.com/tag/mangodb" class="tag-link-35" title="1 个话题" style="font-size: 8pt;">mangodb</a>
+<a href="http://www.searchtb.com/tag/mapreduce" class="tag-link-15" title="1 个话题" style="font-size: 8pt;">MapReduce</a>
+<a href="http://www.searchtb.com/tag/multivariate-test" class="tag-link-47" title="1 个话题" style="font-size: 8pt;">Multivariate Test</a>
+<a href="http://www.searchtb.com/tag/mysql" class="tag-link-13" title="2 个话题" style="font-size: 11.230769230769pt;">MySQL</a>
+<a href="http://www.searchtb.com/tag/nosql" class="tag-link-21" title="3 个话题" style="font-size: 13.384615384615pt;">NoSQL</a>
+<a href="http://www.searchtb.com/tag/paoxs" class="tag-link-49" title="1 个话题" style="font-size: 8pt;">paoxs</a>
+<a href="http://www.searchtb.com/tag/php" class="tag-link-22" title="4 个话题" style="font-size: 15.179487179487pt;">PHP</a>
+<a href="http://www.searchtb.com/tag/protocol-buffers" class="tag-link-16" title="3 个话题" style="font-size: 13.384615384615pt;">Protocol Buffers</a>
+<a href="http://www.searchtb.com/tag/redis" class="tag-link-54" title="2 个话题" style="font-size: 11.230769230769pt;">redis</a>
+<a href="http://www.searchtb.com/tag/samba" class="tag-link-34" title="1 个话题" style="font-size: 8pt;">Samba</a>
+<a href="http://www.searchtb.com/tag/scrapy" class="tag-link-39" title="2 个话题" style="font-size: 11.230769230769pt;">Scrapy</a>
+<a href="http://www.searchtb.com/tag/spider" class="tag-link-59" title="1 个话题" style="font-size: 8pt;">spider</a>
+<a href="http://www.searchtb.com/tag/spinlock" class="tag-link-56" title="1 个话题" style="font-size: 8pt;">spinlock</a>
+<a href="http://www.searchtb.com/tag/streaming" class="tag-link-29" title="2 个话题" style="font-size: 11.230769230769pt;">Streaming</a>
+<a href="http://www.searchtb.com/tag/zookeeper" class="tag-link-48" title="1 个话题" style="font-size: 8pt;">zookeeper</a>
+<a href="http://www.searchtb.com/tag/%e4%b8%80%e6%b7%98" class="tag-link-19" title="5 个话题" style="font-size: 16.615384615385pt;">一淘</a>
+<a href="http://www.searchtb.com/tag/%e5%88%86%e5%b8%83%e5%bc%8f%e6%8a%93%e5%8f%96" class="tag-link-40" title="2 个话题" style="font-size: 11.230769230769pt;">分布式抓取</a>
+<a href="http://www.searchtb.com/tag/%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81" class="tag-link-51" title="1 个话题" style="font-size: 8pt;">分布式锁</a>
+<a href="http://www.searchtb.com/tag/%e5%89%8d%e7%ab%af" class="tag-link-23" title="2 个话题" style="font-size: 11.230769230769pt;">前端</a>
+<a href="http://www.searchtb.com/tag/%e5%8d%95%e5%85%83%e6%b5%8b%e8%af%95" class="tag-link-31" title="1 个话题" style="font-size: 8pt;">单元测试</a>
+<a href="http://www.searchtb.com/tag/%e5%af%bc%e8%b4%ad%e6%90%9c%e7%b4%a2" class="tag-link-10" title="1 个话题" style="font-size: 8pt;">导购搜索</a>
+<a href="http://www.searchtb.com/tag/%e6%80%a7%e8%83%bd" class="tag-link-24" title="1 个话题" style="font-size: 8pt;">性能</a>
+<a href="http://www.searchtb.com/tag/%e6%8a%93%e5%8f%96" class="tag-link-58" title="1 个话题" style="font-size: 8pt;">抓取</a>
+<a href="http://www.searchtb.com/tag/%e6%90%9c%e7%b4%a2%e4%ba%a7%e5%93%81%e4%bc%98%e5%8c%96" class="tag-link-45" title="1 个话题" style="font-size: 8pt;">搜索产品优化</a>
+<a href="http://www.searchtb.com/tag/%e6%90%9c%e7%b4%a2%e5%bc%95%e6%93%8e" class="tag-link-7" title="3 个话题" style="font-size: 13.384615384615pt;">搜索引擎</a>
+<a href="http://www.searchtb.com/tag/%e7%ae%97%e6%b3%95" class="tag-link-25" title="3 个话题" style="font-size: 13.384615384615pt;">算法</a>
+<a href="http://www.searchtb.com/tag/%e7%bd%91%e7%bb%9c%e7%88%ac%e8%99%ab" class="tag-link-38" title="1 个话题" style="font-size: 8pt;">网络爬虫</a>
+<a href="http://www.searchtb.com/tag/%e8%a3%85%e8%bd%bd" class="tag-link-82" title="2 个话题" style="font-size: 11.230769230769pt;">装载</a>
+<a href="http://www.searchtb.com/tag/%e9%93%be%e6%8e%a5" class="tag-link-81" title="2 个话题" style="font-size: 11.230769230769pt;">链接</a></div>
+</li><li class="widgets"><h2 class="mainhead">近期评论</h2><ul id="recentcomments"><li class="recentcomments">piboyeliu 在 <a href="http://www.searchtb.com/2012/09/protocol-buffers.html#comment-9118">玩转Protocol Buffers</a> 上的评论</li><li class="recentcomments"><a href="http://read.guoruei.net/archives/1633" rel="external nofollow" class="url">read.guoruEi » Blog Archive » 淘宝搜索：定向抓取网页技术漫谈</a> 在 <a href="http://www.searchtb.com/2011/01/an-introduction-to-crawler.html#comment-8241">定向抓取漫谈</a> 上的评论</li><li class="recentcomments"><a href="http://blog.csdn.net/chenyu2202863" rel="external nofollow" class="url">YU_YU</a> 在 <a href="http://www.searchtb.com/2013/01/stl-string-overload-functions-and-implicit-conversion.html#comment-8226">不得不留意的STL string重载函数和隐式类型转换</a> 上的评论</li><li class="recentcomments"><a href="http://ifeve.com/disruptor-memory-barrier/" rel="external nofollow" class="url">剖析Disruptor:为什么会这么快？(三)揭秘内存屏障 | 并发编程网 - ifeve.com</a> 在 <a href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html#comment-8221">一种高效无锁内存队列的实现</a> 上的评论</li><li class="recentcomments"><a href="http://ifeve.com/%e5%89%96%e6%9e%90disruptor%e4%b8%ba%e4%bb%80%e4%b9%88%e4%bc%9a%e8%bf%99%e4%b9%88%e5%bf%ab%ef%bc%9f%e5%9b%9b%e6%8f%ad%e7%a7%98%e5%86%85%e5%ad%98%e5%b1%8f%e9%9a%9c/" rel="external nofollow" class="url">剖析Disruptor:为什么会这么快？(四)揭秘内存屏障 | 并发编程网 - ifeve.com</a> 在 <a href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html#comment-8207">一种高效无锁内存队列的实现</a> 上的评论</li><li class="recentcomments"><a href="http://xn--9kr22gnbw3z/" rel="external nofollow" class="url">E7</a> 在 <a href="http://www.searchtb.com/2012/10/introduction_to_disruptor.html#comment-8077">一种高效无锁内存队列的实现</a> 上的评论</li><li class="recentcomments">lcnight 在 <a href="http://www.searchtb.com/2013/01/stl-string-overload-functions-and-implicit-conversion.html#comment-8072">不得不留意的STL string重载函数和隐式类型转换</a> 上的评论</li><li class="recentcomments"><a href="http://blog.tisa7.com/tech/hbase_introduction.html" rel="external nofollow" class="url">HBase简介 | 小猪爬爬</a> 在 <a href="http://www.searchtb.com/2011/01/understanding-hbase.html#comment-8058">HBase技术介绍</a> 上的评论</li></ul></li><li class="widgets"><h2 class="mainhead">友情链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.taobaodba.com/" target="_blank">淘宝DBA团队</a></li>
+<li><a href="http://ued.taobao.com/blog/" target="_blank">淘宝UED团队</a></li>
+<li><a href="http://job.taobao.com/" target="_blank">淘宝招聘</a></li>
+<li><a href="http://www.tbdata.org/" target="_blank">淘宝数据平台团队</a></li>
+<li><a href="http://rdc.taobao.com/blog/cs/" target="_blank">淘宝核心系统团队</a></li>
+<li><a href="http://rdc.taobao.com/blog/qa/" target="_blank">淘宝质量保障团队</a></li>
+<li><a href="http://www.linezing.com/blog/" title="量子统计官方博客" target="_blank">量子统计官方博客</a></li>
+
+	</ul>
+</li>
+<li class="widgets"><h2 class="mainhead">功能</h2>			<ul>
+			<li><a href="http://www.searchtb.com/wp-login.php?action=register">注册</a></li>			<li><a href="http://www.searchtb.com/wp-login.php">登录</a></li>
+			<li><a href="http://www.searchtb.com/feed" title="使用 RSS 2.0 同步站点内容">文章 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://www.searchtb.com/comments/feed" title="使用 RSS 同步站点的近期评论">评论 <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://wordpress.org/" title="基于 WordPress，优美的个人信息发布平台。">WordPress.org</a></li>
+						</ul>
+</li>	</ul>
+		
+</div><!--end of #sidebar -->
+	<br class="clear">
+	</div><!-- end of #wrapper -->
+
+	<div id="footer">
+		<div class="container">
+			<div class="ftext fleft">
+				搜索技术博客－淘宝 © 2013. All rights reserved. 
+			</div>
+				
+			<div class="fcred fright">
+			 	<span class="fleft">A quality product by</span> <a href="http://www.kreativethemes.com/" class="fright" id="kreativethemes">KreativeThemes</a>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	
+	
+		<script language="javascript" type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/tab.js"></script>
+	<script language="javascript" type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/jquery.fieldtag.min.js"></script>
+	
+	<script type="text/javascript">
+	<!--
+	jQuery(function($){
+	    //snip
+		$("#author,#url,#email,#comment").fieldtag();
+	    //snap
+	});
+	-->
+	</script>
+	<script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/shCore.js"></script>
+<script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/shBrushPlain.js"></script>
+<script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://www.searchtb.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.83b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://www.searchtb.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0.83b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '帮助';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = '无法找到Brush：';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush不能设置 html-script选项';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+</script>
+        <script type="text/javascript" src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/tongji.js"></script><img src="./一种高效无锁内存队列的实现 « 搜索技术博客－淘宝_files/tongji.do" border="0" width="1" height="1"><noscript>&lt;a href="http://www.linezing.com"&gt;&lt;img src="http://img.tongji.linezing.com/2033179/tongji.gif"/&gt;&lt;/a&gt;</noscript>
+        <script type="text/javascript">
+          var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-18547630-1']); _gaq.push(['_setDomainName', 'none']); _gaq.push(['_setAllowLinker', true]); _gaq.push(['_trackPageview']);
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+        </script>
+
+
+</body></html>
