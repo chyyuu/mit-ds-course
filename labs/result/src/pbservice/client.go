@@ -2,6 +2,7 @@ package pbservice
 
 import "viewservice"
 import "net/rpc"
+//import "fmt"
 // You'll probably need to uncomment this:
 // import "time"
 
@@ -58,7 +59,32 @@ func call(srv string, rpcname string,
 func (ck *Clerk) Get(key string) string {
 
   // Your code here.
-
+  args := &GetArgs{}
+  args.Key = key
+  var reply GetReply
+  //var i uint
+  for {
+    //fmt.Println("ck:get call vs.pri and pb.get")
+    prisrv := ck.vs.Primary()
+    if prisrv == "" {
+      //i++
+      //if( i== 8000) {
+        //fmt.Println("ck:get pri is NULL")
+        //i=0
+      //}
+      continue
+    } else {
+       // fmt.Printf("ck:get prisrv %s\n",prisrv)
+    }
+    if call(prisrv, "PBServer.Get", args, &reply){
+        if reply.Err==OK {
+        //fmt.Printf("ck.get key %t, vale %t OK\n",args.Key,reply.Value)
+            return reply.Value
+        } //else if reply.Err==ErrNoKey{
+        //fmt.Printf("ck.get NoKey\n")
+       // return ""
+    }
+  }
   return "???"
 }
 
@@ -69,4 +95,28 @@ func (ck *Clerk) Get(key string) string {
 func (ck *Clerk) Put(key string, value string) {
 
   // Your code here.
+  args := &PutArgs{}
+  args.Key, args.Value = key, value
+  var reply PutReply
+//  var i uint
+  for {
+    //fmt.Println("ck:get call vs.pri and pb.put")
+    prisrv := ck.vs.Primary();
+    if prisrv == "" {
+      //i++
+      //if( i== 4000) {
+        //fmt.Println("ck:put pri is NULL")
+        //i=0
+      //}
+      continue
+    }
+    if call(prisrv, "PBServer.Put", args, &reply){
+        if reply.Err==OK {
+        //fmt.Printf("ck.put  %t OK\n",args) 
+        return
+        } else {
+            //fmt.Printf("ERR: ck.put  %t \n",reply) 
+        }
+    }
+  }
 }

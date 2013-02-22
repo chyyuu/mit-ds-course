@@ -473,8 +473,13 @@ func TestRepeatedCrash(t *testing.T) {
     }
   } ()
 
-  for xi := 0; xi < 2; xi++ {
+  const nth = 2
+  var cha [nth]chan bool
+  for xi := 0; xi < nth; xi++ {
+    cha[xi] = make(chan bool)
     go func(i int) {
+      ok := false
+      defer func() { cha[i] <- ok } ()
       ck := MakeClerk(vshost, "")
       data := map[string]string{}
       rr := rand.New(rand.NewSource(int64(os.Getpid()+i)))
@@ -494,12 +499,19 @@ func TestRepeatedCrash(t *testing.T) {
         // enough time to Ping the viewserver.
         time.Sleep(10 * time.Millisecond)
       }
+      ok = true
     }(xi)
   }
 
   time.Sleep(20 * time.Second)
   done = true
-  time.Sleep(time.Second)
+
+  for i := 0; i < nth; i++ {
+    ok := <- cha[i]
+    if ok == false {
+      t.Fatal("child failed")
+    }
+  }
 
   ck := MakeClerk(vshost, "")
   ck.Put("aaa", "bbb")
@@ -566,8 +578,13 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
     }
   } ()
 
-  for xi := 0; xi < 2; xi++ {
+  const nth = 2
+  var cha [nth]chan bool
+  for xi := 0; xi < nth; xi++ {
+    cha[xi] = make(chan bool)
     go func(i int) {
+      ok := false
+      defer func() { cha[i] <- ok } ()
       ck := MakeClerk(vshost, "")
       data := map[string]string{}
       rr := rand.New(rand.NewSource(int64(os.Getpid()+i)))
@@ -587,12 +604,19 @@ func TestRepeatedCrashUnreliable(t *testing.T) {
         // enough time to Ping the viewserver.
         time.Sleep(10 * time.Millisecond)
       }
+      ok = true
     }(xi)
   }
 
   time.Sleep(20 * time.Second)
   done = true
-  time.Sleep(time.Second)
+
+  for i := 0; i < nth; i++ {
+    ok := <- cha[i]
+    if ok == false {
+      t.Fatal("child failed")
+    }
+  }
 
   ck := MakeClerk(vshost, "")
   ck.Put("aaa", "bbb")

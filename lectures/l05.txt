@@ -1,5 +1,44 @@
 6.824 2012 Lecture 13: Paxos
+--------------------------------
+For me, hwo to use paxos in real work
 
+lab2
+  pros:
+   simple, 
+   Few message.
+   2 servers 
+
+  cons:
+    may fail
+    ordering message
+ 
+ -------
+ lab3
+  Goals
+    good general ordering
+    an single pt of failure
+    graceful cache-up  for slow replicas
+   
+    all in memory
+  
+  paxos-agreement on a value
+  
+  correctness -- every srv at agreed  got same value
+  
+  fault-tolerant -- avail despite minoral failusre
+  
+  liveness -- if ... alive large enough agreement
+  
+  big idea of paxos
+     multi round 
+     majority of nodes have agree 
+   
+talk about paxos handout
+
+then give some examples (with some errors occur)
+.... (I don't understand  :( )
+
+--------------------------------
 From Paxos Made Simple, by Leslie Lamport, 2001
 
 introduction
@@ -305,3 +344,108 @@ summary
    e.g. sequence of primaries
  paxos chooses each new view; one paxos instance per view
  servers must
+ 
+==========================================
+ From wikipedia
+ 
+ Message flow: Basic Paxos
+ Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X-------->|          |  |  |       |  |  Request
+   |         X--------->|->|->|       |  |  Prepare(1)
+   |         |<---------X--X--X       |  |  Promise(1,{Va,Vb,Vc})
+   |         X--------->|->|->|       |  |  Accept!(1,Vn)
+   |         |<---------X--X--X------>|->|  Accepted(1,Vn)
+   |<---------------------------------X--X  Response
+   |         |          |  |  |       |  |
+   
+--------------------------------------------------   
+==========================================
+Error cases in basic Paxos
+
+The simplest error cases are the failure of a redundant Learner, or failure of an Acceptor when a Quorum of Acceptors remains live. In these cases, the protocol requires no recovery. No additional rounds or messages are required, as shown below:
+----------------------------
+Message flow: Basic Paxos, failure of Acceptor
+(Quorum size = 2 Acceptors)
+ Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X-------->|          |  |  |       |  |  Request
+   |         X--------->|->|->|       |  |  Prepare(1)
+   |         |          |  |  !       |  |  !! FAIL !!
+   |         |<---------X--X          |  |  Promise(1,{null,null, null})
+   |         X--------->|->|          |  |  Accept!(1,V)
+   |         |<---------X--X--------->|->|  Accepted(1,V)
+   |<---------------------------------X--X  Response
+   |         |          |  |          |  |
+-------------------------------------------------------------
+
+Message flow: Basic Paxos, failure of redundant Learner
+--------------------------------
+Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X-------->|          |  |  |       |  |  Request
+   |         X--------->|->|->|       |  |  Prepare(1)
+   |         |<---------X--X--X       |  |  Promise(1,{null,null,null})
+   |         X--------->|->|->|       |  |  Accept!(1,V)
+   |         |<---------X--X--X------>|->|  Accepted(1,V)
+   |         |          |  |  |       |  !  !! FAIL !!
+   |<---------------------------------X     Response
+   |         |          |  |  |       |
+
+---------------------------------------------------------
+The next failure case is when a Proposer fails after proposing a value, but before agreement is reached. Ignoring Leader election, an example message flow is as follows:
+---------------------
+Message flow: Basic Paxos, failure of Proposer
+--------------------
+Client  Proposer        Acceptor     Learner
+   |      |             |  |  |       |  |
+   X----->|             |  |  |       |  |  Request
+   |      X------------>|->|->|       |  |  Prepare(1)
+   |      |<------------X--X--X       |  |  Promise(1,{null, null, null})
+   |      |             |  |  |       |  |
+   |      |             |  |  |       |  |  !! Leader fails during broadcast !!
+   |      X------------>|  |  |       |  |  Accept!(1,Va)
+   |      !             |  |  |       |  |
+   |         |          |  |  |       |  |  !! NEW LEADER !!
+   |         X--------->|->|->|       |  |  Prepare(2)
+   |         |<---------X--X--X       |  |  Promise(2,{null, null, null})
+   |         X--------->|->|->|       |  |  Accept!(2,V)
+   |         |<---------X--X--X------>|->|  Accepted(2,V)
+   |<---------------------------------X--X  Response
+   |         |          |  |  |       |  |
+
+----------------------------------
+The most complex case is when multiple Proposers believe themselves to be Leaders. For instance the current leader may fail and later recover, but the other Proposers have already re-elected a new leader. The recovered leader has not learned this yet and attempts to begin a round in conflict with the current leader.
+a
+Message flow: Basic Paxos, dueling Proposers
+(one instance, four unsuccessful rounds)
+---------------------------------
+Client   Leader         Acceptor     Learner
+   |      |             |  |  |       |  |
+   X----->|             |  |  |       |  |  Request
+   |      X------------>|->|->|       |  |  Prepare(1)
+   |      |<------------X--X--X       |  |  Promise(1,{null,null,null})
+   |      !             |  |  |       |  |  !! LEADER FAILS
+   |         |          |  |  |       |  |  !! NEW LEADER (knows last number was 1)
+   |         X--------->|->|->|       |  |  Prepare(2)
+   |         |<---------X--X--X       |  |  Promise(2,{null,null,null})
+   |      |  |          |  |  |       |  |  !! OLD LEADER recovers
+   |      |  |          |  |  |       |  |  !! OLD LEADER tries 2, denied
+   |      X------------>|->|->|       |  |  Prepare(2)
+   |      |<------------X--X--X       |  |  Nack(2)
+   |      |  |          |  |  |       |  |  !! OLD LEADER tries 3
+   |      X------------>|->|->|       |  |  Prepare(3)
+   |      |<------------X--X--X       |  |  Promise(3,{null,null,null})
+   |      |  |          |  |  |       |  |  !! NEW LEADER proposes, denied
+   |      |  X--------->|->|->|       |  |  Accept!(2,Va)
+   |      |  |<---------X--X--X       |  |  Nack(3)
+   |      |  |          |  |  |       |  |  !! NEW LEADER tries 4
+   |      |  X--------->|->|->|       |  |  Prepare(4)
+   |      |  |<---------X--X--X       |  |  Promise(4,{null,null,null})
+   |      |  |          |  |  |       |  |  !! OLD LEADER proposes, denied
+   |      X------------>|->|->|       |  |  Accept!(3,Vb)
+   |      |<------------X--X--X       |  |  Nack(4)
+   |      |  |          |  |  |       |  |  ... and so on ...
+--------------------------------------------------
+   
+  

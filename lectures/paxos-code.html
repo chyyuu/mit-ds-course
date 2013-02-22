@@ -1,0 +1,36 @@
+
+<!-- saved from url=(0053)http://pdos.csail.mit.edu/6.824/notes/paxos-code.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><pre>
+        --- Paxos Proposer ---
+      	
+     1	proposer(v):
+     2	 choose n &gt; n<sub>p</sub>
+     3	 send prepare(n) to all servers including self
+     4	 if prepare_ok(n<sub>a</sub>, v<sub>a</sub>) from majority:
+     5	   v' = v<sub>a</sub> with highest n<sub>a</sub>; choose own v otherwise
+     6	   send accept(n, v') to all
+     7	   if accept_ok(n) from majority:
+     8	     send decided(v') to all
+      	
+        
+        --- Paxos Acceptor ---
+
+     9	acceptor state on each node (persistent):
+    10	 n<sub>p</sub>     --- highest prepare seen
+    11	 n<sub>a</sub>, v<sub>a</sub> --- highest accept seen
+      	
+    12	acceptor's prepare(n) handler:
+    13	 if n &gt; n<sub>p</sub>
+    14	   n<sub>p</sub> = n
+    15	   reply prepare_ok(n<sub>a</sub>, v<sub>a</sub>)
+      	
+      	
+    16	acceptor's accept(n, v) handler:
+    17	 if n &gt;= n<sub>p</sub>
+    18	   n<sub>p</sub> = n
+    19	   n<sub>a</sub> = n
+    20	   v<sub>a</sub> = v
+    21	   reply accept_ok(n)
+    	</pre>
+
+</body></html>

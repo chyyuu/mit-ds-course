@@ -27,3 +27,9 @@ type GetReply struct {
 
 
 // Your RPC definitions here.
+type KVArgs struct {
+  KV map[string]string
+}
+
+type KVReply struct {
+}

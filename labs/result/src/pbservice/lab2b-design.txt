@@ -1,0 +1,132 @@
+lab2b design
+NOTICE:
+==============================
+
+assume 
+--------------
+the viewservice never halts or crashes.
+
+
+plan from lab2 web page
+-------------------------
+1 You should start by modifying pbservice/server.go to Ping the viewservice to find the current view. Do this in the tick() function. Once a server knows the current view, it knows if it is the primary, the backup, or neither.
+2 Implement Put and Get handlers in pbservice/server.go; store keys and values in a map[string]string.
+3 Modify your Put handler so that the primary forwards updates to the backup.
+4 When a server becomes the backup in a new view, the primary should send it the primary's complete key/value database.
+5 Modify client.go so that clients keep re-trying until they get an answer. If the current primary doesn't respond, or doesn't think it's the primary, have the client consult the viewservice (in case the primary has changed) and try again. Sleep for viewservice.PingInterval between re-tries to avoid burning up too much CPU time.
+
+key point
+-------------------------
+
+It's crucial that only one primary be active at any given time.
+Ex:
+S1 is the primary; the viewservice changes views so that S2 is the primary; but S1 hasn't yet heard about the new view and thinks it is still primary. Then some clients might talk to S1, and others talk to S2, and not see each others' Put()s.
+
+
+A server that isn't the active primary should either not respond to clients, or respond with an error: it should set GetReply.Err or PutReply.Err to something other than O
+
+ensure that the backup sees every update to the key/value database, by a combination of the primary initializing it with the complete key/value database and forwarding subsequent client Puts.
+
+Important Structure
+====================
+type PBServer struct {
+  ...
+  // Your declarations here.
+  myview  viewservice.View
+  kv      map[string]string
+}
+
+
+active Case
+================
+init
+------------
+  pb.myview.Viewnum = 0
+  pb.kv = map[string]string{}
+  
+  
+control flow
+=====================
+
+client control logic
+=====================
+client get
+----------------
+for {
+ get prisrv
+ if prisrv OK
+   rpc prisrv GET
+   if get OK
+      return key
+ else
+   continue     
+      
+}
+
+client put
+----------------
+for {
+ get prisrv
+ if prisrv OK
+   rpc prisrv PUT
+   if get OK
+      return
+ else
+   continue     
+      
+}
+
+
+server control logic
+======================
+
+server get 
+--------------
+ do
+    get view from vsview
+ wile ok
+ 
+ if I am prisrv
+    if has key
+       set reply.value
+    else 
+       return NOKEY
+ return   
+
+ 
+server put
+--------------
+ do
+    get view from vsview
+ wile ok
+ 
+ if I am prisrv  //pb.me == vsview.Primary
+     set ks.value
+     if vs.view.Backup existed
+        do 
+          rpc  vs.view.Backup BACUPPUT  //may fail to backup and return 
+          if OK return
+          else
+             ping vs to get new view
+             if vs.view != myview
+                return
+        while  return value of( rpc  vs.view.Backup BACUPPUT) == OK  
+ else //I am not prisrv
+   reply.Err = ErrWrongServer      
+ 
+
+server tick
+-----------------
+     ping vsview    //update vs.view
+     if err return
+     
+     if pb.myview != vs.view // pri or srv or other changed!!!
+        if I'm pri and bak will change to pri //
+           prisrv rpc baksrv KV
+           if rpc call backsrv KV fail
+                 ping vsview   
+                 try rpc agian until ping vsview (return error or new vsview )
+                 
+        pb.myview = vs.view
+ 
+ 
