@@ -1,5 +1,56 @@
 6.824 2012 Lecture 14: Harp
+===================
+Harp: one of Robert's favored paper
+2b+1 --> tolerate b failure
 
+failures
+ . unreachable
+ . partitioned
+ . power failure
+ . Reboot, Ram disk intact
+ . Reboot lost disk
+
+   --->NFS-->   Primary           Log: one kind of operation
+C1              Backup            create, mkdir, read, ... 
+C2              B                   ----------
+                Witness             saved reply
+                w
+                
+talk a lot about below part, It's key part.              
+----------------------------------                
+GLB | < | LB < | AP < | CP < |FP
+-----------------------------------
+
+CP: most recently committed event record index.
+AP: most recently applied event record index.
+LB: largest index such that events with indices the LB are on local disk.
+GLB largest index such that events with indices the GLB are known to be on disk at
+    both the primary and the backup.
+
+
+CP is a  demarcation line of what ????
+the different means of gaps，need read paper with more attention
+-----------------------------------
+
+give a exmaple
+
+P   B    B    W    w
+S1  S2   S3   S4   S5
+
+example situlations:
+ . some B down
+ . S2/S2 be partitioned,  maybe 2 partition all can continue
+
+
+1) no other view
+2) know most recent view
+3) all ops from last view
+4) disk image plus a log
+
+----------------------------
+then Robert or students ask How /What ???
+
+----------------------------------------
 Replication in the Harp File System
 Liskov, Ghemawat, Gruber, Johnson, Shrira, Williams
 SOSP 1991
