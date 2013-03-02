@@ -35,6 +35,7 @@ type Paxos struct {
   l net.Listener
   dead bool
   unreliable bool
+  rpcCount int
   peers []string
   me int // index into peers[]
 
@@ -50,22 +51,26 @@ type Paxos struct {
 //
 // the return value is true if the server responded, and false
 // if call() was not able to contact the server. in particular,
-// the reply's contents are only valid if call() returned true.
+// the replys contents are only valid if call() returned true.
 //
 // you should assume that call() will time out and return an
-// error after a while if it doesn't get a reply from the server.
+// error after a while if it does not get a reply from the server.
 //
 // please use call() to send all RPCs, in client.go and server.go.
-// please don't change this function.
+// please do not change this function.
 //
 func call(srv string, name string, args interface{}, reply interface{}) bool {
-  c, errx := rpc.Dial("unix", srv)
-  if errx != nil {
+  c, err := rpc.Dial("unix", srv)
+  if err != nil {
+    err1 := err.(*net.OpError)
+    if err1.Err != syscall.ENOENT && err1.Err != syscall.ECONNREFUSED {
+      fmt.Printf("paxos Dial() failed: %v\n", err1)
+    }
     return false
   }
   defer c.Close()
     
-  err := c.Call(name, args, reply)
+  err = c.Call(name, args, reply)
   if err == nil {
     return true
   }
@@ -107,7 +112,7 @@ func (px *Paxos) Max() int {
 //
 // Min() should return one more than the minimum among z_i,
 // where z_i is the highest number ever passed
-// to Done() on peer i. A peer's z_i is -1 if it has
+// to Done() on peer i. A peers z_i is -1 if it has
 // never called Done().
 //
 // Paxos is required to have forgotten all information
@@ -122,13 +127,13 @@ func (px *Paxos) Max() int {
 // arguments in order to implement Min(). These
 // exchanges can be piggybacked on ordinary Paxos
 // agreement protocol messages, so it is OK if one
-// peer's Min doesn't reflect another Peer's Done()
+// peers Min does not reflect another Peers Done()
 // until after the next instance is agreed to.
 //
 // The fact that Min() is defined as a minimum over
-// *all* Paxos peers means that Min() can't increase until
+// *all* Paxos peers means that Min() cannot increase until
 // all peers have been heard from. So if a peer is dead
-// or unreachable, other peers' Min()s won't increase
+// or unreachable, other peers Min()s will not increase
 // even if all reachable peers call Done. The reason for
 // this is that when the unreachable peer comes back to
 // life, it will need to catch up on instances that it
@@ -144,7 +149,7 @@ func (px *Paxos) Min() int {
 // the application wants to know whether this
 // peer thinks an instance has been decided,
 // and if so what the agreed value is. Status()
-// should just inspect the local peer's state;
+// should just inspect the local peers state;
 // it should not contact other Paxos peers.
 //
 func (px *Paxos) Status(seq int) (bool, interface{}) {
@@ -168,7 +173,7 @@ func (px *Paxos) Kill() {
 //
 // the application wants to create a paxos peer.
 // the ports of all the paxos peers (including this one)
-// are in peers[]. this server's port is peers[me].
+// are in peers[]. this servers port is peers[me].
 //
 func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
   px := &Paxos{}
@@ -213,8 +218,10 @@ func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
             if err != nil {
               fmt.Printf("shutdown: %v\n", err)
             }
+            px.rpcCount++
             go rpcs.ServeConn(conn)
           } else {
+            px.rpcCount++
             go rpcs.ServeConn(conn)
           }
         } else if err == nil {
@@ -222,7 +229,6 @@ func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
         }
         if err != nil && px.dead == false {
           fmt.Printf("Paxos(%v) accept: %v\n", me, err.Error())
-          px.Kill()
         }
       }
     }()

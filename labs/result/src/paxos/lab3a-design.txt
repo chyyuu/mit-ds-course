@@ -1,0 +1,166 @@
+lab3a design
+
+NOTICE:
+==============================
+In this lab you'll fix the above problems by using Paxos to manage the replication of a key/value store.
+
+You won't have anything corresponding to a master view server. Instead, a set of replicas will process all client requests in the same order, using Paxos to agree on the order. Paxos will get the agreement right even if some of the replicas are unavailable, or have unreliable network connections, or even if subsets of the replicas are isolated in their own network partitions. 
+
+As long as Paxos can assemble a majority of replicas, it can process client operations. Replicas that were not in the majority can catch up later by asking Paxos for operations that they missed.
+
+
+Your Paxos library's interface supports an indefinite sequence of agreement "instances". The instances are numbered with sequence numbers. Each instance is either "decided" or not yet decided. A decided instance has a value. If an instance is decided, then all the Paxos peers that are aware that it is decided will agree on the same value for that instance. 
+
+HINTs:
+=========================================
+1. Add elements to the Paxos struct in paxos.go to hold the state you'll need, according to the lecture pseudo-code. You'll need to define a struct to hold information about each agreement instance.
+2. Define RPC argument/reply type(s) for Paxos protocol messages, based on the lecture pseudo-code. The RPCs must include the sequence number for the agreement instance to which they refer. Remember the field names in the RPC structures must start with capital letters.
+3. Write a proposer function that drives the Paxos protocol for an instance, and RPC handlers that implement acceptors. Start a proposer function in its own thread for each instance, as needed (e.g. in Start()).
+4. At this point you should be able to pass the first few tests.
+5. Now implement forgetting.
+
+
+Hint: more than one Paxos instance may be executing at a given time, and they may be Start()ed and/or decided out of order (e.g. seq 10 may be decided before seq 5).
+
+Hint: remember that multiple application peers may call Start() on the same instance, perhaps with different proposed values. An application may even call Start() for an instance that has already been decided.
+
+Hint: think about how your paxos will forget (discard) information about old instances before you start writing code. Each Paxos peer will need to store instance information in some data structure that allows individual instance records to be deleted (so that the Go garbage collector can free / re-use the memory).
+
+Hint: you do not need to write code to handle the situation where a Paxos peer needs to re-start after a crash. If one of your Paxos peers crashes, it will never be re-started.
+
+Hint: have each Paxos peer start a thread per un-decided instance whose job it is to eventually drive the instance to agreement, by acting as a proposer.
+
+Hint: a single Paxos peer may be acting simultaneously as acceptor and proposer for the same instance. Keep these two activities as separate as possible.
+
+Hint: a proposer needs a way to choose a higher proposal number than any seen so far. This is a reasonable exception to the rule that proposer and acceptor should be separate. It may also be useful for the propose RPC handler to return the highest known proposal number if it rejects an RPC, to help the caller pick a higher one next time. The px.me value will be different in each Paxos peer, so you can use px.me to help ensure that proposal numbers are unique.
+
+Hint: figure out the minimum number of messages Paxos should use when reaching agreement in non-failure cases and make your implementation use that minimum.
+
+
+
+Important Structure
+====================
+type Paxos struct {
+......
+  peers []string
+  me int // index into peers[]
+
+  seq_inst map[int]InstanceStatus   //key:seq value:instance
+  maxseq int
+  peers_doneseq map[string]int      //key: peers value:doneseq
+  doneseq int                       //done seq num
+}
+
+paxos control logic
+=====================
+
+Initial stage
+================
+Make() function: 
+--------------------------------
+An application calls Make(peers,me) to create a Paxos peer. The peers argument contains the ports of all the peers (including this one), and the me argument is the index of this peer in the peers array. Start(seq,v) asks Paxos to start agreement on instance seq, with proposed value v;
+--------------------------------
+  px := &Paxos{}
+  px.peers = peers
+  px.me = me
+
+
+  // Your initialization code here.
+  px.seq_inst = map[int]InstanceStatus{}
+  px.maxseq = -1
+  px.peers_doneseq = map[string]int{}
+  for _, val  := range px.peers {
+    px.peers_doneseq[val] = -1
+  }
+  px.doneseq = -1
+......
+
+
+Start() function:
+----------------------------------
+Start() should return immediately, without waiting for agreement to complete. 
+go routine is a good choice
+parameter  seq, val
+----------------------------------
+  if no px.seq_inst[seq] then create px.seq_inst[seq]
+
+  go px.go_proposer(seq,val)
+
+
+go_proposer() go routine will call px.Propose(seq, v) function
+------------------------------
+  choose n, unique and higher than any n seen so far  //CALL px.uniqueHigherNumber(seq)
+  send prepare(n) to all servers including self
+  if prepare_ok(n_a, v_a) from majority:
+    v' = v_a with highest n_a; choose own v otherwise
+    update px.seq_inst[seq].nPrepare
+    update px.peers_doneseq[peer] = preparereply.doneseq  //CALL px.updateDone
+    
+    send accept(n, v') to all
+    update px.seq_inst[seq].nAccept
+    update px.peers_doneseq[peer] = acceptreply.doneseq //CALL px.updateDone
+    
+    if accept_ok(n) from majority:
+      send decided(v') to all
+      update px.peers_doneseq[peer] = decidedreply.doneseq //CALL px.updateDone
+
+ 
+Status() function:
+----------------------------------------
+The application calls Status(seq) to find out whether the Paxos peer thinks the instance has reached agreement, and if so what the agreed value is. The application may call Status() for old instances (but see the discussion of Done() below).
+-----------------------------------------
+
+acceptor's state:
+  n_p (highest prepare seen)
+  n_a, v_a (highest accept seen)
+
+
+acceptor's prepare(n) handler:
+-------------------------------------
+  if n > n_p
+    n_p = n
+    reply prepare_ok(n_a, v_a)
+  else
+    reply prepare_reject
+
+
+acceptor's accept(n, v) handler:
+------------------------------------
+  if n >= n_p
+    n_p = n
+    n_a = n
+    v_a = v
+    reply accept_ok(n)
+  else
+    reply accept_reject
+
+
+
+General Test Instance
+===================
+ pxa[i] = Make(pxh, i, nil)
+ 
+ pxa[i].Start(seq, val)
+ 
+ waitn(pxa[]*Paxos, seq int, wanted int) 
+
+
+Test: Single proposer ...
+Test: Many proposers, same value ...
+Test: Many proposers, different values ...
+Test: Out-of-order instances ...
+Test: Deaf proposer ...
+Test: Forgetting ...
+Test: Lots of forgetting ...
+Test: Paxos frees forgotten instance memory ...
+Test: RPC counts aren't too high ...
+Test: Many instances ...
+Test: Minority proposal ignored ...
+Test: Many instances, unreliable RPC ...
+Test: No decision if partitioned ...
+Test: Decision in majority partition ...
+Test: All agree after full heal ...
+Test: One peer switches partitions ...
+Test: One peer switches partitions, unreliable ...
+Test: Many requests, changing partitions ...
+
