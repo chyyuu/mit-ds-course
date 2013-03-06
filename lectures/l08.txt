@@ -1,5 +1,15 @@
 6.824 2012 Lecture 18: SUNDR
+====================================
+3/5/13:SUNDR paper (OSDI04) writen by Jingyang Li
+First: continue to talk about spanner. Robert think this paper is interesting.
+talk baout TrueTime, the comparing of different times
 
+ now()-->[early, late]
+talk 55 mins on spanner
+now sundr paper
+seems sample then last two papers
+
+====================================
 Secure Untrusted Data Repository (SUNDR)
 Li, Krohn, Mazieres, and Shasha
 OSDI 2004
