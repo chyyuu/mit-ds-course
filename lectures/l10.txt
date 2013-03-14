@@ -1,5 +1,35 @@
 6.824 2012 Lecture 7: Release consistency
+===================
+3/12/13
 
+consistency model
+
+treadmarks solvers
+  false sharing -- two writes on the same page
+  write application - one byte write
+  
+write diffs
+
+Next goal: allow multiple writable copies
+
+release consistency (RC)
+
+acquire(l)
+  x=s'
+release(l)  -->broadcast write diff on release to all copies of page(S)
+  
+
+lazy release consistency
+
+the improtant part is tell the implementation and the demo/examplify the process
+
+Rules
+-----
+  1. every var protected
+  2. must lock  around write
+  3. must lock  around read(if you want to see the fresh data)
+
+===================
 Today:
   Lazy release consistency
   TreadMarks

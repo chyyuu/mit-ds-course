@@ -1,5 +1,34 @@
 6.824 2012 Lecture 8: Optimism, Causality, Vector Timestamps
+======================================
+lecture 11::03/14/2013
+causal order consistency
+vector timestamps
+file synchronizers
 
+-----------------------
+Do it first, fix later
+Replicas 
+
+
+causal consistancy
+
+If x causally precedes y
+    all see x than y
+
+vector timestamps  -- version vectors
+
+VT op
+ a<b -- Vi a[:] =< b[:] and Sj   a[j]=<B[j]
+
+highest seq from each host
+
+------------
+File Sync
+ No lost Updates
+
+
+2-120  quiz
+=================================================
 Consistency so far
   Concurrency forces us to to think about meaning of reads/writes
   Sequential consistency: everyone sees same read/write order (IVY)

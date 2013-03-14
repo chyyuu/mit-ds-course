@@ -36,3 +36,111 @@ talk lab2 info, and I missed this part. :(     (~60 mins)
 then talk the paper (http://pdos.csail.mit.edu/6.824/papers/bressoud-hypervisor.pdf), should read paper first, then I can better understand what RTM said  (~35 mins)
 student have several questions.
 Lab 2 Part A Due: Feb 15, 5:00pm  :(
+
+Tutor
+----------------
+feb 15
+TUT 2: Design project 1 (run by TAs)
+Preparation: Book section 2.5: "Case study: UNIX File System Layering and Naming"
+
+小班制，10人左右。
+王曦用近50分钟，讲解了fs的设计与实现（基于unix fs），觉得他已经算讲得很好了，但感到对没有学过操作系统的学生来说难度较大。
+
+
+lecture4
+--------------
+6.024::lec4::Robert Morris:: talk about lab2 design (he said simple, but I spend a lot of time), then paxos, very difficult to understand, even I read some materials before class. Robert talk about the implement framework of paxos and give some example. then ask to finish LAB3!
+
+
+lecture5
+--------------
+holiday
+
+lecture6
+--------------
+Robert Morris::lec6::2/26/13:: talk about paper: Replication in the Harp File System, key part: GLB | < | LB < | AP < | CP < |FP , then give some examples with the explain of key parts. then Robert or students ask How /What, etc. Hard for me to understand this paper. :(
+
+
+lecture7
+--------------
+||6.824::Lec7::02/28/13::Spanner: Google’s Globally-Distributed Database|| I'm lost. Even I read the translated Chinese paper of span and some cn webpage, I also didn't understand the internal of spanner. Hope when I finish lab4, I can know more. DS is harder than I envisage.
+
+lecture8
+--------------
+||6.824::Lec8::3/5/13:SUNDR paper (OSDI04) First: continue to talk about spanner. Robert think this paper is interesting. talk baout TrueTime, the comparing of different times now()-->[early, late] talk 55 mins on spanner. I need to understand. Now sundr paper, and it seems sample.
+
+lecture9
+--------------
+||6.824::Lec9::03/07/13
+consistency 
+ meaning of read/write
+ perf v.s. easy for prog
+intro:
+  --strict consistency
+  --sequential consistency
+Then discuss the paper of Prof. Kai Li (Memory Coherence in Shared Virtual Memory Systems )
+
+
+lecture10
+--------------
+||6.824::Lec10::3/12/13
+
+consistency model
+
+treadmarks solvers
+  false sharing -- two writes on the same page
+  write application - one byte write
+  
+write diffs
+
+Next goal: allow multiple writable copies
+
+release consistency (RC)
+
+acquire(l)
+  x=s'
+release(l)  -->broadcast write diff on release to all copies of page(S)
+  
+
+lazy release consistency
+
+the improtant part is tell the implementation and the demo/examplify the process
+
+Rules
+-----
+  1. every var protected
+  2. must lock  around write
+  3. must lock  around read(if you want to see the fresh data)
+  
+lecture11
+----------------
+||6.824::Lec11::3/14/13
+causal order consistency
+vector timestamps
+file synchronizers
+
+-----------------------
+Do it first, fix later
+Replicas 
+
+
+causal consistancy
+
+If x causally precedes y
+    all see x than y
+
+vector timestamps  -- version vectors
+
+VT op
+ a<b -- Vi a[:] =< b[:] and Sj   a[j]=<B[j]
+
+highest seq from each host
+
+------------
+File Sync
+ No lost Updates
+
+
+next time  Mid-term  quiz  in 2-190
+
+
