@@ -1,0 +1,136 @@
+lab3a design
+
+NOTICE:
+==============================
+PLAN:
+1. Fill in the Op struct in server.go with the "value" information that kvpaxos will use Paxos to agree on, for each client request. Op field names must start with capital letters. You should use Op structs as the agreed-on values -- for example, you should pass Op structs to Paxos Start(). Go's RPC can marshall/unmarshall Op structs; the call to gob.Register() in StartServer() teaches it how.
+------------------------
+type Op struct {
+  OpTyp string
+  ReqNum int64
+  Key string
+  Value string
+}
+------------------------
+
+2. Implement the Put() handler in server.go. It should enter a Put Op in the Paxos log (i.e., use Paxos to allocate a Paxos instance, whose value includes the key and value (so that other kvpaxoses know about the Put())).
+
+  arg := new(Op)
+  kv.px.Start(kv.DoneInst, *arg)
+  decided, ret = kv.px.Status(kv.DoneInst)
+  val = ret.(Op)
+
+  kv.mydb[arg.Key] = arg.Value
+
+  kv.history[arg.ReqNum] = ""
+      
+  kv.px.Done(kv.DoneInst)
+  kv.DoneInst++
+
+  return OK
+
+------------------------
+3. Implement a Get() handler. It should enter a Get Op in the Paxos log, and then "interpret" the the log before that point to make sure its key/value database reflects all recent Put()s.
+
+  arg := new(Op)
+  kv.px.Start(kv.DoneInst, *arg)
+  decided, ret = kv.px.Status(kv.DoneInst)
+  val = ret.(Op)
+
+  val = kv.mydb[arg.Key]
+
+  kv.history[arg.ReqNum] = val OR ""
+      
+  kv.px.Done(kv.DoneInst)
+  kv.DoneInst++
+ 
+  return OK, (val OR "")
+
+------------------------
+4. Add code to cope with duplicate client Put()s -- i.e. situations in which Put() in client.go sends the same request to multiple kvpaxos replicas. The Put() should execute just once.
+
+    if val, ok := kv.history[arg.ReqNum]; ok {
+      return OK, val
+    }
+
+
+HINTs:
+========================
+1. your server should try to assign the next available Paxos instance (sequence number) to each incoming client RPC. However, some other kvpaxos replica may also be trying to use that instance for a different client's operation. So the kvpaxos server has to be prepared to try different instances.
+
+2. your kvpaxos servers should not directly communicate; they should only interact with each other through the Paxos log.
+
+3. as in Lab 1, you will need to uniquely identify client operations to ensure that they execute just once.
+
+4. a kvpaxos server should not complete a Get() RPC if it is not part of a majority (so that it does not serve stale data). This means that each Get() (as well as each Put()) must involve Paxos agreement.
+
+5. don't forget to call the Paxos Done() method when a kvpaxos has processed an instance and will no longer need it or any previous instance.
+
+6. your code will need to wait for Paxos instances to complete agreement. The only way to do this is to periodically call Status(), sleeping between calls. How long to sleep? A good plan is to check quickly at first, and then more slowly:
+
+  to := 10 * time.Millisecond
+  for {
+    decided, _ := kv.px.Status(seq)
+    if decided {
+      ...
+      return 
+    }
+    time.Sleep(to)
+    if to < 10 * time.Second {
+      to *= 2
+    }
+  }
+  
+7. if one of your kvpaxos servers falls behind (i.e. did not participate in the agreement for some instance), it will later need to find out what (if anything) was agree to. A reasonable way to to this is to call Start(), which will either discover the previously agreed-to value, or cause agreement to happen. Think about what value would be reasonable to pass to Start() in this situation.
+
+
+Important Structure
+====================
+type KVPaxos struct {
+......
+
+  // Your definitions here.
+  // the key/value db
+  mydb map[string]string 
+  //historys of reqnum mapping to the value 
+  history map[int64]string
+  //The instance of done
+  DoneInst int
+}
+
+paxos control logic
+=====================
+
+Initial stage
+================
+MakeClerk() function:
+----------------------
+......
+ck.reqNum = (int64)(rand.Int31()) 
+......
+----------------------------------------------------------
+StartServer() function:
+----------------------------------
+  ......
+  kv.mydb = map[string]string{}
+  kv.history = map[int64]string{}
+  kv.DoneInst = 0
+  ......
+----------------------------------  
+
+
+General Test Instance
+===================
+
+Test: Basic put/get ...
+Test: Concurrent clients ...
+Test: server frees Paxos log memory...
+Test: No partition ...
+Test: Progress in majority ...
+Test: No progress in minority ...
+Test: Completion after heal ...
+Test: Basic put/get, unreliable ...
+Test: Sequence of puts, unreliable ...
+Test: Concurrent clients, unreliable ...
+Test: Tolerates holes in paxos sequence ...
+Test: Many clients, changing partitions ...

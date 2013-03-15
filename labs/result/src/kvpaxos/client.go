@@ -2,16 +2,20 @@ package kvpaxos
 
 import "net/rpc"
 import "time"
+import "math/rand"
 
 type Clerk struct {
   servers []string
   // You will have to modify this struct.
+  reqNum int64
 }
+
 
 func MakeClerk(servers []string) *Clerk {
   ck := new(Clerk)
   ck.servers = servers
   // You'll have to add code here.
+  ck.reqNum = (int64)(rand.Int31()) 
   return ck
 }
 
@@ -53,12 +57,15 @@ func call(srv string, rpcname string,
 //
 func (ck *Clerk) Get(key string) string {
   // You will have to modify this function.
+  reqNum := ck.reqNum
+  ck.reqNum++
 
   for {
     // try each known server.
     for _, srv := range ck.servers {
       args := &GetArgs{}
       args.Key = key
+      args.ReqNum = reqNum
       var reply GetReply
       ok := call(srv, "KVPaxos.Get", args, &reply)
       if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
@@ -76,12 +83,15 @@ func (ck *Clerk) Get(key string) string {
 //
 func (ck *Clerk) Put(key string, value string) {
   // You will have to modify this function.
+  reqNum := ck.reqNum
+  ck.reqNum++
 
   for {
     for _, srv := range ck.servers {
       args := &PutArgs{}
       args.Key = key
       args.Value = value
+      args.ReqNum = reqNum
       var reply PutReply
       ok := call(srv, "KVPaxos.Put", args, &reply)
       if ok && reply.Err == OK {

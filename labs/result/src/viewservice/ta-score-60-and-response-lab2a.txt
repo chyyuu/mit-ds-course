@@ -1,0 +1,26 @@
+Test: First primary ...
+  ... Passed
+Test: First backup ...
+  ... Passed
+Test: Backup takes over if primary fails ...
+  ... Passed
+Test: Restarted server becomes backup ...
+  ... Passed
+Test: Idle third server becomes backup if primary fails ...
+  ... Passed
+Test: Restarted primary treated as dead ...
+--- FAIL: Test1 (3.46 seconds)
+    test_test.go:155: expected primary=/var/tmp/824-1002/viewserver-49068-3, got /var/tmp/824-1002/viewserver-49068-1
+FAIL
+exit status 1
+FAIL    _/home/cg3/school/6.824/student-submissions/chyy/build/lab2a/viewservice    3.470s
+
+In looking at the code, it fails this test because it never
+checks to make sure that the viewnum that the primary is pinging
+with coinsides with the viewnum the viewserver thinks the primary
+should have.  At a higher level the test simulates the primary
+restarting by having the primary always ping with viewnum 0 --
+the server should recognize that the primary should be pinging
+with a larger viewnum and then recognize that a viewchange is
+necessary.
+

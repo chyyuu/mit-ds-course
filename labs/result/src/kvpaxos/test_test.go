@@ -71,7 +71,7 @@ func TestBasic(t *testing.T) {
   fmt.Printf("Test: Concurrent clients ...\n")
 
   for iters := 0; iters < 20; iters++ {
-    const npara = 30
+    const npara = 15
     var ca [npara]chan bool
     for nth := 0; nth < npara; nth++ {
       ca[nth] = make(chan bool)
@@ -101,6 +101,78 @@ func TestBasic(t *testing.T) {
   fmt.Printf("  ... Passed\n")
 
   time.Sleep(1 * time.Second)
+}
+
+func TestDone(t *testing.T) {
+  runtime.GOMAXPROCS(4)
+
+  const nservers = 3
+  var kva []*KVPaxos = make([]*KVPaxos, nservers)
+  var kvh []string = make([]string, nservers)
+  defer cleanup(kva)
+
+  for i := 0; i < nservers; i++ {
+    kvh[i] = port("done", i)
+  }
+  for i := 0; i < nservers; i++ {
+    kva[i] = StartServer(kvh, i)
+  }
+  ck := MakeClerk(kvh)
+  var cka [nservers]*Clerk
+  for pi := 0; pi < nservers; pi++ {
+    cka[pi] = MakeClerk([]string{kvh[pi]})
+  }
+
+  fmt.Printf("Test: server frees Paxos log memory...\n")
+
+  ck.Put("a", "aa")
+  check(t, ck, "a", "aa")
+
+  runtime.GC()
+  var m0 runtime.MemStats
+  runtime.ReadMemStats(&m0)
+  // rtm's m0.Alloc is 2 MB
+
+  sz := 1000000
+  items := 10
+
+  for iters := 0; iters < 2; iters++ {
+    for i := 0; i < items; i++ {
+      key := strconv.Itoa(i)
+      value := make([]byte, sz)
+      for j := 0; j < len(value); j++ {
+        value[j] = byte((rand.Int() % 100) + 1)
+      }
+      ck.Put(key, string(value))
+      check(t, cka[i % nservers], key, string(value))
+    }
+  }
+
+  // Put and Get to each of the replicas, in case
+  // the Done information is piggybacked on
+  // the Paxos proposer messages.
+  for iters := 0; iters < 2; iters++ {
+    for pi := 0; pi < nservers; pi++ {
+      cka[pi].Put("a", "aa")
+      check(t, cka[pi], "a", "aa")
+    }
+  }
+
+  time.Sleep(1 * time.Second)
+
+  runtime.GC()
+  var m1 runtime.MemStats
+  runtime.ReadMemStats(&m1)
+  // rtm's m1.Alloc is 45 MB
+
+  // fmt.Printf("  Memory: before %v, after %v\n", m0.Alloc, m1.Alloc)
+
+  allowed := m0.Alloc + uint64(nservers * items * sz * 2)
+  if m1.Alloc > allowed {
+    fmt.Printf("  You would fail this test if it were enabled (%v vs %v).\n", m1.Alloc, allowed)
+  }
+
+  fmt.Printf("  ... Passed\n")
 }
 
 func pp(tag string, src int, dst int) string {
@@ -280,38 +352,40 @@ func TestUnreliable(t *testing.T) {
 
   fmt.Printf("Test: Sequence of puts, unreliable ...\n")
 
-  const ncli = 30
-  var ca [ncli]chan bool
-  for cli := 0; cli < ncli; cli++ {
-    ca[cli] = make(chan bool)
-    go func(me int) {
-      ok := false
-      defer func() { ca[me] <- ok }()
-      sa := make([]string, len(kvh))
-      copy(sa, kvh)
-      for i := range sa {
-        j := rand.Intn(i+1)
-        sa[i], sa[j] = sa[j], sa[i]
+  for iters := 0; iters < 6; iters++ {
+  const ncli = 5
+    var ca [ncli]chan bool
+    for cli := 0; cli < ncli; cli++ {
+      ca[cli] = make(chan bool)
+      go func(me int) {
+        ok := false
+        defer func() { ca[me] <- ok }()
+        sa := make([]string, len(kvh))
+        copy(sa, kvh)
+        for i := range sa {
+          j := rand.Intn(i+1)
+          sa[i], sa[j] = sa[j], sa[i]
+        }
+        myck := MakeClerk(sa)
+        key := strconv.Itoa(me)
+        myck.Put(key, "0")
+        myck.Put(key, "1")
+        myck.Put(key, "2")
+        time.Sleep(100 * time.Millisecond)
+        if myck.Get(key) != "2" {
+          t.Fatalf("wrong value")
+        }
+        if myck.Get(key) != "2" {
+          t.Fatalf("wrong value")
+        }
+        ok = true
+      }(cli)
+    }
+    for cli := 0; cli < ncli; cli++ {
+      x := <- ca[cli]
+      if x == false {
+        t.Fatalf("failure")
       }
-      myck := MakeClerk(sa)
-      key := strconv.Itoa(me)
-      myck.Put(key, "0")
-      myck.Put(key, "1")
-      myck.Put(key, "2")
-      time.Sleep(100 * time.Millisecond)
-      if myck.Get(key) != "2" {
-        t.Fatalf("wrong value")
-      }
-      if myck.Get(key) != "2" {
-        t.Fatalf("wrong value")
-      }
-      ok = true
-    }(cli)
-  }
-  for cli := 0; cli < ncli; cli++ {
-    x := <- ca[cli]
-    if x == false {
-      t.Fatalf("failure")
     }
   }
 
@@ -320,7 +394,7 @@ func TestUnreliable(t *testing.T) {
   fmt.Printf("Test: Concurrent clients, unreliable ...\n")
 
   for iters := 0; iters < 20; iters++ {
-    const ncli = 30
+    const ncli = 15
     var ca [ncli]chan bool
     for cli := 0; cli < ncli; cli++ {
       ca[cli] = make(chan bool)
@@ -478,7 +552,9 @@ func TestManyPartition(t *testing.T) {
   done := false
 
   // re-partition periodically
+  ch1 := make(chan bool)
   go func() {
+    defer func() { ch1 <- true } ()
     for done == false {
       var a [nservers]int
       for i := 0; i < nservers; i++ {
@@ -534,8 +610,9 @@ func TestManyPartition(t *testing.T) {
     } (xcli)
   }
 
-  time.Sleep(10 * time.Second)
+  time.Sleep(20 * time.Second)
   done = true
+  <- ch1
   part(t, tag, nservers, []int{0,1,2,3,4}, []int{}, []int{})
 
   ok := true
