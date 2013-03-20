@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0049)http://d1.sina.com.cn/litong/zhitou/identity.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Identity Frame</title>
+</head>
+<body>
+    <object type="application/x-shockwave-flash" data="http://d1.sina.com.cn/litong/zhitou/storage.swf" width="1" height="1" id="flashStorage">
+        <param name="movie" value="storage.swf">
+        <param name="wmode" value="transparent">
+    </object>
+<script type="text/javascript">
+document.domain = "sina.com.cn";
+var ident = {};
+ident = {
+    flashStorage: function() {
+        if (navigator.appName.indexOf("Microsoft") != -1) {
+            return window["flashStorage"];
+        } else {
+            return document["flashStorage"];
+        }
+    },
+    getCookie: function(key) {
+        var c = document.cookie.split("; ");
+        for(var i = 0; i < c.length; i++) {
+            var d = c[i].split("=");
+            if(d[0] == key) {
+                return unescape(d[1]);
+            }
+        }
+        return '';
+    },
+    UserData: {
+        _data: null,
+        _defExpires: null,
+        _saveFile: null,
+        setDefExpires: function(expires) {
+            var This = this;
+            This._defExpires = expires || 365;
+        },
+        setSaveFile: function(s) {
+            var This = this;
+            This._saveFile = s || window.location.hostname;
+        },
+        _init: function() {
+            var This = this;
+            if(!This._data) {
+                try {
+                    This._data = document.createElement('input');
+                    This._data.type = "hidden";
+                    This._data.addBehavior("#default#userData"); //这里一定是#default#userData
+                    document.body.appendChild(This._data);
+                } catch(e) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        setItem: function(opt) { 
+            var This = this;
+            if(This._init()) {
+                This.setDefExpires(opt.e);
+                var expires = new Date();
+                expires.setDate(expires.getDate() + This._defExpires);
+                This._data.expires = expires.toUTCString();
+                This.setSaveFile(opt.file);
+                This._data.load(This._saveFile);
+                This._data.setAttribute(opt.key, opt.value);
+                This._data.save(This._saveFile);
+            }
+        },
+        getItem: function(opt) { 
+            var This = this;
+            if(This._init()) {
+                This.setSaveFile(opt.file);
+                This._data.load(This._saveFile);
+                return This._data.getAttribute(opt.key);
+            }
+        },
+        removeItem: function(opt) { 
+            var This = this;
+            if(This._init()) {
+                This.setSaveFile(opt.file);
+                This._data.load(This._saveFile);
+                This._data.removeAttribute(opt.key);
+                This._data.save(This._saveFile);
+            }
+        }
+    },
+    setLocalStorage: function(opt){ //opt={file: ,key: ,value: ,e: }
+        if(window.localStorage) {
+            localStorage.setItem(opt.key, opt.value);
+        } else {
+            ident.UserData.setItem(opt);
+        }
+    },
+    getLocalStorage: function(opt){ //opt={file: ,key: }
+        if(window.localStorage) {
+            return localStorage.getItem(opt.key);
+        } else {
+            return ident.UserData.getItem(opt);
+        }
+    },
+    removeLocalStorage: function(opt){ //opt={file: ,key: }
+        if(window.localStorage) {
+            if(opt.clear) localStorage.clear();
+            else localStorage.removeItem(opt.key);
+        } else {
+            ident.UserData.removeItem(opt);
+        }   
+    },
+    setFlashStorage: function(opt) {//opt={file: ,key: ,value: ,e: }
+        try{
+            ident.flashStorage().saveBaseCookie(opt.key, opt.value);
+        }catch(e){
+            return false;
+        }
+    },
+    getFlashStorage: function(opt){
+        try{
+            return ident.flashStorage().getBaseCookie(opt.key);
+        }catch(e){
+            return false;
+        }
+    },
+    post: function(url, params, onsuccess){
+        var queryString = "flashStorage=fs_"+params.SinaAdFlashKey+"&localStorage=ls_"+params.SinaAdLSKey+"&cookie=" + params.SINAGLOBAL;
+        var img = document.createElement("img");
+        img.width = 0;
+        img.height = 0;
+        img.src = url + "?" + queryString;
+        document.body.appendChild(img);
+    },
+    postNRS: function(url, params, onsuccess){
+        var queryString = "uid="+ params.uid +"&sinaglobal="+ params.mapid;
+        var scr = document.createElement("script");
+        scr.src = url + "?" + queryString;
+        document.body.appendChild(scr);
+        scr.onload = scr.onreadystatechange = function () {
+            var readyState = scr.readyState;
+            if('undefined' == typeof readyState || readyState == "loaded" || readyState == "complete") {
+                onsuccess(_nrs_uuid);
+                scr.onerror = scr.onload = scr.onreadystatechange = null;
+            }
+        };
+    },
+    init: function(){
+        var me = this,
+            gc = me.getCookie("SINAGLOBAL"),
+            uid = me.getCookie("SUP");
+        if(gc){
+            var fs = me.getFlashStorage({key:"SinaAdFlashKey"});
+            if(fs){
+
+            }else{
+                fs = gc;
+                me.setFlashStorage({key:"SinaAdFlashKey",value:gc});
+            }
+            var ls = me.getLocalStorage({key:"SinaAdLSKey"});
+            if(ls){
+                
+            }else{
+                ls = gc;
+                me.setLocalStorage({key:"SinaAdLSKey",value:gc});
+            }
+            var params = {
+                    "SinaAdFlashKey" : fs,
+                    "SinaAdLSKey" : ls,
+                    "SINAGLOBAL" : gc
+            };
+            var url = "http://cc.ads.sina.com.cn/flash_cookie";
+            me.post(url, params, function(){
+            
+            });
+            if(uid && document.referrer.match(/^http\:\/\/blog\.sina\.com\.cn\//)){
+                if(typeof uid == "string"){
+                    var SUPs = uid.split("&");
+                    for(var i = 0,il = SUPs.length; i < il; i++){
+                        if(SUPs[i].split("=")[0]=="uid"){
+                            uid = SUPs[i].split("=")[1];
+                            break;
+                        }
+                    }
+                }
+                mapid = ident.getCookie("SINAGLOBAL");
+                var url = "http://ads.ad.sina.com.cn/sina/uid";
+                var params = {
+                    "uid": uid,
+                    "mapid": mapid
+                }
+                me.postNRS(url, params, function(uid){
+                    if(uid){
+                        var imgNRS = document.createElement("img");
+                        imgNRS.width = 0;
+                        imgNRS.height = 0;
+                        imgNRS.src = "http://adclick-cn.imrworldwide.com/cgi-bin/m?ci=drop2012&cg=0&si=20121116s/" + uid;
+                        document.body.appendChild(imgNRS);
+                    }
+                }); 
+            }
+        }
+    }
+};
+setTimeout(function(){
+    ident.init();
+},2000);
+</script>
+
+
+<img width="0" height="0" src="flash_cookie"></body></html>

@@ -1,0 +1,31 @@
+var data={
+   isAD:true,
+   flashURL:'http://d3.sina.com.cn/litong/kuaijieweibo/yafeng/boke/sc/bk.swf', //flash source if use
+   clickUrl:'http://sina.allyes.com/main/adfclick?db=sina&bid=530628,596615,601891&cid=0,0,0&sid=604704&advid=13912&camid=92078&show=ignore&url=http://ad-apac.doubleclick.net/clk;268055754;93925934;z?http://sale.suning.com/images/advertise/003/sn315promise/index.html?utm_source=dl-huay-sina&utm_medium=bkbk&utm_campaign=paiqi',//click address
+   picURL:'http://d1.sina.com.cn/201303/11/480111_262255.gif', //background picture    
+   logurl:'http://1088.adsina.allyes.com/main/adfshow?user=AFP6_for_SINA|2012_add|2012_blog_fdtc_bk&db=sina&border=0&local=yes&js=ie',
+   isUseWb:false,
+   bloger:{	 
+	 id:'1951657750',
+	 name:'轻博客',
+	 isV:true,
+	 vType:2
+  },
+  addata:{	 
+	  appkey: "2034545597",
+	  ralateUid: "1951657750",
+	  title: "#Qing新年祝福#2012年求桃花？求多金？求瘦身？求船票？来Qing送出你的定制祝福吧，各种超炫心愿祝福卡片让你一求百应！",
+	  pic: "http://d1.sina.com.cn/litong/kuaijieweibo/yafeng/boke/sc/fxbk.jpg",
+	  searchPic:false,
+	  url: "http://qing.weibo.com/tag/%E6%96%B0%E5%B9%B4%E7%A5%9D%E7%A6%8F"
+   },
+   txtcontent:'精彩你的手机生活 与众不同的生活',
+   txturl:'http://sms.sina.com.cn/act/090819/zazhitoutiao.html',
+   //don't modify all following content
+   borderImg: 'http://d1.sina.com.cn/litong/kuaijieweibo/yafeng/boke/images/imgbgnn.gif', 
+   flashWidth:293,       
+   flashHeight:60, 	   
+   btnImg: 'http://d1.sina.com.cn/201007/09/237719_btn.gif'   
+};
+
+

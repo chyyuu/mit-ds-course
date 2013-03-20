@@ -1,5 +1,21 @@
 6.824 2012 Lecture 9: Eventual Consistency
+===========================================
+3/19/2013， discuss bayou paper
+Bayou的网络环境在现在看来有些过时。它的网络环境也是当时bayou没有采用 central server的一个原因。
 
+Straw man 1
+ merge DBs -pairwise
+ 
+cirtical Idea -- update functions
+ 
+Eventual consistency
+
+Idea-- ordered update log of upd funs   
+  Update ID: <time T, node ID>
+
+Lamport Clock and vector clock need to read more
+
+===========================================
 Managing Update Conflicts in Bayou, a Weakly Connected Replicated
 Storage System Terry, Theimer, Petersen, Demers, Spreitzer, Hauser,
 SOSP 95
