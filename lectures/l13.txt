@@ -1,5 +1,14 @@
 6.824 2012 Lecture 19: PNUTS
+----------------------------
+04-02-13:TA Naha gave this lecture
 
+per-record timeline consistency
+
+fault tolerant, even the whole site is down
+
+primary bakup system
+
+---------------------------
 Brian F. Cooper, Raghu Ramakrishnan, Utkarsh Srivastava, Adam
 Silberstein, Philip Bohannon, Hans-Arno Jacobsen, Nick Puz, Daniel
 Weaver and Ramana Yerneni. PNUTS: Yahoo!'s Hosted Data Serving

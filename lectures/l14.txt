@@ -1,5 +1,60 @@
 6.824 2012 Lecture 20: Dynamo
+==========================
+040413:Morris
+Dynamo
 
+Focus
+   SLA--99.9% of delay
+   temp failover
+   partitioned sites
+   always writeable
+
+   high avail --> replicas
+   always writable --> write just one replicas  //means cann't use paxos
+   always write + replicas + partition --> conflicting vsons
+
+Eventual consistency
+  divergent replicas
+  merge conflicts
+
+B+-
+  no "latest" vers
+  reads --> set of values
+  app average
+  no atomic ops
+
+  horp/spanner/FDS
+    sync repl
+ 
+  PNUTS
+    async repl
+    
+  Dynamo/FiCUS/Bayou
+    eventual consist
+
+
+get (key) --> {value} + "context"
+
+put(k,v,context)
+
+    
+
+partition -->how to split key space
+placement -->which servers for data chunk
+
+consistent hashing
+
+
+failures
+   permanent
+   temporary
+
+
+Quorum
+  goals- don't block
+    Sloppy Quorum
+
+============================
 Dynamo: Amazon's Highly Available Key-value Store
 DeCandia et al, SOSP 2007
 
