@@ -1,5 +1,12 @@
 6.824 2012 Lecture 11: two-phase commmit
+==========================
+漏了。听autin的eurosys 2013 presentation了, 
+radixvm，讲得很好。简单聊聊，他
+1 坚决不用windows, offcie...
+2 latex,beamer还不够，用inkscope画图，用javascript写动态的presentation
+3 对语言感兴趣，有啥学啥，包括lisp等。不觉得学习一种语言很困难。
 
+==========================
 Topic: fault-tolerance for distributed systems
   Yesterday: crash recovery for single system
   Today: crash recovery for distributed system

@@ -1,5 +1,14 @@
 6.824 2012 Lecture 4: RPC wrap-up; Plan 9
+=============
+漏了。但根据王鹏的述说进行了记录
+18,april, 2013: Prof. Robert Morris
+一个问题：plan9为何没有成果
+morris: plan9 的假定环境是有大机器有强大的cpu/mem/disk，plan9把小机器（类似NC）连接到大机器上使用，让用户感觉自己就拥有大机器。但计算机的发展是没有这样的大机器(不要考虑数据中心)，大机器用的也是类似的cpu(最多快2～3倍)。
 
+我个人理解：另外，网络也是问题，网络还达不到足够快且稳定。数据中心也无法提供一个大机器的幻象，如果要用好大机器，你还是需要分布式编程。除非你只是把data center当成是一个应用平台（比如qq, search等）
+
+golang的不少东西就是从plan9中来的。
+====================================
 How does the lab RPC library use threads?
 
 client classes:
